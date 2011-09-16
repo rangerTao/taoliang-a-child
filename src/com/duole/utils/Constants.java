@@ -76,7 +76,7 @@ public class Constants {
 	public static final String XML_VER = "ver";
 	
 	//refresh frequences.
-	public static final int frequence = 60000;
+	public static final int frequence = 180000;
 	
 	public static final long countInterval = 1000;
 	

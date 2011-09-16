@@ -27,7 +27,7 @@ public class UnLockScreenService extends Service{
 	@Override
 	public void onStart(Intent intent, int startId) {
 
-		acquireWakeLock();
+//		acquireWakeLock();
 		IntentFilter intentFilter = new IntentFilter(
 				"android.intent.action.SCREEN_ON");
 		Duole.appref.registerReceiver(brScreenOn, intentFilter);

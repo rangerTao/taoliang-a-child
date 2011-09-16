@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<com.duole.layout.ScrollLayout
-		xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/ScrollLayoutTest"
-		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:background="@drawable/bg86">
-	</com.duole.layout.ScrollLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="@drawable/bg86">
+	<RelativeLayout android:id="@+id/rlMain"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+		<com.duole.layout.ScrollLayout
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:id="@+id/ScrollLayoutTest" android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+		</com.duole.layout.ScrollLayout>
+		<LinearLayout android:id="@+id/llPageDividerTip"
+			android:layout_alignParentBottom="true" android:layout_height="40dip"
+			android:layout_width="wrap_content"
+			android:orientation="horizontal" android:layout_centerHorizontal="true"
+			android:baselineAligned="false" />
+	</RelativeLayout>
 </LinearLayout>

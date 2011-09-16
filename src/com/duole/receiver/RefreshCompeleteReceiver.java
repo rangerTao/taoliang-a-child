@@ -85,7 +85,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 							
 							appPage.setPadding(0, 10, 0, 0);
 							
-							appPage.setVerticalSpacing(20);
+							appPage.setVerticalSpacing(30);
 
 							appPage.setOnItemClickListener(Duole.appref.listener);
 							Duole.appref.mScrollLayout.addView(appPage);
