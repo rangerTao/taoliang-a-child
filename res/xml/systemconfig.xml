@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="@string/storage">
+		<Preference android:selectable="false" android:enabled="true"
+			android:key="preStorage"></Preference>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/network">
+		<CheckBoxPreference android:title="Wi-Fi"
+			android:selectable="true" android:enabled="true" android:key="preWIFI" />
+		<Preference android:title="@string/wifi_connection"
+			android:enabled="false" android:selectable="true" android:key="preListWifi" />
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="@string/system_tweak">
+		<Preference android:title="@string/volume_tweak"
+			android:key="preVolume"></Preference>
+		<Preference android:title="@string/bright_tweak"
+			android:key="preBright"></Preference>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/user_info"
+		android:key="pcUserInfo">
+		<Preference android:title="@string/device_id" android:key="preDeviceId"
+			android:selectable="false" android:enabled="false"></Preference>
+		<Preference android:title="@string/getting_user_info"
+			android:key="preGettingUserInfo"></Preference>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/security_title">
+		<Preference android:title="@string/security_changePasswd"
+			android:key="preSecurityChangePasswd"></Preference>
+
+		<Preference android:key="preCheckUpdate" android:title="@string/check_update"></Preference>
+		<Preference android:title="@string/security_exit"
+			android:key="preSecurityExit"></Preference>
+	</PreferenceCategory>
+
+
+</PreferenceScreen>

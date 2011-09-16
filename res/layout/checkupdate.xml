@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/relativeLayout1"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<ProgressBar android:layout_height="wrap_content"
+		android:layout_width="wrap_content" android:id="@+id/pbLoad"
+		android:layout_alignParentTop="true" android:layout_centerHorizontal="true"></ProgressBar>
+	<RelativeLayout android:layout_below="@+id/pbLoad"
+		android:visibility="gone" android:id="@+id/rlContent"
+		android:layout_width="wrap_content" android:layout_centerHorizontal="true"
+		android:layout_height="wrap_content">
+		<TextView android:layout_width="300dip"
+			android:layout_height="wrap_content" android:id="@+id/tvUpdate"
+			android:layout_centerHorizontal="true"
+			android:layout_alignParentLeft="true" android:text="TextView"></TextView>
+		<RelativeLayout android:layout_height="wrap_content"
+			android:layout_width="300dip" android:layout_below="@+id/tvUpdate"
+			android:orientation="horizontal">
+			<Button android:layout_width="wrap_content" android:id="@+id/btnConfirm" android:layout_alignParentLeft="true"
+				android:layout_marginLeft="50dip" android:layout_height="wrap_content"
+				android:text="@string/update_start"></Button>
+			<Button android:layout_width="wrap_content" android:id="@+id/btnCancel" android:layout_alignParentRight="true"
+				android:layout_marginRight="50dip" android:layout_height="wrap_content"
+				android:text="@string/btnNegative"></Button>
+		</RelativeLayout>
+	</RelativeLayout>
+</RelativeLayout>
+

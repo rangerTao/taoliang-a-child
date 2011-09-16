@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/llMusicPlayer" 
+	android:layout_width="match_parent" android:layout_height="match_parent">
+	<RelativeLayout android:id="@+id/relativeLayout1"
+		android:layout_height="wrap_content" android:layout_width="match_parent">
+		<ImageView android:layout_height="wrap_content" android:src="@drawable/icon"
+			android:layout_width="wrap_content" android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true" android:id="@+id/ivMusicThumb"></ImageView>
+		<TextView android:layout_height="wrap_content" android:text="TextView" style="@style/DuoleText"
+			android:layout_width="wrap_content" android:layout_below="@+id/ivMusicThumb"
+			android:layout_centerHorizontal="true" android:id="@+id/tvMusicTitle"></TextView>
+	</RelativeLayout>
+	
+</LinearLayout>
