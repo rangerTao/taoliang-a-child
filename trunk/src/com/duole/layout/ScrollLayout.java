@@ -1,5 +1,7 @@
 package com.duole.layout;
 
+import com.duole.Duole;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -30,6 +32,8 @@ public class ScrollLayout extends ViewGroup {
 	private int mTouchSlop;
 	private float mLastMotionX;
 	private float mLastMotionY;
+	private int last;
+	private int index;
 
 	public ScrollLayout(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -55,7 +59,7 @@ public class ScrollLayout extends ViewGroup {
 				final View childView = getChildAt(i);
 				if (childView.getVisibility() != View.GONE) {
 					final int childWidth = childView.getMeasuredWidth();
-					childView.layout(childLeft, 0, 
+					childView.layout(childLeft, 5, 
 							childLeft+childWidth, childView.getMeasuredHeight());
 					childLeft += childWidth;
 				}
@@ -68,7 +72,7 @@ public class ScrollLayout extends ViewGroup {
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {   
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);   
-  
+
         final int width = MeasureSpec.getSize(widthMeasureSpec);   
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);   
         if (widthMode != MeasureSpec.EXACTLY) {   
@@ -76,9 +80,9 @@ public class ScrollLayout extends ViewGroup {
         }   
   
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);   
-        if (heightMode != MeasureSpec.EXACTLY) {   
-            throw new IllegalStateException("ScrollLayout only can run at EXACTLY mode!");
-        }   
+//        if (heightMode != MeasureSpec.EXACTLY) {   
+//            throw new IllegalStateException("ScrollLayout only can run at EXACTLY mode!");
+//        }   
   
         // The children are given the same width and height as the scrollLayout   
         final int count = getChildCount();   
@@ -107,7 +111,10 @@ public class ScrollLayout extends ViewGroup {
     		mScroller.startScroll(getScrollX(), 0, 
     				delta, 0, Math.abs(delta)*2);
     		mCurScreen = whichScreen;
+    		
     		invalidate();		// Redraw the layout
+    		
+    		Duole.appref.setPageDividerSelected(last, index);
     	}
     }
     
@@ -165,10 +172,16 @@ public class ScrollLayout extends ViewGroup {
             
             if (velocityX > SNAP_VELOCITY && mCurScreen > 0) {   
                 // Fling enough to move left   
+
+				last = mCurScreen;
+				index = mCurScreen - 1;
+            	
                 snapToScreen(mCurScreen - 1);   
             } else if (velocityX < -SNAP_VELOCITY   
                     && mCurScreen < getChildCount() - 1) {   
                 // Fling enough to move right   
+				last= mCurScreen;
+				index =  mCurScreen + 1;
                 snapToScreen(mCurScreen + 1);   
             } else {   
                 snapToDestination();   
@@ -205,6 +218,7 @@ public class ScrollLayout extends ViewGroup {
 		case MotionEvent.ACTION_MOVE:
 			final int xDiff = (int)Math.abs(mLastMotionX-x);
 			if (xDiff>mTouchSlop) {
+				
 				mTouchState = TOUCH_STATE_SCROLLING;
 				
 			}

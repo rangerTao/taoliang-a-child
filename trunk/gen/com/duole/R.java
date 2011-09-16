@@ -15,37 +15,43 @@ public final class R {
         public static final int icon=0x7f020001;
         public static final int ke=0x7f020002;
         public static final int network=0x7f020003;
+        public static final int pagedivider=0x7f020004;
+        public static final int pagedividerselected=0x7f020005;
     }
     public static final class id {
-        public static final int ScrollLayoutTest=0x7f07000a;
+        public static final int ScrollLayoutTest=0x7f07000b;
         public static final int btnCancel=0x7f070008;
         public static final int btnConfirm=0x7f070007;
-        public static final int etNewPass=0x7f070010;
-        public static final int etNewPassConfirm=0x7f070012;
-        public static final int etOldPass=0x7f07000e;
-        public static final int etPassword=0x7f070017;
-        public static final int etUserName=0x7f070015;
+        public static final int etNewPass=0x7f070014;
+        public static final int etNewPassConfirm=0x7f070016;
+        public static final int etOldPass=0x7f070012;
+        public static final int etPassword=0x7f07001b;
+        public static final int etUserName=0x7f070019;
         public static final int ivAppIcon=0x7f070000;
+        public static final int ivBackground=0x7f07000f;
         public static final int ivKe=0x7f070001;
-        public static final int ivMusicThumb=0x7f070018;
-        public static final int llMusicPlayer=0x7f07000b;
-        public static final int musicGallery=0x7f07000c;
+        public static final int ivMusicThumb=0x7f07001c;
+        public static final int llMusicPlayer=0x7f07000d;
+        public static final int llPageDividerTip=0x7f07000c;
+        public static final int musicGallery=0x7f07000e;
         public static final int pbLoad=0x7f070004;
-        public static final int progressBar1=0x7f07001b;
+        public static final int progressBar1=0x7f07001f;
         public static final int relativeLayout1=0x7f070003;
         public static final int rlContent=0x7f070005;
-        public static final int textView1=0x7f07001a;
+        public static final int rlMain=0x7f07000a;
+        public static final int textView1=0x7f07001e;
         public static final int tvAppName=0x7f070002;
-        public static final int tvDeviceID=0x7f070013;
-        public static final int tvMusicTitle=0x7f070019;
-        public static final int tvNewPass=0x7f07000f;
-        public static final int tvNewPassConfirm=0x7f070011;
-        public static final int tvPassword=0x7f070016;
-        public static final int tvSSID=0x7f07001d;
-        public static final int tvTipOldPass=0x7f07000d;
+        public static final int tvDeviceID=0x7f070017;
+        public static final int tvIndex=0x7f070010;
+        public static final int tvMusicTitle=0x7f07001d;
+        public static final int tvNewPass=0x7f070013;
+        public static final int tvNewPassConfirm=0x7f070015;
+        public static final int tvPassword=0x7f07001a;
+        public static final int tvSSID=0x7f070021;
+        public static final int tvTipOldPass=0x7f070011;
         public static final int tvUpdate=0x7f070006;
-        public static final int tvUserName=0x7f070014;
-        public static final int vvVideoPlayer=0x7f07001c;
+        public static final int tvUserName=0x7f070018;
+        public static final int vvVideoPlayer=0x7f070020;
         public static final int wvFlash=0x7f070009;
     }
     public static final class layout {
@@ -54,12 +60,13 @@ public final class R {
         public static final int flashplayer=0x7f030002;
         public static final int main=0x7f030003;
         public static final int musicplayer=0x7f030004;
-        public static final int passwordinput=0x7f030005;
-        public static final int registerdevice=0x7f030006;
-        public static final int singlemusicplayer=0x7f030007;
-        public static final int updateprogress=0x7f030008;
-        public static final int videoplayer=0x7f030009;
-        public static final int wificonnection=0x7f03000a;
+        public static final int pagedividerselected=0x7f030005;
+        public static final int passwordinput=0x7f030006;
+        public static final int registerdevice=0x7f030007;
+        public static final int singlemusicplayer=0x7f030008;
+        public static final int updateprogress=0x7f030009;
+        public static final int videoplayer=0x7f03000a;
+        public static final int wificonnection=0x7f03000b;
     }
     public static final class string {
         public static final int about=0x7f060013;
