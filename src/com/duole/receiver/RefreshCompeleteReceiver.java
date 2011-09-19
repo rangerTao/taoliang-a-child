@@ -120,7 +120,6 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 							
 							PageDiv pd = Duole.appref.new PageDiv();
 							pd.ivPageDiv = (ImageView) view.findViewById(R.id.ivBackground);
-							pd.tvIndex = (TextView) view.findViewById(R.id.tvIndex);
 							view.setTag(pd);
 							
 							Duole.appref.llPageDivider.addView(view,i);
