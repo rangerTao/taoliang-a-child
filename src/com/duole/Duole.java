@@ -38,6 +38,7 @@ import com.duole.activity.BaseActivity;
 import com.duole.activity.PasswordActivity;
 import com.duole.asynctask.ItemListTask;
 import com.duole.layout.ScrollLayout;
+import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
 import com.duole.player.SingleMusicPlayerActivity;
 import com.duole.pojos.DuoleCountDownTimer;
@@ -55,7 +56,7 @@ public class Duole extends BaseActivity {
 
 	public static DuoleCountDownTimer gameCountDown;
 	public static DuoleCountDownTimer restCountDown;
-	LinearLayout llPageDivider;
+	public LinearLayout llPageDivider;
 	View view;
 	LayoutInflater inflater;
 	TextView tvIndex;
@@ -92,8 +93,9 @@ public class Duole extends BaseActivity {
 		mContext = this;
 //		SetFullScreen();
 		setContentView(R.layout.main);
-		 bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
-		 bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
+		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
+		bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
+		Constants.bmpKe = BitmapFactory.decodeResource(getResources(), R.drawable.ke);
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
 		startService(screenLock);
 		
@@ -110,6 +112,17 @@ public class Duole extends BaseActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		mScrollLayout.setOnScrolledListener(new OnScrolledListener(){
+
+			@Override
+			public void scrolled(final int last, final int index) {
+				
+				setPageDividerSelected(last,index);
+				
+			}
+			
+		});
 	}
 	
 	public void initContents()  throws Exception{
@@ -288,15 +301,18 @@ public class Duole extends BaseActivity {
 
 	}
 	
-	public void setPageDividerSelected(final int last,final int index){
+	void setPageDividerSelected(final int last,final int index){
+
 		mHandler.post(new Runnable(){
 
 			public void run() {
 				if(last != index){
 					view = llPageDivider.getChildAt(last);
-					pageDiv = (PageDiv) view.getTag();
-					pageDiv.ivPageDiv.setImageBitmap(bmp);
-					pageDiv.tvIndex.setText("");
+					if(view != null){
+						pageDiv = (PageDiv) view.getTag();
+						pageDiv.ivPageDiv.setImageBitmap(bmp);
+						pageDiv.tvIndex.setText("");
+					}
 					
 					view = llPageDivider.getChildAt(index);
 					pageDiv = (PageDiv) view.getTag();
@@ -304,9 +320,12 @@ public class Duole extends BaseActivity {
 					pageDiv.tvIndex.setText(index + 1 + "");
 				}else{
 					view = llPageDivider.getChildAt(index);
-					pageDiv = (PageDiv) view.getTag();
-					pageDiv.ivPageDiv.setImageBitmap(bmp2);
-					pageDiv.tvIndex.setText(index + 1 + "");
+					if(view != null){
+						pageDiv = (PageDiv) view.getTag();
+						pageDiv.ivPageDiv.setImageBitmap(bmp2);
+						pageDiv.tvIndex.setText(index + 1 + "");
+					}
+
 				}
 			}
 			
@@ -314,6 +333,7 @@ public class Duole extends BaseActivity {
 		
 		
 		
+	
 	}
 
 	public void getMusicList(ArrayList<Asset> assets) {
@@ -419,9 +439,9 @@ public class Duole extends BaseActivity {
 		super.onResume();
 	}
 	
-	class PageDiv {
-		ImageView ivPageDiv;
-		TextView tvIndex;
+	public class PageDiv {
+		public ImageView ivPageDiv;
+		public TextView tvIndex;
 	}
 
 }

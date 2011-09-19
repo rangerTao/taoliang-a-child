@@ -340,7 +340,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 				final EditText etPassword = new EditText(appref);
 				boolean isConfiged = false;
 				etPassword
-						.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+						.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD| InputType.TYPE_CLASS_TEXT);
 				List<WifiConfiguration> wificonfigs = wifiManager
 						.getConfiguredNetworks();
 				for (WifiConfiguration temp : wificonfigs) {
@@ -418,6 +418,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 														wifiManager
 																.saveConfiguration();
 														wifiPass.dismiss();
+														if(adWifi != null){
+															adWifi.dismiss();
+														}
 													} else {
 
 													}
@@ -426,6 +429,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 										}
 
 									}).create();
+					wifiPass.show();
 
 				}
 			}

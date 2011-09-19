@@ -2,6 +2,10 @@ package com.duole.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import android.graphics.Bitmap;
+import android.view.View;
 
 import com.duole.pojos.asset.Asset;
 
@@ -17,6 +21,12 @@ public class Constants {
 	public static ArrayList<Asset> AssetList;
 	public static ArrayList<Asset> MusicList;
 	public static ArrayList<Asset> DownLoadTaskList;
+	
+	//Bitmap constant
+	public static Bitmap bmpKe;
+	
+	//Asset item cache array.
+	public static HashMap<String,View> alAssetCache = new HashMap<String,View>();
 	
 	//Default num of items in one page.
 	public static int APP_PAGE_SIZE = 12;
@@ -76,7 +86,7 @@ public class Constants {
 	public static final String XML_VER = "ver";
 	
 	//refresh frequences.
-	public static final int frequence = 180000;
+	public static final int frequence = 60000;
 	
 	public static final long countInterval = 1000;
 	

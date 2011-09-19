@@ -1,6 +1,6 @@
 package com.duole.layout;
 
-import com.duole.Duole;
+import com.duole.listener.OnScrolledListener;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -17,6 +17,8 @@ public class ScrollLayout extends ViewGroup {
 	private static final String TAG = "TAG";
 	private Scroller mScroller;
 	private VelocityTracker mVelocityTracker;
+	
+	private OnScrolledListener scrolled;
 	
 	private boolean change = true;
 	
@@ -59,13 +61,20 @@ public class ScrollLayout extends ViewGroup {
 				final View childView = getChildAt(i);
 				if (childView.getVisibility() != View.GONE) {
 					final int childWidth = childView.getMeasuredWidth();
-					childView.layout(childLeft, 5, 
+					childView.layout(childLeft, 0, 
 							childLeft+childWidth, childView.getMeasuredHeight());
 					childLeft += childWidth;
 				}
 			}
 			
 			change = false;
+			
+			if(mCurScreen >= childCount){
+				scrolled.scrolled(childCount, childCount);
+			}else{
+				scrolled.scrolled(mCurScreen, mCurScreen);
+			}
+			
 		}
 	}
 
@@ -114,7 +123,7 @@ public class ScrollLayout extends ViewGroup {
     		
     		invalidate();		// Redraw the layout
     		
-    		Duole.appref.setPageDividerSelected(last, index);
+    		scrolled.scrolled(last, index);
     	}
     }
     
@@ -242,5 +251,9 @@ public class ScrollLayout extends ViewGroup {
 	//Refresh the view
 	public void refresh(){
 		change = true;
+	}
+	
+	public void setOnScrolledListener(com.duole.listener.OnScrolledListener scrolled){
+		this.scrolled = scrolled;
 	}
 }
