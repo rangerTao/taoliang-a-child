@@ -82,17 +82,26 @@ public class AssetItemAdapter extends BaseAdapter {
 			return convertView;
 		}
 		
+		if(Constants.alAssetCache.containsKey(asset.getId())){
+			return Constants.alAssetCache.get(asset.getId());
+		}
+		
 		if(!asset.getThumbnail().equals("")){
 			assItem.ivAssetThumb.setImageBitmap(BitmapFactory
 					.decodeFile(Constants.CacheDir
 							+ "/thumbnail/"	+ asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/"))));
 		}
 		
-		assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
+		assItem.ivKe.setImageBitmap(Constants.bmpKe);
 		// set the icon
 		
 		// set the app name
 		assItem.tvAssetName.setText(asset.getFilename());
+		
+		if(Constants.alAssetCache.size() < 50){
+			Constants.alAssetCache.put(asset.getId(), convertView);
+		}
+		
 
 		return convertView;
 	}

@@ -11,9 +11,9 @@
 			android:layout_height="wrap_content">
 		</com.duole.layout.ScrollLayout>
 		<LinearLayout android:id="@+id/llPageDividerTip"
-			android:layout_alignParentBottom="true" android:layout_height="40dip"
+			android:layout_alignParentBottom="true" android:layout_height="45dip"
 			android:layout_width="wrap_content"
-			android:orientation="horizontal" android:layout_centerHorizontal="true"
+			android:orientation="horizontal" android:layout_centerHorizontal="true" android:gravity="center_vertical"
 			android:baselineAligned="false" />
 	</RelativeLayout>
 </LinearLayout>

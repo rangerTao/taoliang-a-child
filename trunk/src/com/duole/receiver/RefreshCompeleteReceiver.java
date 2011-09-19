@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.duole.Duole;
+import com.duole.R;
+import com.duole.Duole.PageDiv;
 import com.duole.layout.ScrollLayout;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
@@ -17,9 +19,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class RefreshCompeleteReceiver extends BroadcastReceiver {
 
@@ -100,6 +106,25 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 						}
 						
 						
+					}
+					
+					int llChildCount = Duole.appref.llPageDivider.getChildCount();
+					if(PageCount <= llChildCount){
+						for(int i = llChildCount; i > PageCount ; i --){
+							Duole.appref.llPageDivider.removeViewAt(i - 1);
+						}
+					}else{
+						View view;
+						for(int i = llChildCount; i < PageCount ; i ++){
+							view = LayoutInflater.from(Duole.appref).inflate(R.layout.pagedividerselected, null);
+							
+							PageDiv pd = Duole.appref.new PageDiv();
+							pd.ivPageDiv = (ImageView) view.findViewById(R.id.ivBackground);
+							pd.tvIndex = (TextView) view.findViewById(R.id.tvIndex);
+							view.setTag(pd);
+							
+							Duole.appref.llPageDivider.addView(view,i);
+						}
 					}
 					
 					DuoleUtils.setChildrenDrawingCacheEnabled(Duole.appref.mScrollLayout,true);
