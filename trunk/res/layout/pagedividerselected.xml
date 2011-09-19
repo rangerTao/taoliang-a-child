@@ -3,8 +3,4 @@
 	android:layout_width="wrap_content" android:layout_height="wrap_content">
 	<ImageView android:id="@+id/ivBackground" android:background="@drawable/pagedivider"
 		android:layout_width="wrap_content" android:layout_height="wrap_content" />
-	<TextView android:id="@+id/tvIndex" android:layout_width="wrap_content" android:layout_alignTop="@+id/ivBackground"
-	android:layout_centerHorizontal="true"
-		android:layout_height="wrap_content" android:textColor="#FFFFFF"/>
-
 </RelativeLayout>

@@ -289,7 +289,6 @@ public class Duole extends BaseActivity {
 			
 			PageDiv pd = new PageDiv();
 			pd.ivPageDiv = (ImageView) view.findViewById(R.id.ivBackground);
-			pd.tvIndex = (TextView) view.findViewById(R.id.tvIndex);
 			view.setTag(pd);
 			
 			llPageDivider.addView(view);
@@ -311,19 +310,16 @@ public class Duole extends BaseActivity {
 					if(view != null){
 						pageDiv = (PageDiv) view.getTag();
 						pageDiv.ivPageDiv.setImageBitmap(bmp);
-						pageDiv.tvIndex.setText("");
 					}
 					
 					view = llPageDivider.getChildAt(index);
 					pageDiv = (PageDiv) view.getTag();
 					pageDiv.ivPageDiv.setImageBitmap(bmp2);
-					pageDiv.tvIndex.setText(index + 1 + "");
 				}else{
 					view = llPageDivider.getChildAt(index);
 					if(view != null){
 						pageDiv = (PageDiv) view.getTag();
 						pageDiv.ivPageDiv.setImageBitmap(bmp2);
-						pageDiv.tvIndex.setText(index + 1 + "");
 					}
 
 				}
