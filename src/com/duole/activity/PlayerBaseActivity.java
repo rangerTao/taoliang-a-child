@@ -19,7 +19,7 @@ public class PlayerBaseActivity extends BaseActivity{
 		switch(keyCode){
 		case KeyEvent.KEYCODE_HOME:
 			finish();
-			sendBroadcast(new Intent(Constants.Event_AppEnd));
+//			sendBroadcast(new Intent(Constants.Event_AppEnd));
 			break;
 		}
 		return super.onKeyDown(keyCode, event);

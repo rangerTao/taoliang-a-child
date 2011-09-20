@@ -11,10 +11,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONObject;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Environment;
 import android.provider.Settings.System;
@@ -431,7 +436,33 @@ public class DuoleUtils {
 		}
 
 		//Source file does not exists.
-		if (!asset.getUrl().equals("")) {
+		if(asset.getType().equals(Constants.RES_APK)){
+			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
+					asset.getUrl().lastIndexOf("/")));
+			
+			if(asset.getUrl().startsWith("http")){
+				return false;
+			}
+			if (!file.exists()) {
+				return true;
+			}else{
+				PackageManager pm = Duole.appref.getPackageManager();
+				file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+
+				PackageInfo info;
+				info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+				if(info != null){
+					List<PackageInfo> infos = pm.getInstalledPackages(0);
+					if(!infos.contains(infos)){
+						if(DuoleUtils.installApkFromFile(file)){
+							return false;
+						}else{
+							return true;
+						}
+					}
+				}
+			}
+		}else if (!asset.getUrl().equals("")) {
 			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
 			
@@ -606,5 +637,42 @@ public class DuoleUtils {
 			return false;
 		}
 
+	}
+	
+	//Get the music list from sources
+	public static void getMusicList(ArrayList<Asset> assets) {
+
+		Constants.MusicList = new ArrayList<Asset>();
+
+		for (Asset asset : assets) {
+			if (asset.getType().equals(Constants.RES_AUDIO)) {
+				Constants.MusicList.add(asset);
+			}
+		}
+
+	}
+	
+	/**
+	 * Install a apk from a file.
+	 * @param file
+	 * @return
+	 */
+	public static boolean installApkFromFile(File file){
+		try {
+			Process p = Runtime.getRuntime().exec("pm install " + file.getAbsolutePath());
+			p.waitFor();
+			int result = p.exitValue();
+			if(result == 0 ){
+				return true;
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return false;
 	}
 }

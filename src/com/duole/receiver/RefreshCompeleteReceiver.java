@@ -59,7 +59,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 						
 						DuoleUtils.addNetworkManager(temp);
 						
-						Duole.appref.getMusicList(temp);
+						DuoleUtils.getMusicList(temp);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

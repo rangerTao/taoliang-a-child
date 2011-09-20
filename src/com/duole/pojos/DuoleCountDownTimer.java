@@ -8,6 +8,7 @@ public abstract class DuoleCountDownTimer {
 	private final long mCountdownInterval;  
     private long mTotalTime;  
     private long mRemainTime;  
+    private boolean isRunning;
       
     public DuoleCountDownTimer(long millisInFuture, long countDownInterval) {  
         mTotalTime = millisInFuture;  
@@ -31,7 +32,10 @@ public abstract class DuoleCountDownTimer {
         mHandler.removeMessages(MSG_RUN);  
         mHandler.removeMessages(MSG_PAUSE);  
     }  
-    public final void resume() {  
+    public final void resume() {
+    	if(!isRunning){
+        	isRunning = true;
+    	}
         mHandler.removeMessages(MSG_PAUSE);  
         mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(MSG_RUN));  
     }  
@@ -78,4 +82,11 @@ public abstract class DuoleCountDownTimer {
         }  
     };  
 	
+    public boolean isRunning(){
+    	return isRunning;
+    }
+    
+    public void stop(){
+    	isRunning = false;
+    }
 }

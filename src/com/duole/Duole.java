@@ -91,7 +91,7 @@ public class Duole extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mContext = this;
-//		SetFullScreen();
+
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
 		bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
@@ -145,7 +145,7 @@ public class Duole extends BaseActivity {
 			new ItemListTask().execute();
 
 		} else {
-			Toast.makeText(this, "No TF Card", 2000).show();
+			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
 			
 			IntentFilter intentFilter = new IntentFilter(
 			"android.intent.action.MEDIA_MOUNTED");
@@ -192,6 +192,9 @@ public class Duole extends BaseActivity {
 
 			@Override
 			public void onTick(long millisUntilFinished, int percent) {
+				
+				Log.v("TAG", "remains " + millisUntilFinished);
+				
 			}
 
 			@Override
@@ -201,7 +204,7 @@ public class Duole extends BaseActivity {
 				this.setTotalTime(Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000);
 				this.seek(0);
 				restCountDown.start();
-				// appref.startMusicPlay();
+				appref.startMusicPlay();
 			}
 
 		};
@@ -237,7 +240,6 @@ public class Duole extends BaseActivity {
 				if(d != null){
 					mScrollLayout.setBackgroundDrawable(d);
 				}
-				
 			}
 		}
 	}
@@ -360,11 +362,8 @@ public class Duole extends BaseActivity {
 
 			try {
 				// launcher the package
-				
-				
-
 				if (assItem.getType().equals(Constants.RES_AUDIO)) {
-					//intent = new Intent(appref, SingleMusicPlayerActivity.class);
+
 					intent = new Intent(appref , SingleMusicPlayerActivity.class);
 					int index = Constants.MusicList.indexOf(assItem);
 
@@ -380,8 +379,6 @@ public class Duole extends BaseActivity {
 					intent.putExtra("type", "0");
 				}else{
 
-					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
-
 					intent = new Intent(appref, FlashPlayerActivity.class);
 
 					if (assItem.getUrl().startsWith("http:")) {
@@ -393,6 +390,11 @@ public class Duole extends BaseActivity {
 										assItem.getUrl().lastIndexOf("/")));
 					}
 				}
+				
+				if(!appref.gameCountDown.isRunning()){
+					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
+				}
+				
 
 				mContext.startActivity(intent);
 			} catch (ActivityNotFoundException noFound) {

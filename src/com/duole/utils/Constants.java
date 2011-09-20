@@ -21,9 +21,12 @@ public class Constants {
 	public static ArrayList<Asset> AssetList;
 	public static ArrayList<Asset> MusicList;
 	public static ArrayList<Asset> DownLoadTaskList;
+	public static ArrayList<Asset> temp;
 	
 	//Bitmap constant
 	public static Bitmap bmpKe;
+	public static Bitmap bmpPageDivider;
+	public static Bitmap bmpPageDividerSelected;
 	
 	//Asset item cache array.
 	public static HashMap<String,View> alAssetCache = new HashMap<String,View>();
