@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
 import com.duole.pojos.adapter.AssetItemAdapter;
+import com.duole.pojos.adapter.MusicItemAdapter;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleUtils;
 
@@ -49,7 +50,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 
 		gallery.setOnItemSelectedListener(this);
 		
-		gallery.setAdapter(new AssetItemAdapter(Constants.MusicList));
+		gallery.setAdapter(new MusicItemAdapter(Constants.MusicList));
 		
 		mp = new MediaPlayer();
 		
