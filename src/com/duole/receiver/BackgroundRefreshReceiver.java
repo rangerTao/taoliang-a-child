@@ -35,6 +35,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					}
 				}else{
 					Constants.SLEEP_TIME = false;
+					Duole.appref.sendBroadcast(new Intent("com.duole.restime.out"));
 				}
 			}catch(Exception e){
 				Constants.SLEEP_TIME = false;
