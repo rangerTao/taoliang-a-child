@@ -223,6 +223,7 @@ public class Duole extends BaseActivity {
 				Constants.ENTIME_OUT = false;
 				this.setTotalTime(Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000);
 				this.seek(0);
+				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
 
 		};
@@ -391,7 +392,7 @@ public class Duole extends BaseActivity {
 					}
 				}
 				
-				if(!appref.gameCountDown.isRunning()){
+				if(!Constants.ENTIME_OUT){
 					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
 				}
 				
