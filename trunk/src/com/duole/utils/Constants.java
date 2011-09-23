@@ -14,9 +14,10 @@ public class Constants {
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
-	public static final String Duole = "http://www.duoleyuan.com";
+	public static final String Duole = "http://www.67sh.com";
 	
 	public static final String ItemList = CacheDir + "itemlist.xml";
+	public static final String SystemConfigFile = CacheDir + "config.xml";
 	
 	public static ArrayList<Asset> AssetList;
 	public static ArrayList<Asset> MusicList;

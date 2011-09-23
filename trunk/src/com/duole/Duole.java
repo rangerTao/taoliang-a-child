@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
@@ -192,14 +193,10 @@ public class Duole extends BaseActivity {
 
 			@Override
 			public void onTick(long millisUntilFinished, int percent) {
-				
-				Log.v("TAG", "remains " + millisUntilFinished);
-				
 			}
 
 			@Override
 			public void onFinish() {
-//				appref.startMusicPlay();
 				Constants.ENTIME_OUT = true;
 				this.setTotalTime(Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000);
 				this.seek(0);
@@ -246,11 +243,12 @@ public class Duole extends BaseActivity {
 	}
 
 	public void initViews() throws IOException, TransformerException,
-			SAXException, XmlPullParserException {
+			SAXException, XmlPullParserException, ParserConfigurationException {
 
 		// get all apps
 		Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
 				+ "itemlist.xml");
+		XmlUtils.readConfiguration();
 		ArrayList<Asset> temp = new ArrayList<Asset>();
 		temp.addAll(Constants.AssetList);
 		DuoleUtils.checkFilesExists(temp);
@@ -277,7 +275,7 @@ public class Duole extends BaseActivity {
 
 			appPage.setNumColumns(Constants.COLUMNS);
 
-			appPage.setPadding(0, 10, 0, 0);
+			appPage.setPadding(20, 10, 0,20);
 
 			appPage.setVerticalSpacing(30);
 

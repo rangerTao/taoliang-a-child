@@ -65,7 +65,6 @@ public class ItemListTask extends AsyncTask {
 					hmSource, Constants.AssetList);
 			
 			Constants.DownLoadTaskList = new ArrayList<Asset>();
-			Log.v("TAG", "start to get download list");
 			if (Constants.AssetList != null && Constants.AssetList.size() > 0) {
 				for (int i = 0; i < Constants.AssetList.size(); i++) {
 					Asset ass = Constants.AssetList.get(i);
@@ -97,8 +96,6 @@ public class ItemListTask extends AsyncTask {
 			}
 		}
 
-		
-
 		Log.v("TAG", Constants.DownLoadTaskList.size() + " downloads");
 		Log.v("TAG", alAssetDeleteList.size()  + " deletes");
 		if (alAssetDeleteList.size() > 0) {
@@ -122,16 +119,16 @@ public class ItemListTask extends AsyncTask {
 	public boolean getSourceList() {
 		try {
 			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
-			"http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
+			"http://www.67sh.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
 			JSONObject jsonObject = new JSONObject(result);
-			Log.v("TAG", result);
 			String error = null;
 			try {
 				error = jsonObject.getString("errstr");
 			} catch (Exception e) {
+				Constants.DOWNLOAD_RUNNING = false;
 				e.printStackTrace();
 			}
 
@@ -143,6 +140,7 @@ public class ItemListTask extends AsyncTask {
 				try{
 					JsonUtils.parserJson(alAsset, jsonObject);
 				}catch(Exception e){
+					Constants.DOWNLOAD_RUNNING = false;
 					e.printStackTrace();
 				}
 				
@@ -150,6 +148,7 @@ public class ItemListTask extends AsyncTask {
 
 			return true;
 		} catch (Exception e) {
+			Constants.DOWNLOAD_RUNNING = false;
 			Log.v("TAG", e.getMessage());
 			return false;
 		}
@@ -172,7 +171,7 @@ public class ItemListTask extends AsyncTask {
 				try {
 					
 					if(checkUserName()){
-						String url = "http://www.duoleyuan.com/e/enews/?enews=BindCmcode&username=" +
+						String url = "http://www.67sh.com/e/enews/?enews=BindCmcode&username=" +
 								etUserName.getText().toString() +
 								"&password=" +
 								etPassword.getText().toString() +

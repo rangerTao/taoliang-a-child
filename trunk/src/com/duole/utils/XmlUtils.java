@@ -27,7 +27,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.util.Xml;
 
 import com.duole.Duole;
@@ -56,9 +55,55 @@ public class XmlUtils {
 		transformer.transform(domSource, streamResult);
 
 	}
+	
+	public static void initConfiguration(String path,DocumentBuilder dBuilder,
+			File file) throws SAXException, IOException, TransformerException {
+
+		try {
+			File itemlist = new File(Constants.SystemConfigFile);
+			if(!itemlist.exists()){
+				itemlist.createNewFile();
+			}
+			FileInputStream iStream = new FileInputStream(itemlist);
+			Document document = dBuilder.newDocument();
+
+			Text value = document.createTextNode("");
+			// new elements
+			Element newElement = document.createElement("items");
+
+			newElement.appendChild(value);
+			
+			document.appendChild(newElement);
+//			document.getDocumentElement().appendChild(newElement);
+
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource domSource = new DOMSource(document);
+
+			StreamResult streamResult = new StreamResult(itemlist);
+			transformer.transform(domSource, streamResult);
+			iStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+	
+		
+		
+		
+		
+		
+	}
 
 	public static ArrayList<Asset> readFile(String filePath,
-			DocumentBuilder dBuilder) throws SAXException, IOException, XmlPullParserException {
+			DocumentBuilder dBuilder) throws SAXException, IOException, XmlPullParserException, TransformerException, ParserConfigurationException {
 
 		ArrayList<Asset> result = new ArrayList<Asset>();
 		
@@ -153,12 +198,60 @@ public class XmlUtils {
 					dBuilder);
 		}
 		 
-		
 		return result;
+	}
+	
+	/**
+	 * Get the configuration from config.xml
+	 * @param filePath
+	 * @param dBuilder
+	 * @return
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws XmlPullParserException
+	 * @throws TransformerException 
+	 * @throws ParserConfigurationException 
+	 */
+	public static void readConfiguration() throws SAXException, IOException, XmlPullParserException, TransformerException, ParserConfigurationException {
+		
+		File file = new File(Constants.SystemConfigFile);
+
+		try{
+			
+			FileInputStream iStream = new FileInputStream(file);
+
+			XmlPullParser parser = Xml.newPullParser();
+			
+			parser.setInput(iStream, "UTF-8");
+			
+			int event = parser.getEventType();
+			Asset asset = null;
+			
+			while(event!=XmlPullParser.END_DOCUMENT){
+				switch(event){
+				case XmlPullParser.START_DOCUMENT:
+					break;
+				case XmlPullParser.START_TAG:
+					if(Constants.XML_PASSWORD.equals(parser.getName())){
+						Constants.System_Password = parser.nextText();
+					}
+					break;
+				case XmlPullParser.END_TAG:
+					break;
+				}
+				event = parser.next();
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			file.delete();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
+			initConfiguration(Constants.SystemConfigFile,dBuilder,file);
+		}
 	}
 
 	public static ArrayList<Asset> readXML(InputStream is, String filePath)
-			throws IOException, TransformerException, SAXException, XmlPullParserException {
+			throws IOException, TransformerException, SAXException, XmlPullParserException, ParserConfigurationException {
 
 		ArrayList<Asset> result = null;
 		StringBuffer sbresult = new StringBuffer();
@@ -468,6 +561,12 @@ public class XmlUtils {
 
 	}
 	
+	/**
+	 * update a node in file itemlist.xml
+	 * @param name
+	 * @param value
+	 * @return
+	 */
 	public static boolean updateSingleNode(String name,String value){
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -496,6 +595,47 @@ public class XmlUtils {
 			transformer.transform(domSource, streamResult);
 			iStream.close();
 		}catch(Exception e){
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Update a node in file.
+	 * @param file
+	 * @param name
+	 * @param value
+	 * @return
+	 */
+	public static boolean updateSingleNode(String file,String name,String value){
+		
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
+			FileInputStream iStream = new FileInputStream(new File(file));
+			Document document = dBuilder.parse(iStream);
+			
+			NodeList nl;
+			if (!value.equals("")){
+				nl = document.getElementsByTagName(name);
+				if(nl.getLength() > 0){
+					nl.item(0).getFirstChild().setNodeValue(value);
+				}else{
+					createNode(document,name,value);
+				}
+			}   
+
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource domSource = new DOMSource(document);
+
+			StreamResult streamResult = new StreamResult(new File(file));
+			transformer.transform(domSource, streamResult);
+			iStream.close();
+		}catch(Exception e){
+			
 			return false;
 		}
 		

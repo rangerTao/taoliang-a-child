@@ -146,4 +146,20 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		super.onDestroy();
 	}
 
+
+	@Override
+	protected void onPause() {
+		mp.pause();
+		super.onPause();
+	}
+
+
+	@Override
+	protected void onResume() {
+		mp.start();
+		super.onResume();
+	}
+	
+	
+
 }
