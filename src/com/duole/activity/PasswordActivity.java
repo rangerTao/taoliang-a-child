@@ -169,7 +169,7 @@ public class PasswordActivity extends BaseActivity {
 									}).show();
 				} else {
 					Constants.System_Password = newpass;
-					if (XmlUtils.updateSingleNode(Constants.XML_PASSWORD,
+					if (XmlUtils.updateSingleNode(Constants.SystemConfigFile ,Constants.XML_PASSWORD,
 							newpass)) {
 						Toast.makeText(appref, R.string.password_set_success,
 								2000).show();

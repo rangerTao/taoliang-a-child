@@ -287,7 +287,7 @@ public class DuoleUtils {
 				return new URL(url);
 
 			} else {
-				url = "http://www.duoleyuan.com" + url;
+				url = "http://www.67sh.com" + url;
 				return new URL(url);
 			}
 		} catch (MalformedURLException e) {
@@ -570,6 +570,7 @@ public class DuoleUtils {
     		String type = asset.getType();
     		String thumb = asset.getThumbnail();
     		String path = asset.getUrl();
+
     		File file = null;
     		if(!thumb.equals("")){
     			file = new File(Constants.CacheDir + Constants.RES_THUMB + thumb.substring(thumb.lastIndexOf("/")));
@@ -607,7 +608,7 @@ public class DuoleUtils {
 	public static boolean getSourceList(ArrayList<Asset> alAsset) {
 		try {
 			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
-			"http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
+			"http://www.67sh.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
