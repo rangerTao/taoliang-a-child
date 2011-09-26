@@ -1,5 +1,6 @@
 package com.duole.pojos;
 
+import android.R.integer;
 import android.os.Handler;
 import android.os.Message;
 
@@ -88,5 +89,27 @@ public abstract class DuoleCountDownTimer {
     
     public void stop(){
     	isRunning = false;
+    }
+    
+    public String getRemainTime(){
+    	
+    	StringBuffer sb =  new StringBuffer();
+    	int seconds = (int) (mRemainTime / 1000);
+    	int mins = seconds /60;
+    	int second = seconds % 60;
+    	
+    	if(mins < 10){
+    		sb.append("0" + mins);
+    	}else{
+    		sb.append(mins);
+    	}
+    	sb.append(":");
+    	if(second < 10){
+    		sb.append("0" + second);
+    	}else{
+    		sb.append(second);
+    	}
+    	
+    	return sb.toString();
     }
 }

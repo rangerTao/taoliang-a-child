@@ -4,6 +4,10 @@
 		<Preference android:selectable="false" android:enabled="true"
 			android:key="preStorage"></Preference>
 	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/anti_fatigure">
+		<Preference android:title="@string/enterteiment" android:enabled="true" android:key="preTimeEclipsed"/>
+		<Preference android:title="@string/sleep" android:selectable="false" android:enabled="true" android:key="preSleep"/>
+	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/network">
 		<CheckBoxPreference android:title="Wi-Fi"
 			android:selectable="true" android:enabled="true" android:key="preWIFI" />

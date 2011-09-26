@@ -9,6 +9,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
+
 import com.duole.utils.Constants;
 
 public class BackgroundRefreshService extends Service{
@@ -41,7 +43,7 @@ public class BackgroundRefreshService extends Service{
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-
+		Log.v("TAG", "background refresh start");
 		super.onStart(intent, startId);
 	}
 	
