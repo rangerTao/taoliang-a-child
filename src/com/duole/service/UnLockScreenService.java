@@ -67,7 +67,6 @@ public class UnLockScreenService extends Service{
 
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
-			Log.v("TAG", "button clicked");
 			KeyguardManager keyguardManager = (KeyguardManager) Duole.appref.getSystemService(Context.KEYGUARD_SERVICE);
 			KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("");
 			keyguardLock.disableKeyguard();

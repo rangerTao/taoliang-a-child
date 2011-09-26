@@ -1,5 +1,15 @@
 package com.duole.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.RandomAccess;
+
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+
 import android.util.Log;
 
 import com.duole.pojos.asset.Asset;
@@ -18,11 +28,14 @@ public class DownloadFileUtils extends Thread {
 
 		int listsize = Constants.DownLoadTaskList.size();
 		// If there are several task in the list.
-
-		if (listsize > 0) {
-			for (int i = 0; i < listsize; i++) {
-				download(i);
+		try{
+			if (listsize > 0) {
+				for (int i = 0; i < listsize; i++) {
+					download(i);
+				}
 			}
+		}catch(Exception e){
+			Log.v("TAG", e.getMessage());
 		}
 		return true;
 	}
@@ -65,6 +78,87 @@ public class DownloadFileUtils extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static boolean downloadCacheFile(URL url, File cacheFile){
+		
+		try{
+			// Open a connection.
+			URLConnection conn = url.openConnection();
+			// get the size of file.
+			int fileSize = conn.getContentLength();
+
+			byte[] buffer = new byte[8 * 1024];
+
+			InputStream bis = null;
+			FileOutputStream fos = null;
+
+			// Create a file.
+			cacheFile.createNewFile();
+
+			bis = conn.getInputStream();
+			fos = new FileOutputStream(cacheFile);
+			int len = 0;
+			while ((len = bis.read(buffer)) != -1) {
+				fos.write(buffer, 0, len);
+			}
+			fos.close();
+			bis.close();
+			
+			return true;
+		}catch(Exception e){
+			return false;
+		}
+		
+		
+	}
+	
+	public static boolean resumeDownloadCacheFile(URL url, File cacheFile) {
+		try {
+			
+			RandomAccessFile rAccess = new RandomAccessFile(cacheFile.getAbsoluteFile(),"rw");
+			InputStream bis = null;
+			FileOutputStream fos = null;
+			long localSize = cacheFile.length();
+			
+			rAccess.seek(localSize);
+			
+			// Open a connection.
+			URLConnection conn = url.openConnection();
+
+			
+			
+			conn.setAllowUserInteraction(true); 
+			conn.setRequestProperty("RANGE","bytes=" + localSize + "-");
+			
+			Log.v("TAG", cacheFile.getName() + localSize);
+			// get the size of file.
+			int fileSize = conn.getContentLength();
+
+			
+			//set the resume point of the file
+			if(fileSize != localSize){
+				
+				
+				byte[] buffer = new byte[8 * 1024];
+
+				bis = conn.getInputStream();
+				fos = new FileOutputStream(cacheFile);
+				int len = 0;
+				while ((len = bis.read(buffer)) != -1) {
+					rAccess.write(buffer, 0, len);
+				}
+				fos.close();
+				bis.close();
+				Log.v("TAG","download complete");
+			}
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.v("TAG",e.getMessage());
+			return false;
+		}
+
 	}
 	
 

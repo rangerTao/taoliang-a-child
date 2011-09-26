@@ -45,6 +45,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
+import com.duole.Duole;
 import com.duole.R;
 import com.duole.pojos.adapter.WifiNetworkAdapter;
 import com.duole.utils.Constants;
@@ -71,6 +72,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 	Preference preStorage;
 	CheckBoxPreference preWifi;
 	Preference preListWifi;
+	
+	Preference preTimeEclipsed;
+	Preference preSleep;
 
 	WifiManager wifiManager;
 	WifiInfo wifiInfo;
@@ -130,6 +134,21 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		//get the detail info of user.
 		getUserInfo();
+		
+		//init the content of anti fatigure views.
+		initAntiFatigureViews();
+	}
+	
+	private void initAntiFatigureViews(){
+		
+		preTimeEclipsed = findPreference("preTimeEclipsed");
+		preSleep = findPreference("preSleep");
+		
+		String entime = getString(R.string.entime) + " : " + Duole.appref.gameCountDown.getRemainTime() + "     " + getString(R.string.restime) + " : " + Duole.appref.restCountDown.getRemainTime(); 
+		String sleepTime = getString(R.string.sleepstart) + " : " + Constants.sleepstart + "     " + getString(R.string.sleepend) + " : " + Constants.sleepend;
+		preTimeEclipsed.setSummary(entime);
+		preSleep.setSummary(sleepTime);
+		
 	}
 
 	private void initWifiSetting() {

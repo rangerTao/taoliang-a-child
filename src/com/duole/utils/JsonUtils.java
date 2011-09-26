@@ -77,5 +77,10 @@ public class JsonUtils {
 		Constants.sleepstart = jsonObject.getString("sleepstart");
 		Constants.sleepend = jsonObject.getString("sleepend");
 		
+		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);
+		XmlUtils.updateSingleNode(Constants.XML_RESTIME, Constants.restime);
+		XmlUtils.updateSingleNode(Constants.XML_SLEEPEND, Constants.sleepend);
+		XmlUtils.updateSingleNode(Constants.XML_SLEEPSTART, Constants.sleepstart);
+		
 	}
 }

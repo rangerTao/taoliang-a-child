@@ -11,6 +11,8 @@ import com.duole.pojos.asset.Asset;
 
 public class Constants {
 
+	//system flags
+	public static boolean musicPlayerIsRunning = false;
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	

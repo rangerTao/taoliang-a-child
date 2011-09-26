@@ -42,6 +42,7 @@ import com.duole.layout.ScrollLayout;
 import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
 import com.duole.player.SingleMusicPlayerActivity;
+import com.duole.player.VideoPlayerActivity;
 import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
@@ -275,9 +276,10 @@ public class Duole extends BaseActivity {
 
 			appPage.setNumColumns(Constants.COLUMNS);
 
-			appPage.setPadding(20, 10, 0,20);
+			appPage.setPadding(40, 10, 40,0);
 
 			appPage.setVerticalSpacing(30);
+			appPage.setColumnWidth(110);
 
 			appPage.setOnItemClickListener(listener);
 			mScrollLayout.addView(appPage);
@@ -376,6 +378,10 @@ public class Duole extends BaseActivity {
 				}else if(assItem.getType().equals(Constants.RES_CONFIG)){
 					intent = new Intent(appref,PasswordActivity.class);
 					intent.putExtra("type", "0");
+				}else if (assItem.getType().equals(Constants.RES_VIDEO)){
+					intent = new Intent(appref , VideoPlayerActivity.class);
+
+					intent.putExtra("index", position + "");
 				}else{
 
 					intent = new Intent(appref, FlashPlayerActivity.class);
@@ -421,8 +427,6 @@ public class Duole extends BaseActivity {
 	protected void onResume(){
 		        
 //		new ItemListTask().execute();
-		
-		Log.v("TAG", appref.mScrollLayout.getChildCount() + "child counts");
 		
 		if(this.mScrollLayout.getChildCount() <= 0){
 			try {

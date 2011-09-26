@@ -306,32 +306,27 @@ public class DuoleUtils {
 	 */
 	public static boolean downloadSingleFile(Asset asset ,URL url, File file) {
 		try {
-			// Open a connection.
-			URLConnection conn = url.openConnection();
-			// get the size of file.
-			int fileSize = conn.getContentLength();
-
-			byte[] buffer = new byte[8 * 1024];
-
-			InputStream bis = null;
-			FileOutputStream fos = null;
-
-			// Create a file.
-			file.createNewFile();
-
-			bis = conn.getInputStream();
-			fos = new FileOutputStream(file);
-			int len = 0;
-			while ((len = bis.read(buffer)) != -1) {
-				fos.write(buffer, 0, len);
+			Log.v("TAG", asset.getType());
+			Log.v("TAG", url.toString());
+			//get the name of file
+			String filename = file.getName();
+			File cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
+			
+			if (FileUtils.isCacheFileExists(filename)) {
+				if (DownloadFileUtils.resumeDownloadCacheFile(url, cacheFile)) {
+					FileUtils.copyFile(cacheFile.getAbsolutePath(), file.getAbsolutePath());
+					cacheFile.delete();
+				}
+			} else {
+				if (DownloadFileUtils.downloadCacheFile(url, cacheFile)) {
+					FileUtils.copyFile(cacheFile.getAbsolutePath(), file.getAbsolutePath());
+					cacheFile.delete();
+				}
 			}
-			fos.close();
-			bis.close();
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			Constants.AssetList.remove(asset);
-			file.delete();
 			return false;
 		}
 	}
@@ -445,6 +440,8 @@ public class DuoleUtils {
 			}
 			if (!file.exists()) {
 				return true;
+			}else if(file.exists()){
+				return false;
 			}else{
 				PackageManager pm = Duole.appref.getPackageManager();
 				file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));

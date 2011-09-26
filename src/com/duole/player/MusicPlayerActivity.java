@@ -171,6 +171,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	protected void onDestroy() {
 		mp.stop();
 		unregisterReceiver(timeOutReceiver);
+
 		super.onDestroy();
 	}
 
@@ -181,7 +182,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	public void onItemSelected(AdapterView<?> arg0, View view, int position,
 			long arg3) {
 		index = position;
-		Log.v("TAG", position + "position");
 		if (position != Constants.MusicList.size()) {
 			AnimationSet animationSet = new AnimationSet(true);
 			if (manimationSet != null && manimationSet != animationSet) {
@@ -268,6 +268,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		btnPlay.setBackgroundResource(R.drawable.play);
 		mp.seekTo(0);
 	}
+	
 	
 	
 }

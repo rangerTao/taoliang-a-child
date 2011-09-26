@@ -46,12 +46,21 @@ public class ItemListTask extends AsyncTask {
 		return true;
 	}
 
-	public void treatData() {
+	public boolean treatData() {
 		HashMap<String, Asset> hmSource = new HashMap<String, Asset>();
 		ArrayList<Asset> alAssetDeleteList = new ArrayList<Asset>();
+		boolean gettedSourceList = false;
 		
-		boolean gettedSourceList = getSourceList();
+		if(!Constants.DOWNLOAD_RUNNING){
+			Constants.DOWNLOAD_RUNNING = true;
+			gettedSourceList = getSourceList();
+		}else{
+			Log.v("TAG", "download task not finished");
+			return false;
+		}
 		
+		
+
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
 			for (int i = 0; i < alAsset.size(); i++) {
@@ -110,7 +119,8 @@ public class ItemListTask extends AsyncTask {
 			DuoleUtils.updateAssetListFile(alAsset);
 		}
 		
-		
+		Constants.DOWNLOAD_RUNNING = false;
+		return true;
 	}
 
 	/**
@@ -128,20 +138,18 @@ public class ItemListTask extends AsyncTask {
 			try {
 				error = jsonObject.getString("errstr");
 			} catch (Exception e) {
-				Constants.DOWNLOAD_RUNNING = false;
+//				Constants.DOWNLOAD_RUNNING = false;
 				e.printStackTrace();
 			}
 
 			
-			if (error != null) {
-				bindDevice();
-				getSourceList();
-			} else {
+			if (error == null){
 				try{
 					JsonUtils.parserJson(alAsset, jsonObject);
 				}catch(Exception e){
 					Constants.DOWNLOAD_RUNNING = false;
 					e.printStackTrace();
+					return false;
 				}
 				
 			}
@@ -153,61 +161,6 @@ public class ItemListTask extends AsyncTask {
 			return false;
 		}
 
-	}
-	
-	public static boolean bindDevice(){
-		
-		LayoutInflater inflater = LayoutInflater.from(Duole.appref);
-		View inputView = inflater.inflate(R.layout.registerdevice, null);
-		
-		initBindDeviceView(inputView);
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(Duole.appref);
-		builder.setView(inputView);
-		builder.setTitle(R.string.bindDeviceTitle);
-		builder.setPositiveButton(R.string.btnPositive, new OnClickListener(){
-
-			public void onClick(DialogInterface arg0, int arg1) {
-				try {
-					
-					if(checkUserName()){
-						String url = "http://www.67sh.com/e/enews/?enews=BindCmcode&username=" +
-								etUserName.getText().toString() +
-								"&password=" +
-								etPassword.getText().toString() +
-								"&cmcode=" + DuoleUtils.getAndroidId();
-						JSONObject jsonObject = new JSONObject(DuoleNetUtils.connect(url));
-						
-						String error = null;
-						try{
-							error = jsonObject.getString("errstr");
-						}catch(Exception e){
-							e.printStackTrace();
-						}
-						
-					}
-
-
-				}catch(Exception e){
-					e.printStackTrace();
-				}
-				
-			}
-			
-		});
-		
-		builder.setNegativeButton(R.string.btnNegative, new OnClickListener(){
-
-			public void onClick(DialogInterface arg0, int arg1) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
-		
-		builder.show();
-		
-		return true;
 	}
 
 	private static boolean checkUserName(){
