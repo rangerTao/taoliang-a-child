@@ -2,6 +2,8 @@ package com.duole.pojos.asset;
 
 import org.json.JSONObject;
 
+import com.duole.utils.Constants;
+
 public class Asset {
 
 	private String name;
@@ -14,6 +16,7 @@ public class Asset {
 	private String filename;
 	private String packag;
 	private String activity;
+	private String bg;
 
 	public Asset(JSONObject json) {
 		try {
@@ -23,6 +26,10 @@ public class Asset {
 			String type = json.getString("type");
 			String id = json.getString("id");
 			String lastmodifi = json.getString("lastmodified");
+			if(type.equals(Constants.RES_AUDIO)){
+				String mpbg = json.getString("bg");
+				setBg(mpbg == null ? "" : mpbg);
+			}
 			setName(title == null ? "" : title);
 			setThumbnail(pic == null ? "" : pic);
 			setUrl(url == null ? "" : url);
@@ -30,6 +37,7 @@ public class Asset {
 			setId(id == null ? "" : id);
 			setLastmodified(lastmodifi == null ? "" : lastmodifi);
 			setFilename(url.substring(url.lastIndexOf("/")));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -118,6 +126,16 @@ public class Asset {
 
 	public void setActivity(String activity) {
 		this.activity = activity;
+	}
+	
+	
+
+	public String getBg() {
+		return bg;
+	}
+
+	public void setBg(String bg) {
+		this.bg = bg;
 	}
 
 	public String toString(){

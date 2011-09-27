@@ -13,19 +13,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.Settings.System;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.duole.Duole;
 import com.duole.R;
@@ -364,7 +368,9 @@ public class DuoleUtils {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			file.delete();
+			if(file != null){
+				file.delete();
+			}
 			return false;
 		}
 	}
@@ -528,18 +534,72 @@ public class DuoleUtils {
     /**
      * Update the client.
      */
-    public static void updateClient(String path){
-    	
-    	File newClient = new File(Constants.CacheDir + path.substring(path.lastIndexOf("/")));
-    	try {
-			if(downloadSingleFile(new URL(Constants.Duole + path ), newClient)){
-				
+    public static synchronized void updateClient(){
+    	String path;
+
+		String url = Constants.ClientUpdate;
+		
+		String version = DuoleUtils.getVersion(Duole.appref);
+		String mCode = DuoleUtils.getAndroidId();
+		
+		url = url + "?cver=" + version + "&cmcode=" + mCode;
+		
+		String result = DuoleNetUtils.connect(url);
+
+		try {
+			JSONObject json = new JSONObject(result);
+
+			String ver = json.getString("ver");
+			path = json.getString("path");
+			String updateHour = json.getString("uptime");
+			if(!path.equals("null") || !path.equals("")){
+				File client = new File(Constants.CacheDir + "client.apk");
+		    	File newClient = new File(Constants.CacheDir + "/temp/" + path.substring(path.lastIndexOf("/")));
+		    	try {
+		    		if(!client.exists()){
+		    			if(DownloadFileUtils.resumeDownloadCacheFile(new URL(Constants.Duole + path ), newClient)){
+		    				FileUtils.copyFile(newClient.getAbsolutePath(), client.getAbsolutePath());
+		    				newClient.delete();
+		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile ,Constants.XML_VER,
+									ver);
+		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile,Constants.XML_UPDATE, Constants.TRUE);
+		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME,updateHour);
+		    				Constants.clientApkDownloaded = true;
+		    			}
+		    		}else{
+		    			if(!ver.equals(DuoleUtils.getPackageVersion(client))){
+		    				client.delete();
+		    				updateClient();
+		    			}else{
+		    				Constants.clientApkDownloaded = true;
+		    			}
+		    		}
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
 			}
-		} catch (MalformedURLException e) {
+		
+			
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+    
+    /**
+     * get apk version
+     */
+    public static String getPackageVersion(File file){
     	
+    	PackageManager pm = Duole.appref.getPackageManager();
+
+		PackageInfo info;
+		info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+		if(info != null){
+			return info.versionName;
+		}else{
+			return "";
+		}
     }
     
     /**
@@ -657,20 +717,44 @@ public class DuoleUtils {
 	 */
 	public static boolean installApkFromFile(File file){
 		try {
-			Process p = Runtime.getRuntime().exec("pm install " + file.getAbsolutePath());
+			Process p = Runtime.getRuntime().exec("pm install -r " + file.getAbsolutePath());
 			p.waitFor();
 			int result = p.exitValue();
 			if(result == 0 ){
 				return true;
 			}
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		return false;
+	}
+	
+	/**
+	 * install a update
+	 */
+	public static boolean instalUpdateApk(Context context){
+		File client = new File(Constants.CacheDir + "client.apk");
+		if(client.exists()){
+			PackageManager pm = context.getPackageManager();
+
+			PackageInfo info = pm.getPackageArchiveInfo(client.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+			if(!DuoleUtils.getVersion(context).equals(info.versionName)){
+				Log.v("TAG", "upate client");
+				try{
+//					XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE, Constants.FALSE);
+					Log.v("TAG", "pm install -r" + client.getAbsolutePath());
+					DuoleUtils.installApkFromFile(client);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
+				
+				return true;
+			}
+		}
+		
 		return false;
 	}
 }

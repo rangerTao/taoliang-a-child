@@ -2,6 +2,7 @@ package com.duole.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -93,13 +94,46 @@ public class XmlUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
 	
-	
+	public static String readNodeValue(String file,String nodename){
+		try {
+			FileInputStream iStream = new FileInputStream(file);
+			
+			XmlPullParser parser = Xml.newPullParser();
+			parser.setInput(iStream, "UTF-8");
+			int event = parser.getEventType();
+			
+			while(event!=XmlPullParser.END_DOCUMENT){
+				switch(event){
+				case XmlPullParser.START_DOCUMENT:
+					break;
+				case XmlPullParser.START_TAG:
+					if (nodename.equals(parser.getName())) {
+						return parser.nextText();
+					}
+					break;
+				case XmlPullParser.END_TAG:
+					if(Constants.XML_ITEM.equals(parser.getName())){
+					}
+					break;
+					
+				}
+				event = parser.next();
+			}
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XmlPullParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		
-		
-		
+		return "";
 	}
 
 	public static ArrayList<Asset> readFile(String filePath,
@@ -352,6 +386,7 @@ public class XmlUtils {
 				Text lastmodified = document.createTextNode(asset
 						.getLastmodified());
 				Text type = document.createTextNode(asset.getType());
+				
 
 				// new elements
 				Element newElement = document.createElement("item");
@@ -363,18 +398,27 @@ public class XmlUtils {
 						.createElement("lastmodified");
 				Element newTypeElement = document.createElement("type");
 				
+				
 				newIdElement.appendChild(id);
 				newTitleElement.appendChild(title);
 				newThumbElement.appendChild(thumbnail);
 				newUrlElement.appendChild(url);
 				newLastModifiedElement.appendChild(lastmodified);
 				newTypeElement.appendChild(type);
+
 				newElement.appendChild(newIdElement);
 				newElement.appendChild(newTitleElement);
 				newElement.appendChild(newThumbElement);
 				newElement.appendChild(newUrlElement);
 				newElement.appendChild(newLastModifiedElement);
 				newElement.appendChild(newTypeElement);
+				
+				if(asset.getType().equals(Constants.RES_AUDIO)){
+					Text bg = document.createTextNode(asset.getBg());
+					Element newBGElement = document.createElement("bg");
+					newBGElement.appendChild(bg);
+					newElement.appendChild(newBGElement);
+				}
 				
 				if(asset.getType().equals(Constants.RES_APK)){
 					

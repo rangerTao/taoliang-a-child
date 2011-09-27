@@ -5,6 +5,8 @@
 	
 	<string name="date">\u65e5\u671f</string>
 	
+	<string name="minute">\u5206\u949f</string>
+	
 	<string name="network_config">\u7f51\u7edc\u8bbe\u7f6e</string>
 	<string name="wifi_connection">Wi-Fi\u8fde\u63a5</string>
 	<string name="network">\u7f51\u7edc</string>
@@ -87,8 +89,9 @@
 	
 	<!-- anti fatgure -->
 	<string name="anti_fatigure">\u9632\u6c89\u8ff7\u8bbe\u7f6e</string>
-	<string name="entime">\u6e38\u620f\u65f6\u95f4\u5269\u4f59</string>
-	<string name="enterteiment">\u6e38\u620f\u65f6\u95f4</string>
+	<string name="entime">\u4f7f\u7528\u65f6\u95f4\u5269\u4f59</string>
+	<string name="enterteiment">\u4f7f\u7528\u65f6\u95f4</string>
+	<string name="anti_rest">\u4f11\u606f\u65f6\u95f4</string>
 	<string name="sleep">\u7761\u7720\u65f6\u95f4</string>
 	<string name="restime">\u4f11\u606f\u65f6\u95f4\u5269\u4f59</string>
 	<string name="sleepstart">\u7761\u7720\u5f00\u59cb\u65f6\u95f4</string>

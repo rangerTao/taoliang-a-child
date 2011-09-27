@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -30,11 +31,14 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.Gallery;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.duole.Duole;
 import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
 import com.duole.layout.MusicGallery;
+import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.MusicItemAdapter;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleUtils;
@@ -45,9 +49,12 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	RelativeLayout llMain;
 	String url = "";
 	int index;
+	String type = "";
 	Gallery gallery;
-	MusicPlayerActivity appref;
+	public MusicPlayerActivity appref;
 	private AnimationSet manimationSet; 
+	
+	ProgressBar pbCountDown;
 	
 	public boolean clicked = false;
 	
@@ -78,17 +85,39 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		mp = new MediaPlayer();
 		
 		index = Integer.parseInt(intent.getStringExtra("index"))  - 1;
+		type = intent.getStringExtra("type");
+		
 		gallery.setSelection(index);
 		
-		setMusicData(index);
+		if(Constants.MusicList.size() > 0){
+			setMusicData(index);
+		}
+		
 		
 		btnPlay.setOnClickListener(this);
 		mp.setOnCompletionListener(this);
 		
 		registerReceiver();
+		
+		initProgressBar();
 
 	}
 	
+	private void initProgressBar(){
+		
+		if(type != null && type.equals("rest")){
+			pbCountDown = (ProgressBar) findViewById(R.id.pbRestTime);
+			pbCountDown.setVisibility(View.VISIBLE);
+			pbCountDown.setMax(Duole.appref.restCountDown.getTotalTime());
+			pbCountDown.setBackgroundColor(Color.RED);
+			
+			Duole.appref.restCountDown.setPb(pbCountDown);
+			
+			Duole.appref.restCountDown.start();
+		}
+		
+	}
+
 	private void registerReceiver(){
 		
 		IntentFilter intentFilter = new IntentFilter(
