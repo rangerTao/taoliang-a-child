@@ -3,6 +3,7 @@ package com.duole.pojos;
 import android.R.integer;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.ProgressBar;
 
 public abstract class DuoleCountDownTimer {
 	
@@ -10,6 +11,7 @@ public abstract class DuoleCountDownTimer {
     private long mTotalTime;  
     private long mRemainTime;  
     private boolean isRunning;
+    private ProgressBar pb;
       
     public DuoleCountDownTimer(long millisInFuture, long countDownInterval) {  
         mTotalTime = millisInFuture;  
@@ -110,6 +112,20 @@ public abstract class DuoleCountDownTimer {
     		sb.append(second);
     	}
     	
-    	return sb.toString();
+    	return "00:" + sb.toString();
     }
+    
+    public int getTotalTime(){
+    	return (int) mTotalTime;
+    }
+	public ProgressBar getPb() {
+		return pb;
+	}
+	public void setPb(ProgressBar pb) {
+		if(pb != null){
+			this.pb = pb;
+		}
+	}
+    
+    
 }

@@ -1,10 +1,7 @@
 package com.duole.receiver;
 
 import com.duole.Duole;
-import com.duole.service.AntiFatigueService;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import com.duole.utils.DuoleUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +19,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 			LoadurlIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			context.startActivity(LoadurlIntent);
 			
+			DuoleUtils.instalUpdateApk(context);
 		}
 	}
 

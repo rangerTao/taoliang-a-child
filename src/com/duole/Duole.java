@@ -10,6 +10,7 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.ExpandableListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -19,6 +20,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -32,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +61,7 @@ public class Duole extends BaseActivity {
 
 	public static DuoleCountDownTimer gameCountDown;
 	public static DuoleCountDownTimer restCountDown;
+	
 	public LinearLayout llPageDivider;
 	View view;
 	LayoutInflater inflater;
@@ -73,6 +77,8 @@ public class Duole extends BaseActivity {
 	private static Context mContext;
 	private static BackgroundRefreshService mBoundService;
 	public static ArrayList<AssetItemAdapter> alAIA;
+	
+	ProgressBar pbEnTime;
 
 	public static ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -125,6 +131,18 @@ public class Duole extends BaseActivity {
 			}
 			
 		});
+		
+		
+	}
+	
+	private void initEnTimeProgressBar(){
+		
+		pbEnTime = (ProgressBar)findViewById(R.id.pbEnTime);
+		
+		pbEnTime.setMax(Duole.appref.gameCountDown.getTotalTime());
+		pbEnTime.setBackgroundColor(Color.RED);
+		
+		gameCountDown.setPb(pbEnTime);		
 	}
 	
 	public void initContents()  throws Exception{
@@ -139,9 +157,10 @@ public class Duole extends BaseActivity {
 				setBackground();
 				
 				initCountDownTimer();
+				
+				initEnTimeProgressBar();
 			} else {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
-
 			}
 
 			new ItemListTask().execute();
@@ -149,8 +168,7 @@ public class Duole extends BaseActivity {
 		} else {
 			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
 			
-			IntentFilter intentFilter = new IntentFilter(
-			"android.intent.action.MEDIA_MOUNTED");
+			IntentFilter intentFilter = new IntentFilter("android.intent.action.MEDIA_MOUNTED");
 			try{
 				registerReceiver(mountedReceiver, intentFilter);
 			}catch(Exception e ){
@@ -181,19 +199,16 @@ public class Duole extends BaseActivity {
 	
 	public void initCountDownTimer() {
 
-		long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
-		long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
-		
-		//long entime = 1 * 60 * 1000;
-		
-		//
-		
-		// long restime = 1 * 60 * 1000;
+		final long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+		final long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
 
 		gameCountDown = new DuoleCountDownTimer(entime, Constants.countInterval) {
 
 			@Override
 			public void onTick(long millisUntilFinished, int percent) {
+				if(getPb() != null){
+					this.getPb().setProgress((int)(entime - millisUntilFinished));
+				}
 			}
 
 			@Override
@@ -201,19 +216,22 @@ public class Duole extends BaseActivity {
 				Constants.ENTIME_OUT = true;
 				this.setTotalTime(Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000);
 				this.seek(0);
-				restCountDown.start();
+				this.stop();
+//				restCountDown.start();
 				appref.startMusicPlay();
 			}
 
 		};
-
+		
 		restCountDown = new DuoleCountDownTimer(restime,
 				Constants.countInterval) {
 
 			@Override
 			public void onTick(long millisUntilFinished, int percent) {
-				// TODO Auto-generated method stub
-
+				if(getPb() != null){
+					this.getPb().setProgress((int)(restime - millisUntilFinished));
+				}
+				
 			}
 
 			@Override
@@ -221,10 +239,11 @@ public class Duole extends BaseActivity {
 				Constants.ENTIME_OUT = false;
 				this.setTotalTime(Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000);
 				this.seek(0);
+				this.stop();
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
-
 		};
+
 	}
 
 	public void setBackground() {
@@ -246,6 +265,7 @@ public class Duole extends BaseActivity {
 	public void initViews() throws IOException, TransformerException,
 			SAXException, XmlPullParserException, ParserConfigurationException {
 
+		Constants.System_ver = DuoleUtils.getVersion(appref);
 		// get all apps
 		Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
 				+ "itemlist.xml");
@@ -308,24 +328,29 @@ public class Duole extends BaseActivity {
 		mHandler.post(new Runnable(){
 
 			public void run() {
-				if(last != index){
-					view = llPageDivider.getChildAt(last);
-					if(view != null){
-						pageDiv = (PageDiv) view.getTag();
-						pageDiv.ivPageDiv.setImageBitmap(bmp);
-					}
-					
-					view = llPageDivider.getChildAt(index);
-					pageDiv = (PageDiv) view.getTag();
-					pageDiv.ivPageDiv.setImageBitmap(bmp2);
-				}else{
-					view = llPageDivider.getChildAt(index);
-					if(view != null){
+				try{
+					if(last != index){
+						view = llPageDivider.getChildAt(last);
+						if(view != null){
+							pageDiv = (PageDiv) view.getTag();
+							pageDiv.ivPageDiv.setImageBitmap(bmp);
+						}
+						
+						view = llPageDivider.getChildAt(index);
 						pageDiv = (PageDiv) view.getTag();
 						pageDiv.ivPageDiv.setImageBitmap(bmp2);
-					}
+					}else{
+						view = llPageDivider.getChildAt(index);
+						if(view != null){
+							pageDiv = (PageDiv) view.getTag();
+							pageDiv.ivPageDiv.setImageBitmap(bmp2);
+						}
 
+					}
+				}catch(Exception e){
+					e.printStackTrace();
 				}
+				
 			}
 			
 		});

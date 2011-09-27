@@ -130,7 +130,7 @@ public class ItemListTask extends AsyncTask {
 		try {
 			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
 			"http://www.67sh.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
-
+			
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
 			JSONObject jsonObject = new JSONObject(result);

@@ -1,5 +1,6 @@
 package com.duole.utils;
 
+import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +14,12 @@ public class Constants {
 
 	//system flags
 	public static boolean musicPlayerIsRunning = false;
+	public static boolean clientApkDownloaded = false;
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
 	public static final String Duole = "http://www.67sh.com";
+	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
 	
 	public static final String ItemList = CacheDir + "itemlist.xml";
 	public static final String SystemConfigFile = CacheDir + "config.xml";
@@ -90,6 +93,11 @@ public class Constants {
 	public static final String XML_KE = "ke";
 	public static final String XML_PASSWORD = "password";
 	public static final String XML_VER = "ver";
+	public static final String TRUE = "true";
+	public static final String FALSE = "false";
+	public static final String XML_UPDATE = "update";
+	public static final String XML_UPDATE_TIME = "uptime";
+	
 	
 	//refresh frequences.
 	public static final int frequence = 60000;
@@ -127,5 +135,6 @@ public class Constants {
 	public static final String Pre_Security_Exit = "preSecurityExit";
 	public static String System_Password = "";
 	public static String System_ver = "";
+	public static String system_uptime = "";
 	
 }

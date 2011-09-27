@@ -54,6 +54,13 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		TextView tvMusicTitle = (TextView)findViewById(R.id.tvMusicTitle);
 		Asset asset = Constants.MusicList.get(index);
 		
+//		String mpbg = asset.getBg();
+//		
+//		if(mpbg != "" || mpbg != null){
+//			
+//		}
+		
+		
 		String ivUrl = asset.getThumbnail();
 		String ivThumb = Constants.CacheDir + Constants.RES_THUMB + ivUrl.substring(ivUrl.lastIndexOf("/"));
 		ivMusicThumb.setImageDrawable(Drawable.createFromPath(ivThumb));

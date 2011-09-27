@@ -47,6 +47,7 @@ import android.widget.Toast;
 
 import com.duole.Duole;
 import com.duole.R;
+import com.duole.player.MusicPlayerActivity;
 import com.duole.pojos.adapter.WifiNetworkAdapter;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
@@ -144,8 +145,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 		preTimeEclipsed = findPreference("preTimeEclipsed");
 		preSleep = findPreference("preSleep");
 		
-		String entime = getString(R.string.entime) + " : " + Duole.appref.gameCountDown.getRemainTime() + "     " + getString(R.string.restime) + " : " + Duole.appref.restCountDown.getRemainTime(); 
-		String sleepTime = getString(R.string.sleepstart) + " : " + Constants.sleepstart + "     " + getString(R.string.sleepend) + " : " + Constants.sleepend;
+		preTimeEclipsed.setTitle(getString(R.string.enterteiment) + ":  " + Constants.entime + getString(R.string.minute) + "        " + getString(R.string.anti_rest)+ ":  " + Constants.restime + getString(R.string.minute));
+		String entime = getString(R.string.entime) + " : " + Duole.appref.gameCountDown.getRemainTime(); 
+		String sleepTime = getString(R.string.sleepstart) + " : " + Constants.sleepstart +":00" + "     " + getString(R.string.sleepend) + " : " + Constants.sleepend+":00";
 		preTimeEclipsed.setSummary(entime);
 		preSleep.setSummary(sleepTime);
 		
