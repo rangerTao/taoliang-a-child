@@ -2,6 +2,8 @@ package com.duole.receiver;
 
 import com.duole.Duole;
 import com.duole.utils.DuoleUtils;
+
+import android.R.array;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

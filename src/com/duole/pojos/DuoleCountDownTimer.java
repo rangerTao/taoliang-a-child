@@ -3,6 +3,7 @@ package com.duole.pojos;
 import android.R.integer;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.ProgressBar;
 
 public abstract class DuoleCountDownTimer {
@@ -10,7 +11,7 @@ public abstract class DuoleCountDownTimer {
 	private final long mCountdownInterval;  
     private long mTotalTime;  
     private long mRemainTime;  
-    private boolean isRunning;
+    private boolean isRunning = false;
     private ProgressBar pb;
       
     public DuoleCountDownTimer(long millisInFuture, long countDownInterval) {  
@@ -35,13 +36,15 @@ public abstract class DuoleCountDownTimer {
         mHandler.removeMessages(MSG_RUN);  
         mHandler.removeMessages(MSG_PAUSE);  
     }  
-    public final void resume() {
-    	if(!isRunning){
-        	isRunning = true;
-    	}
-        mHandler.removeMessages(MSG_PAUSE);  
-        mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(MSG_RUN));  
-    }  
+
+	public final void resume() {
+		if (!isRunning) {
+			isRunning = true;
+			mHandler.removeMessages(MSG_PAUSE);
+			mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(MSG_RUN));
+		}
+
+	}  
     public final void pause() {  
         mHandler.removeMessages(MSG_RUN);  
         mHandler.sendMessageAtFrontOfQueue(mHandler.obtainMessage(MSG_PAUSE));  
@@ -51,9 +54,11 @@ public abstract class DuoleCountDownTimer {
         if (mRemainTime <= 0) {  
             onFinish();  
             return this;  
-        }  
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_RUN),  
-                mCountdownInterval);  
+        } 
+        if(!isRunning){
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_RUN),  
+                    mCountdownInterval);  
+        }
         return this;  
     }  
     public abstract void onTick(long millisUntilFinished, int percent);  

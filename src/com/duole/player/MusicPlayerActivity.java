@@ -261,7 +261,9 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
-			appref.finish();
+			if(!Constants.SLEEP_TIME){
+				appref.finish();
+			}
 		}
 		
 	};

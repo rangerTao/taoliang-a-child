@@ -18,11 +18,13 @@ public class Constants {
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
-	public static final String Duole = "http://www.67sh.com";
+	public static final String Duole = "http://www.duoleyuan.com";
 	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
 	
 	public static final String ItemList = CacheDir + "itemlist.xml";
 	public static final String SystemConfigFile = CacheDir + "config.xml";
+	
+	public static final String defaultPasswd = "duoleyuan";
 	
 	public static ArrayList<Asset> AssetList;
 	public static ArrayList<Asset> MusicList;
@@ -97,6 +99,7 @@ public class Constants {
 	public static final String FALSE = "false";
 	public static final String XML_UPDATE = "update";
 	public static final String XML_UPDATE_TIME = "uptime";
+	public static final String XML_LASTENSTART = "lastenstart";
 	
 	
 	//refresh frequences.

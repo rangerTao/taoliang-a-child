@@ -54,7 +54,7 @@ public class CheckUpdateActivity extends BaseActivity {
 
 		@Override
 		protected Object doInBackground(Object... arg0) {
-			String url = "http://www.67sh.com/e/member/child/ancJver.php";
+			String url = "http://www.duoleyuan.com/e/member/child/ancJver.php";
 
 			String result = DuoleNetUtils.connect(url);
 			String version = DuoleUtils.getVersion(appref);

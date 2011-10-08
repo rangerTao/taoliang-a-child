@@ -16,7 +16,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.DetailedState;
 import android.net.wifi.ScanResult;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -73,6 +76,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 	Preference preStorage;
 	CheckBoxPreference preWifi;
 	Preference preListWifi;
+	Preference preCheckUpdate;
 	
 	Preference preTimeEclipsed;
 	Preference preSleep;
@@ -101,6 +105,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 		preGettingUserInfo = this.findPreference(Constants.Pre_GettingUserInfo);
 		preID = this.findPreference(Constants.Pre_deviceid);
 		preID.setSummary(DuoleUtils.getAndroidId());
+		preCheckUpdate = (Preference)findPreference("preCheckUpdate");
+		
+		preCheckUpdate.setSummary("\u5f53\u524d\u7248\u672c\uff1a" + DuoleUtils.getVersion(this));
 
 		preStorage = this.findPreference(Constants.Pre_Storage);
 
@@ -196,6 +203,8 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		IntentFilter intentFilter = new IntentFilter(
 				"android.net.wifi.WIFI_STATE_CHANGED");
+		intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+		intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 		appref.registerReceiver(wifiReceiver, intentFilter);
 
 	}
@@ -204,35 +213,59 @@ public class SystemConfigActivity extends PreferenceActivity {
 	BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
 
 		@Override
-		public void onReceive(Context arg0, Intent arg1) {
+		public void onReceive(Context context, Intent intent) {
 
-			switch (wifiManager.getWifiState()) {
-			case WifiManager.WIFI_STATE_DISABLED:
-				preWifi.setSummary(appref.getString(R.string.wifi_closed));
-				break;
-			case WifiManager.WIFI_STATE_DISABLING:
-				preWifi.setSummary(appref.getString(R.string.wifi_closing));
-				break;
-			case WifiManager.WIFI_STATE_ENABLED:
-				wifiInfo = wifiManager.getConnectionInfo();
-				if (wifiInfo.getNetworkId() != -1) {
-					preWifi.setSummary(getString(R.string.wifi_enabled)
-							+ wifiInfo.getSSID());
-				} else {
-					preWifi.setSummary(getString(R.string.wifi_opened));
-				}
-				break;
-			case WifiManager.WIFI_STATE_ENABLING:
-				wifiInfo = wifiManager.getConnectionInfo();
-				preWifi.setSummary(appref.getString(R.string.wifi_enabling)
-						+ wifiInfo.getSSID());
-				break;
-			case WifiManager.WIFI_STATE_UNKNOWN:
-				break;
-			}
+			Log.v("TAG", intent.getAction());
+			
+			if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+                handleStateChanged(WifiInfo.getDetailedStateOf((SupplicantState)
+                        intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE)));
+            }else if(WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent.getAction())){
+    			switch (wifiManager.getWifiState()) {
+    			case WifiManager.WIFI_STATE_DISABLED:
+    				preWifi.setSummary(appref.getString(R.string.wifi_closed));
+    				break;
+    			case WifiManager.WIFI_STATE_DISABLING:
+    				preWifi.setSummary(appref.getString(R.string.wifi_closing));
+    				break;
+    			case WifiManager.WIFI_STATE_ENABLED:
+    				wifiInfo = wifiManager.getConnectionInfo();
+    				if (wifiInfo.getNetworkId() != -1) {
+    					preWifi.setSummary(getString(R.string.wifi_enabled)
+    							+ wifiInfo.getSSID());
+    				} else {
+    					preWifi.setSummary(getString(R.string.wifi_opened));
+    				}
+    				break;
+    			case WifiManager.WIFI_STATE_ENABLING:
+    				wifiInfo = wifiManager.getConnectionInfo();
+    				preWifi.setSummary(appref.getString(R.string.wifi_enabling)
+    						+ wifiInfo.getSSID());
+    				break;
+    			case WifiManager.WIFI_STATE_UNKNOWN:
+    				break;
+    			}
+            }else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+                handleStateChanged(((NetworkInfo) intent.getParcelableExtra(
+                        WifiManager.EXTRA_NETWORK_INFO)).getDetailedState());
+            }
+			
+
 		}
 
 	};
+	
+    private void handleStateChanged(NetworkInfo.DetailedState state) {
+        // WifiInfo is valid if and only if Wi-Fi is enabled.
+        // Here we use the state of the check box as an optimization.
+        if (state != null && preWifi.isChecked()) {
+            WifiInfo info = wifiManager.getConnectionInfo();
+            if (info != null) {
+            	Log.v("TAG",state.name() + "     " + state.ordinal());
+            	preWifi.setSummary(Summary.get(appref, info.getSSID(), state));
+            }
+        }
+    }
 
 	private boolean isWifiEnabled() {
 
@@ -365,10 +398,19 @@ public class SystemConfigActivity extends PreferenceActivity {
 				List<WifiConfiguration> wificonfigs = wifiManager
 						.getConfiguredNetworks();
 				for (WifiConfiguration temp : wificonfigs) {
-
+					
 					if (temp.SSID.equals("\"" + sr.SSID + "\"")) {
-						wifiManager.enableNetwork(temp.networkId, true);
-						isConfiged = true;
+						
+						isConfiged = wifiManager.enableNetwork(temp.networkId, true);
+						
+						WifiInfo wifiinfo = wifiManager.getConnectionInfo();
+						
+						Log.v("TAG", wifiinfo.getNetworkId() + "");
+						if(wifiinfo.getNetworkId() == -1){
+							wifiManager.removeNetwork(temp.networkId);
+							isConfiged = false;
+						}
+						
 						if (adWifi != null)
 							adWifi.dismiss();
 					}
@@ -406,21 +448,15 @@ public class SystemConfigActivity extends PreferenceActivity {
 												// wc.BSSID = sr.BSSID;
 												wc.SSID = "\"" + sr.SSID
 														+ "\"";
-
+												
 												wc.hiddenSSID = true;
 
 												wc.status = WifiConfiguration.Status.ENABLED;
-
+												
 												DuoleNetUtils
 														.setWifiConfigurationSettings(
 																wc,
-																sr.capabilities);
-
-												wc.preSharedKey = "\""
-														+ etPassword
-																.getText()
-																.toString()
-														+ "\"";
+																sr.capabilities,etPassword.getText().toString());
 												int res = wifiManager
 														.addNetwork(wc);
 
@@ -443,7 +479,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 															adWifi.dismiss();
 														}
 													} else {
-
+														Toast.makeText(appref, "can not connect", 2000).show();
 													}
 												}
 											}
@@ -594,7 +630,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		@Override
 		protected Object doInBackground(Object... arg0) {
-			String url = "http://www.67sh.com/e/member/child/ancJinfo.php?cc="
+			String url = "http://www.duoleyuan.com/e/member/child/ancJinfo.php?cc="
 					+ DuoleUtils.getAndroidId();
 
 			String result = DuoleNetUtils.connect(url);
@@ -681,4 +717,22 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 	}
 
+}
+
+
+class Summary {
+    static String get(Context context, String ssid, DetailedState state) {
+        String[] formats = context.getResources().getStringArray((ssid == null)
+                ? R.array.wifi_status : R.array.wifi_status_with_ssid);
+        int index = state.ordinal();
+
+        if (index >= formats.length || formats[index].length() == 0) {
+            return null;
+        }
+        return String.format(formats[index], ssid);
+    }
+
+    static String get(Context context, DetailedState state) {
+        return get(context, null, state);
+    }
 }
