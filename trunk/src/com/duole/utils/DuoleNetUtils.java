@@ -23,6 +23,7 @@ public class DuoleNetUtils {
 		try {
 			URL urlCon = new URL(url);
 
+			Log.v("TAG", url);
 			HttpURLConnection conn = (HttpURLConnection) urlCon
 					.openConnection();
 
@@ -70,12 +71,26 @@ public class DuoleNetUtils {
     /**
      * Set WifiConfiguration
      */
-    public static void setWifiConfigurationSettings(WifiConfiguration wc,String capa){
+    public static void setWifiConfigurationSettings(WifiConfiguration wc,String capa,String pass){
+    	
     	
     	if(capa.contains("WEP")){
-    		wc.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-    		wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+    		wc.priority = 40;
+    	    wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+    	    wc.allowedProtocols.set(WifiConfiguration.Protocol.RSN); 
+    	    wc.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+    	    wc.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+    	    wc.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+    	    wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+    	    wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+    	    wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+    	    wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+    	    wc.wepKeys[0] = "\"" + pass + "\"";
     	}else{
+
+			wc.preSharedKey = "\""
+					+ pass
+					+ "\"";
 			wc.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
 			wc.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
 			wc.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);

@@ -8,20 +8,26 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
 
 public class JsonUtils {
 
 	public static void parserJson(ArrayList<Asset> alAsset ,JSONObject jsonObject) throws MalformedURLException, JSONException{
-		
+		File client;
 		String version = jsonObject.getString("ver");
+		
+		Log.v("TAG", "server version" + version);
+		Log.v("TAG", "local version" + Constants.System_ver);
 		if(!version.equals(Constants.System_ver)){
-			if(!Constants.clientApkDownloaded){
+			client = new File(Constants.CacheDir + "client.apk");
+			if((!client.exists() || !version.equals(DuoleUtils.getPackageVersion(client))) && !Constants.clientApkDownloaded){
 				DuoleUtils.updateClient();
 			}
 		}else{
-			File client = new File(Constants.CacheDir + "client.apk");
+			client = new File(Constants.CacheDir + "client.apk");
 			if(client.exists()){
 				client.delete();
 			}
@@ -81,6 +87,9 @@ public class JsonUtils {
 		Constants.restime = jsonObject.getString("restime");
 		Constants.sleepstart = jsonObject.getString("sleepstart");
 		Constants.sleepend = jsonObject.getString("sleepend");
+		
+		Log.v("TAG",Constants.sleepstart);
+		Log.v("TAG",Constants.sleepend);
 		
 		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);
 		XmlUtils.updateSingleNode(Constants.XML_RESTIME, Constants.restime);

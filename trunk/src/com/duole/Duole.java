@@ -2,7 +2,9 @@ package com.duole;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -18,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -104,6 +108,7 @@ public class Duole extends BaseActivity {
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
 		bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
 		Constants.bmpKe = BitmapFactory.decodeResource(getResources(), R.drawable.ke);
+
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
 		startService(screenLock);
 		
@@ -139,10 +144,10 @@ public class Duole extends BaseActivity {
 		
 		pbEnTime = (ProgressBar)findViewById(R.id.pbEnTime);
 		
-		pbEnTime.setMax(Duole.appref.gameCountDown.getTotalTime());
+		pbEnTime.setMax(appref.gameCountDown.getTotalTime());
 		pbEnTime.setBackgroundColor(Color.RED);
 		
-		gameCountDown.setPb(pbEnTime);		
+		gameCountDown.setPb(pbEnTime);
 	}
 	
 	public void initContents()  throws Exception{
@@ -199,26 +204,48 @@ public class Duole extends BaseActivity {
 	
 	public void initCountDownTimer() {
 
-		final long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
-		final long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
+		long currentTimeMillis = System.currentTimeMillis();
+		String enstart = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
+		final long current = Long.parseLong(enstart.equals("") ? currentTimeMillis+"" : enstart);
+
+		long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+		long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
+		
+		long poor = System.currentTimeMillis() - current;
+		long now = (poor) % (entime + restime);
+		
+		now = Math.abs(now);
+
+		Log.v("TAG", now + "");
+		if(now > 0 && now < entime){
+			entime -= now;
+			Log.v("TAG", entime + "entime");
+		}else if(now > 0 && now < entime + restime){
+			appref.startMusicPlay();
+			Log.v("TAG", restime + "entime");
+		}
 
 		gameCountDown = new DuoleCountDownTimer(entime, Constants.countInterval) {
 
 			@Override
 			public void onTick(long millisUntilFinished, int percent) {
 				if(getPb() != null){
-					this.getPb().setProgress((int)(entime - millisUntilFinished));
+					this.getPb().setProgress((int)(this.getTotalTime() - millisUntilFinished));
 				}
 			}
 
 			@Override
 			public void onFinish() {
 				Constants.ENTIME_OUT = true;
-				this.setTotalTime(Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000);
+				int time = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+				this.setTotalTime(time);
 				this.seek(0);
 				this.stop();
-//				restCountDown.start();
-				appref.startMusicPlay();
+				getPb().setMax(time);
+				getPb().setProgress(0);
+				if(!Constants.SLEEP_TIME){
+					appref.startMusicPlay();
+				}
 			}
 
 		};
@@ -229,7 +256,7 @@ public class Duole extends BaseActivity {
 			@Override
 			public void onTick(long millisUntilFinished, int percent) {
 				if(getPb() != null){
-					this.getPb().setProgress((int)(restime - millisUntilFinished));
+					this.getPb().setProgress((int)(this.getTotalTime() - millisUntilFinished));
 				}
 				
 			}
@@ -237,9 +264,12 @@ public class Duole extends BaseActivity {
 			@Override
 			public void onFinish() {
 				Constants.ENTIME_OUT = false;
-				this.setTotalTime(Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000);
+				int time = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
+				this.setTotalTime(time);
 				this.seek(0);
 				this.stop();
+				getPb().setMax(time);
+				getPb().setProgress(0);
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
 		};
@@ -247,7 +277,8 @@ public class Duole extends BaseActivity {
 	}
 
 	public void setBackground() {
-
+		
+		LinearLayout llMain = (LinearLayout)findViewById(R.id.llMain);
 		if (!Constants.bgurl.equals("")) {
 			File bg = new File(Constants.CacheDir
 					+ Constants.bgurl.substring(Constants.bgurl
@@ -256,7 +287,7 @@ public class Duole extends BaseActivity {
 				Drawable d = Drawable.createFromPath(bg
 						.getAbsolutePath());
 				if(d != null){
-					mScrollLayout.setBackgroundDrawable(d);
+					llMain.setBackgroundDrawable(d);
 				}
 			}
 		}
@@ -384,7 +415,7 @@ public class Duole extends BaseActivity {
 			// TODO Auto-generated method stub
 			Asset assItem = (Asset) parent.getItemAtPosition(position);
 
-			Intent intent;
+			Intent intent = null;
 
 			try {
 				// launcher the package
@@ -397,8 +428,47 @@ public class Duole extends BaseActivity {
 
 				} else if(assItem.getType().equals(Constants.RES_APK)){
 					
+					
 					intent = new Intent();
 					intent.setComponent(new ComponentName(assItem.getPackag(),assItem.getActivity()));
+					intent.setAction(Intent.ACTION_MAIN);  
+					intent.addCategory(Intent.CATEGORY_LAUNCHER);  
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
+					intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);  
+					
+					boolean startactivity = true;
+					int activities = 1;
+					while(startactivity){
+						try{
+							startActivity(intent);
+							startactivity = false;
+						}catch(Exception e){
+							e.printStackTrace();
+							
+							PackageManager pm = Duole.appref.getPackageManager();
+							File file = new File(Constants.CacheDir + Constants.RES_APK + assItem.getUrl().substring(assItem.getUrl().lastIndexOf("/")));
+
+							PackageInfo info;
+							info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+							
+							intent.setComponent(new ComponentName(assItem.getPackag(),info.activities[activities].name));
+
+							intent.setAction(Intent.ACTION_MAIN);  
+							intent.addCategory(Intent.CATEGORY_LAUNCHER);  
+							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
+							intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);  
+							
+							if(activities < info.activities.length - 1){
+								activities ++;
+							}else{
+								startactivity = false;
+							}
+							
+						}
+						
+					}
+					
+					
 					
 				}else if(assItem.getType().equals(Constants.RES_CONFIG)){
 					intent = new Intent(appref,PasswordActivity.class);
@@ -426,7 +496,9 @@ public class Duole extends BaseActivity {
 				}
 				
 
-				mContext.startActivity(intent);
+				if(!assItem.getType().equals(Constants.RES_APK)){
+					mContext.startActivity(intent);
+				}
 			} catch (ActivityNotFoundException noFound) {
 				Toast.makeText(mContext, "Package not found!",
 						Toast.LENGTH_SHORT).show();
@@ -440,24 +512,22 @@ public class Duole extends BaseActivity {
 		// TODO Auto-generated method stub
 		try {
 			unbindService(mConnection);
+			
+			Log.v("TAG", "power off");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		// android.os.Process.killProcess(android.os.Process.myPid());
 		super.onDestroy();
 	}
 	
 	@Override
 	protected void onResume(){
-		        
-//		new ItemListTask().execute();
 		
 		if(this.mScrollLayout.getChildCount() <= 0){
 			try {
 				appref.initContents();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

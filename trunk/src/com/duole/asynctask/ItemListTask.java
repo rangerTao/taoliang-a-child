@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.duole.Duole;
 import com.duole.R;
@@ -51,9 +52,17 @@ public class ItemListTask extends AsyncTask {
 		ArrayList<Asset> alAssetDeleteList = new ArrayList<Asset>();
 		boolean gettedSourceList = false;
 		
+		if(!DuoleUtils.checkTFCard()){
+			Toast.makeText(Duole.appref, "no tf", 2000);
+			return false;
+		}
+		
 		if(!Constants.DOWNLOAD_RUNNING){
 			Constants.DOWNLOAD_RUNNING = true;
 			gettedSourceList = getSourceList();
+			if(!gettedSourceList){
+				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
+			}
 		}else{
 			Log.v("TAG", "download task not finished");
 			return false;
@@ -107,6 +116,7 @@ public class ItemListTask extends AsyncTask {
 
 		Log.v("TAG", Constants.DownLoadTaskList.size() + " downloads");
 		Log.v("TAG", alAssetDeleteList.size()  + " deletes");
+		
 		if (alAssetDeleteList.size() > 0) {
 			new DeleteAssetFilesThread(alAssetDeleteList).start();
 		}
@@ -129,17 +139,18 @@ public class ItemListTask extends AsyncTask {
 	public boolean getSourceList() {
 		try {
 			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
-			"http://www.67sh.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
+			"http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 			
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
+			if(result.equals("")){
+				return false;
+			}
 			JSONObject jsonObject = new JSONObject(result);
 			String error = null;
 			try {
 				error = jsonObject.getString("errstr");
 			} catch (Exception e) {
-//				Constants.DOWNLOAD_RUNNING = false;
-				e.printStackTrace();
 			}
 
 			
@@ -157,7 +168,6 @@ public class ItemListTask extends AsyncTask {
 			return true;
 		} catch (Exception e) {
 			Constants.DOWNLOAD_RUNNING = false;
-			Log.v("TAG", e.getMessage());
 			return false;
 		}
 

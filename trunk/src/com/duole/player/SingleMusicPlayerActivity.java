@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -54,25 +55,22 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		TextView tvMusicTitle = (TextView)findViewById(R.id.tvMusicTitle);
 		Asset asset = Constants.MusicList.get(index);
 		
-//		String mpbg = asset.getBg();
-//		
-//		if(mpbg != "" || mpbg != null){
-//			
-//		}
+		String mpbg = asset.getBg();
 		
-		
-		String ivUrl = asset.getThumbnail();
-		String ivThumb = Constants.CacheDir + Constants.RES_THUMB + ivUrl.substring(ivUrl.lastIndexOf("/"));
-		ivMusicThumb.setImageDrawable(Drawable.createFromPath(ivThumb));
-		tvMusicTitle.setText(asset.getFilename());
-		
-		if (!Constants.bgRestUrl.equals("")) {
+		if( mpbg != null || mpbg != ""){
+
 			File bg = new File(Constants.CacheDir
-					+ Constants.bgRestUrl.substring(Constants.bgRestUrl
+					+ Constants.RES_THUMB + mpbg.substring(mpbg
 							.lastIndexOf("/")));
+			
 			if (bg.exists()) {
-				llMain.setBackgroundDrawable(Drawable.createFromPath(bg
-						.getAbsolutePath()));
+				try{
+					llMain.setBackgroundDrawable(Drawable.createFromPath(bg
+							.getAbsolutePath()));
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
 			} else {
 				try {
 					DuoleUtils.downloadSingleFile(new URL(Constants.Duole
@@ -82,7 +80,16 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 					e.printStackTrace();
 				}
 			}
+		
 		}
+		
+		
+		String ivUrl = asset.getThumbnail();
+		String ivThumb = Constants.CacheDir + Constants.RES_THUMB + ivUrl.substring(ivUrl.lastIndexOf("/"));
+		ivMusicThumb.setImageDrawable(Drawable.createFromPath(ivThumb));
+		tvMusicTitle.setText(asset.getFilename());
+		
+		if (!Constants.bgRestUrl.equals("")) {}
 	}
 	
 	public void setMusicData(int index) {
@@ -140,7 +147,6 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 			
 			if (!Constants.SLEEP_TIME && !Constants.ENTIME_OUT) {
 				finish();
-				sendBroadcast(new Intent(Constants.Event_AppEnd));
 			}
 			break;
 		}
@@ -157,6 +163,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 	@Override
 	protected void onPause() {
 		mp.pause();
+		finish();
 		super.onPause();
 	}
 

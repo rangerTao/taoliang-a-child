@@ -22,8 +22,6 @@ public class BackgroundRefreshService extends Service{
 	@Override
 	public IBinder onBind(Intent arg0) {
 
-		
-//		acquireWakeLock();
 		am = (AlarmManager) this.getSystemService(ALARM_SERVICE);
 		
 		Intent ii = new Intent(Constants.Refresh_Start);

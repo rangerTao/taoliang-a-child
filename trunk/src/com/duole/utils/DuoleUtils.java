@@ -102,6 +102,8 @@ public class DuoleUtils {
 
 		// Whether TF card inserted.
 		String status = Environment.getExternalStorageState();
+		
+		
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			return false;
 		}
@@ -268,9 +270,8 @@ public class DuoleUtils {
 			File file = new File(Constants.CacheDir
 					+ "/thumbnail"
 					+ "/"
-					+ asset.getThumbnail().substring(
-							asset.getThumbnail().lastIndexOf("/")));
-
+					+ pic.substring(
+							pic.lastIndexOf("/")));
 			if (downloadSingleFile(asset, url, file))
 				return true;
 		}
@@ -291,7 +292,7 @@ public class DuoleUtils {
 				return new URL(url);
 
 			} else {
-				url = "http://www.67sh.com" + url;
+				url = "http://www.duoleyuan.com" + url;
 				return new URL(url);
 			}
 		} catch (MalformedURLException e) {
@@ -565,6 +566,11 @@ public class DuoleUtils {
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile,Constants.XML_UPDATE, Constants.TRUE);
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME,updateHour);
 		    				Constants.clientApkDownloaded = true;
+		    				
+		    				url = Constants.ClientUpdate + "?cver=" + ver + "&cmcode=" + mCode;
+		    				
+		    				DuoleNetUtils.connect(url);
+		    				
 		    			}
 		    		}else{
 		    			if(!ver.equals(DuoleUtils.getPackageVersion(client))){
@@ -664,8 +670,7 @@ public class DuoleUtils {
 	 */
 	public static boolean getSourceList(ArrayList<Asset> alAsset) {
 		try {
-			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
-			"http://www.67sh.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
+			String url = "http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);

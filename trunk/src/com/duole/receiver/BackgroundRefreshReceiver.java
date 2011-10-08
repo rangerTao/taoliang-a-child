@@ -1,15 +1,18 @@
 package com.duole.receiver;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import com.duole.Duole;
 import com.duole.asynctask.ItemListTask;
 import com.duole.player.MusicPlayerActivity;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleSysConfigUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.XmlUtils;
 
+import android.R.xml;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -43,10 +46,17 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 			try{
 				Date dateStart = sdf.parse(sleepStart);
 				Date dateEnd = sdf.parse(sleepEnd);
-
-				if(date.after(dateStart) && date.before(dateEnd)){
+				
+				Log.v("TAG"	, dateStart.toString());
+				Log.v("TAG", date.toString());
+				Log.v("TAG",dateEnd.toString());
+				
+				if(date.after(dateStart) || date.before(dateEnd)){
 					if (!Constants.musicPlayerIsRunning) {
 						Constants.SLEEP_TIME = true;
+						
+//						DuoleSysConfigUtils.disableWifi(context);
+						
 						Intent intent1 = new Intent(Duole.appref,
 								MusicPlayerActivity.class);
 						intent1.putExtra("index", "1");
@@ -56,19 +66,21 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					}
 					
 					String curHour = Constants.sdf_hour.format(date);
-					if(curHour.equals(Constants.system_uptime.substring(0, 2))){
-						Log.v("TAG",Constants.system_uptime);
+					String uptime = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME);
+					Log.v("TAG","curhour + uptime" + curHour + "   " + uptime);
+					if(curHour.equals(uptime.substring(0, 2))){
 						DuoleUtils.instalUpdateApk(context);
 					}
 					
 				}else if(Constants.SLEEP_TIME){
-					Log.v("TAG", "time out");
 					Constants.SLEEP_TIME = false;
+					
+//					DuoleSysConfigUtils.enableWifi(context);
+					
 					Duole.appref.sendBroadcast(new Intent("com.duole.restime.out"));
 					Constants.musicPlayerIsRunning = false;
 				}
 			}catch(Exception e){
-				Log.v("TAG"	, e.getMessage());
 				Constants.SLEEP_TIME = false;
 			}
 			

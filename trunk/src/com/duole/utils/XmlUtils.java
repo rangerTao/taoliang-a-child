@@ -26,8 +26,13 @@ import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.content.ComponentName;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.Log;
 import android.util.Xml;
 
 import com.duole.Duole;
@@ -185,6 +190,9 @@ public class XmlUtils {
 						if(Constants.XML_TYPE.equals(parser.getName())){
 							asset.setType(parser.nextText());
 						}
+						if(Constants.XML_BG.equals(parser.getName())){
+							asset.setBg(parser.nextText());
+						}
 					}
 					
 					if (Constants.XML_BGURL.equals(parser.getName())) {
@@ -194,16 +202,37 @@ public class XmlUtils {
 						Constants.bgRestUrl = parser.nextText();
 					}
 					if (Constants.XML_ENTIME.equals(parser.getName())) {
-						Constants.entime = parser.nextText();
+						String entime = parser.nextText();
+						if(entime.equals("")){
+							Constants.entime = "25";
+						}else{
+							Constants.entime = entime;
+						}
+						
 					}
 					if (Constants.XML_RESTIME.equals(parser.getName())) {
-						Constants.restime = parser.nextText();
+						String entime = parser.nextText();
+						if(entime.equals("")){
+							Constants.restime = "120";
+						}else{
+							Constants.restime = entime;
+						}
 					}
 					if (Constants.XML_SLEEPSTART.equals(parser.getName())) {
-						Constants.sleepstart = parser.nextText();
+						String entime = parser.nextText();
+						if(entime.equals("")){
+							Constants.sleepstart = "22:00";
+						}else{
+							Constants.sleepstart = entime;
+						}
 					}
 					if (Constants.XML_SLEEPEND.equals(parser.getName())) {
-						Constants.sleepend = parser.nextText();
+						String entime = parser.nextText();
+						if(entime.equals("")){
+							Constants.sleepend = "07:00";
+						}else{
+							Constants.sleepend = entime;
+						}
 					}
 					if (Constants.XML_KE.equals(parser.getName())){
 						Constants.ke = parser.nextText();
@@ -427,6 +456,7 @@ public class XmlUtils {
 
 					PackageInfo info;
 					info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+
 					if(info != null){
 						Text packag = document.createTextNode(info.packageName);
 						Element newPackage = document.createElement("package");
@@ -664,6 +694,12 @@ public class XmlUtils {
 			if (!value.equals("")){
 				nl = document.getElementsByTagName(name);
 				if(nl.getLength() > 0){
+					if(nl.item(0).getFirstChild() != null){
+						nl.item(0).getFirstChild().setNodeValue(value);
+					}else{
+						Text nodevalue = document.createTextNode(value);
+						nl.item(0).appendChild(nodevalue);
+					}
 					nl.item(0).getFirstChild().setNodeValue(value);
 				}else{
 					createNode(document,name,value);
@@ -679,7 +715,7 @@ public class XmlUtils {
 			transformer.transform(domSource, streamResult);
 			iStream.close();
 		}catch(Exception e){
-			
+			e.printStackTrace();
 			return false;
 		}
 		

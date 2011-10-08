@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,7 +29,7 @@ public class PasswordActivity extends BaseActivity {
 	EditText etOldPass;
 	EditText etNewPass;
 	EditText etNewPassConfirm;
-
+	String passwd;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -42,6 +43,12 @@ public class PasswordActivity extends BaseActivity {
 		Intent intent = this.getIntent();
 		String type = intent.getStringExtra("type");
 
+		passwd = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_PASSWORD);
+		Log.v("TAG", passwd);
+		if(passwd.equals("")){
+			passwd = Constants.defaultPasswd;
+		}
+		
 		if (type.equals("0")) {
 
 			doCheckPassword();
@@ -69,7 +76,7 @@ public class PasswordActivity extends BaseActivity {
 
 			public void onClick(View arg0) {
 				String pass = etOldPass.getText().toString();
-				if (pass.equals(Constants.System_Password)) {
+				if (pass.equals(passwd)) {
 					Intent intent = new Intent(appref,
 							SystemConfigActivity.class);
 					appref.startActivity(intent);
@@ -125,7 +132,7 @@ public class PasswordActivity extends BaseActivity {
 				String newpass = etNewPass.getText().toString();
 				String newpassconfirm = etNewPassConfirm.getText().toString();
 
-				if (!oldpass.equals(Constants.System_Password)) {
+				if (!oldpass.equals(passwd)) {
 					new AlertDialog.Builder(appref)
 							.setTitle(R.string.password_wrong)
 							.setMessage(R.string.password_old_wrong)
@@ -168,9 +175,10 @@ public class PasswordActivity extends BaseActivity {
 										}
 									}).show();
 				} else {
-					Constants.System_Password = newpass;
+					
 					if (XmlUtils.updateSingleNode(Constants.SystemConfigFile ,Constants.XML_PASSWORD,
 							newpass)) {
+						Constants.System_Password = newpass;
 						Toast.makeText(appref, R.string.password_set_success,
 								2000).show();
 						finish();
