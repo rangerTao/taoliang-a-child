@@ -61,6 +61,7 @@ public class Constants {
 	public static final String RES_THUMB = "thumbnail";
 	public static final String RES_APK = "apk";
 	public static final String RES_CONFIG = "config";
+	public static final String RES_CONFIG_STATUS = "status";
 	public static final String RES_ABOUT = "about";
 	
 	//Configuration
