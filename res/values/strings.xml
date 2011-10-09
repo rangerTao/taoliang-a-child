@@ -96,5 +96,8 @@
 	<string name="restime">\u4f11\u606f\u65f6\u95f4\u5269\u4f59</string>
 	<string name="sleepstart">\u7761\u7720\u5f00\u59cb\u65f6\u95f4</string>
 	<string name="sleepend">\u7761\u7720\u7ed3\u675f\u65f6\u95f4</string>
+	
+	<string name="batterylevel">\u7535\u6c60\u7535\u91cf</string>
+	<string name="systemstatus">\u7cfb\u7edf\u72b6\u6001</string>
 </resources>
 

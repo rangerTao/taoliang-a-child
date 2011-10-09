@@ -530,6 +530,11 @@ public class DuoleUtils {
     	asset.setFilename(Duole.appref.getString(R.string.system_tweak));
     	
     	assets.add(asset);
+    	
+    	asset = new Asset();
+    	asset.setType(Constants.RES_CONFIG_STATUS);
+    	asset.setFilename(Duole.appref.getString(R.string.systemstatus));
+    	assets.add(asset);
     }
     
     /**

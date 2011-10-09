@@ -15,12 +15,6 @@
 			android:enabled="false" android:selectable="true" android:key="preListWifi" />
 	</PreferenceCategory>
 
-	<PreferenceCategory android:title="@string/system_tweak">
-		<Preference android:title="@string/volume_tweak"
-			android:key="preVolume"></Preference>
-		<Preference android:title="@string/bright_tweak"
-			android:key="preBright"></Preference>
-	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/user_info"
 		android:key="pcUserInfo">
 		<Preference android:title="@string/device_id" android:key="preDeviceId"

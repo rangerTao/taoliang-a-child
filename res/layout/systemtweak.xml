@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="300dip"
+	android:layout_height="match_parent">
+
+	<TextView android:id="@+id/tvWifiStatus" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="@string/network" />
+	<TextView android:id="@+id/WifiStatus" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<TextView android:id="@+id/tvBatteryStatus"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:text="@string/batterylevel" />
+	<TextView android:id="@+id/BatteryStatus"
+		android:layout_width="fill_parent" android:layout_height="wrap_content" />
+	<TextView android:id="@+id/tvVolumeTweak"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:text="@string/volume_tweak" />
+	<SeekBar android:id="@+id/sbVolume" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+
+	<TextView android:id="@+id/tvBrightnessTweak"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:text="@string/bright_tweak" />
+	<SeekBar android:id="@+id/sbBrightness" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		<Button android:id="@+id/btnClose" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="close" android:layout_centerHorizontal="true" />
+	</RelativeLayout>
+
+</LinearLayout>

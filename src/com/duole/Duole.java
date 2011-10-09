@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import com.duole.activity.BaseActivity;
 import com.duole.activity.PasswordActivity;
+import com.duole.activity.SystemTweakActivity;
 import com.duole.asynctask.ItemListTask;
 import com.duole.layout.ScrollLayout;
 import com.duole.listener.OnScrolledListener;
@@ -473,6 +474,9 @@ public class Duole extends BaseActivity {
 				}else if(assItem.getType().equals(Constants.RES_CONFIG)){
 					intent = new Intent(appref,PasswordActivity.class);
 					intent.putExtra("type", "0");
+				}else if(assItem.getType().equals(Constants.RES_CONFIG_STATUS)){
+						intent = new Intent(appref,SystemTweakActivity.class);
+						
 				}else if (assItem.getType().equals(Constants.RES_VIDEO)){
 					intent = new Intent(appref , VideoPlayerActivity.class);
 
