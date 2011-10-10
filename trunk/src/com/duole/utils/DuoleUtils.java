@@ -311,8 +311,6 @@ public class DuoleUtils {
 	 */
 	public static boolean downloadSingleFile(Asset asset ,URL url, File file) {
 		try {
-			Log.v("TAG", asset.getType());
-			Log.v("TAG", url.toString());
 			//get the name of file
 			String filename = file.getName();
 			File cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
@@ -330,7 +328,7 @@ public class DuoleUtils {
 			}
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + asset.getUrl());
 			Constants.AssetList.remove(asset);
 			return false;
 		}
