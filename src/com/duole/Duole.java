@@ -417,7 +417,6 @@ public class Duole extends BaseActivity {
 			Asset assItem = (Asset) parent.getItemAtPosition(position);
 
 			Intent intent = null;
-
 			try {
 				// launcher the package
 				if (assItem.getType().equals(Constants.RES_AUDIO)) {
@@ -477,7 +476,7 @@ public class Duole extends BaseActivity {
 				}else if(assItem.getType().equals(Constants.RES_CONFIG_STATUS)){
 						intent = new Intent(appref,SystemTweakActivity.class);
 						
-				}else if (assItem.getType().equals(Constants.RES_VIDEO)){
+				}else if (assItem.getType().equals(Constants.RES_VIDEO) && !assItem.getUrl().endsWith(".swf") && !assItem.getUrl().endsWith(".flv")){
 					intent = new Intent(appref , VideoPlayerActivity.class);
 
 					intent.putExtra("index", position + "");

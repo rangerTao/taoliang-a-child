@@ -51,7 +51,7 @@ public class DownloadFileUtils extends Thread {
 			//Download thumbnail.
 			DuoleUtils.downloadPic(asset,asset.getThumbnail());
 			
-			if(!asset.getBg().equals("")){
+			if(asset.getBg() != null && !asset.getBg().equals("")){
 				Log.v("TAG", "download bg " + asset.getBg());
 				DuoleUtils.downloadPic(asset, asset.getBg());
 			}
