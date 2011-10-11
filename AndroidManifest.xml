@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.duole" android:versionCode="1" android:versionName="1.05.0007">
+	package="com.duole" android:versionCode="1" android:versionName="1.05.0009">
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:sharedUserId="android.uid.system" android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 		<activity android:name="Duole" android:label="@string/app_name"
-			android:screenOrientation="landscape">
+			android:screenOrientation="landscape" android:launchMode="singleTask">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
-				<!-- <category android:name="android.intent.category.HOME" /> -->
-				<!-- <category android:name="android.intent.category.DEFAULT" /> -->
-				<category android:name="android.intent.category.LAUNCHER" />
+				<category android:name="android.intent.category.HOME" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<!-- <category android:name="android.intent.category.LAUNCHER" /> -->
 			</intent-filter>
 		</activity>
 
@@ -73,6 +73,7 @@
 	<!-- Create or delete files -->
 	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
 	<!-- output datas. -->
+	<user-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS"/>	
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -83,4 +84,6 @@
 	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+	<uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
+	
 </manifest> 

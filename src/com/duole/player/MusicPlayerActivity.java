@@ -37,11 +37,11 @@ import android.widget.RelativeLayout;
 import com.duole.Duole;
 import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
-import com.duole.layout.MusicGallery;
 import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.MusicItemAdapter;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleUtils;
+import com.duole.widget.MusicGallery;
 
 public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusChangeListener, OnItemSelectedListener, OnClickListener, OnItemClickListener, OnCompletionListener{
 
@@ -104,6 +104,8 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	}
 	
 	private void initProgressBar(){
+		
+		Duole.appref.gameCountDown.pause();
 		
 		if(type != null && type.equals("rest")){
 			pbCountDown = (ProgressBar) findViewById(R.id.pbRestTime);
@@ -298,6 +300,12 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	public void onCompletion(MediaPlayer arg0) {
 		btnPlay.setBackgroundResource(R.drawable.play);
 		mp.seekTo(0);
+	}
+
+	@Override
+	protected void onPause() {
+		Constants.musicPlayerIsRunning = false;
+		super.onPause();
 	}
 	
 	

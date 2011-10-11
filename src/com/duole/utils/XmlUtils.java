@@ -257,8 +257,8 @@ public class XmlUtils {
 		}catch (Exception e){
 			e.printStackTrace();
 			createItemList();
-			Constants.AssetList = readFile(filePath,
-					dBuilder);
+//			Constants.AssetList = readFile(filePath,
+//					dBuilder);
 		}
 		 
 		return result;

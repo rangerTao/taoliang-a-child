@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.ActivityManager;
 import android.app.ExpandableListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -26,6 +27,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -46,7 +48,6 @@ import com.duole.activity.BaseActivity;
 import com.duole.activity.PasswordActivity;
 import com.duole.activity.SystemTweakActivity;
 import com.duole.asynctask.ItemListTask;
-import com.duole.layout.ScrollLayout;
 import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
 import com.duole.player.SingleMusicPlayerActivity;
@@ -57,8 +58,10 @@ import com.duole.pojos.asset.Asset;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.XmlUtils;
+import com.duole.widget.ScrollLayout;
 
 public class Duole extends BaseActivity {
 
@@ -121,6 +124,8 @@ public class Duole extends BaseActivity {
 		try {
 
 			initContents();
+			
+			enableWifiState();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -131,14 +136,16 @@ public class Duole extends BaseActivity {
 
 			@Override
 			public void scrolled(final int last, final int index) {
-				
 				setPageDividerSelected(last,index);
-				
 			}
-			
 		});
-		
-		
+	}
+	
+	private void enableWifiState(){
+		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if(!wm.isWifiEnabled()){
+			wm.setWifiEnabled(true);
+		}
 	}
 	
 	private void initEnTimeProgressBar(){
@@ -415,7 +422,8 @@ public class Duole extends BaseActivity {
 				long id) {
 			// TODO Auto-generated method stub
 			Asset assItem = (Asset) parent.getItemAtPosition(position);
-
+			playStart = System.currentTimeMillis();
+			resourceId = assItem.getId();
 			Intent intent = null;
 			try {
 				// launcher the package
@@ -435,6 +443,8 @@ public class Duole extends BaseActivity {
 					intent.addCategory(Intent.CATEGORY_LAUNCHER);  
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
 					intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);  
+					
+					pkgName = assItem.getPackag();
 					
 					boolean startactivity = true;
 					int activities = 1;
@@ -461,6 +471,7 @@ public class Duole extends BaseActivity {
 							if(activities < info.activities.length - 1){
 								activities ++;
 							}else{
+								
 								startactivity = false;
 							}
 							
@@ -479,7 +490,14 @@ public class Duole extends BaseActivity {
 				}else if (assItem.getType().equals(Constants.RES_VIDEO) && !assItem.getUrl().endsWith(".swf") && !assItem.getUrl().endsWith(".flv")){
 					intent = new Intent(appref , VideoPlayerActivity.class);
 
-					intent.putExtra("index", position + "");
+					if (assItem.getUrl().startsWith("http:")) {
+						intent.putExtra("filename", assItem.getUrl());
+					} else {
+						intent.putExtra(
+								"filename",
+								assItem.getUrl().substring(
+										assItem.getUrl().lastIndexOf("/")));
+					}
 				}else{
 
 					intent = new Intent(appref, FlashPlayerActivity.class);
@@ -526,6 +544,12 @@ public class Duole extends BaseActivity {
 	
 	@Override
 	protected void onResume(){
+		
+		Log.v("TAG", "on resume");
+		if(pkgName != null && !pkgName.equals(""))
+			forceStopActivity();
+		
+		uploadGamePeriod();
 		
 		if(this.mScrollLayout.getChildCount() <= 0){
 			try {

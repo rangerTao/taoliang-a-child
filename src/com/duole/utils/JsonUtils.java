@@ -18,12 +18,13 @@ public class JsonUtils {
 	public static void parserJson(ArrayList<Asset> alAsset ,JSONObject jsonObject) throws MalformedURLException, JSONException{
 		File client;
 		String version = jsonObject.getString("ver");
-		
+		client = new File(Constants.CacheDir + "client.apk");
 		Log.v("TAG", "server version" + version);
 		Log.v("TAG", "local version" + Constants.System_ver);
 		if(!version.equals(Constants.System_ver)){
 			client = new File(Constants.CacheDir + "client.apk");
-			if((!client.exists() || !version.equals(DuoleUtils.getPackageVersion(client))) && !Constants.clientApkDownloaded){
+			Log.v("TAG", "apk version " + DuoleUtils.getPackageVersion(client));
+			if((!client.exists() || !version.equals("1.05.0004")) && !Constants.clientApkDownloaded){
 				DuoleUtils.updateClient();
 			}
 		}else{
@@ -53,7 +54,7 @@ public class JsonUtils {
 		}
 		
 		
-		if (file == null || !file.exists() || Constants.bgurl != jsonObject.getString("bg")) {
+		if (file == null || !file.exists() && Constants.bgurl != jsonObject.getString("bg")) {
 			
 			Constants.bgurl = jsonObject.getString("bg");
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole + Constants.bgurl), file);
@@ -77,19 +78,15 @@ public class JsonUtils {
 //		}
 		
 		if (file == null || !file.exists()
-				|| Constants.bgRestUrl != jsonObject.getString("bg1")) {
+				&& Constants.bgRestUrl != jsonObject.getString("bg1")) {
 			Constants.bgRestUrl = jsonObject.getString("bg1");
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
 					+ Constants.bgRestUrl), file);
 		}
-//		Constants.ke = jsonObject.getString("ke");
 		Constants.entime = jsonObject.getString("entime");
 		Constants.restime = jsonObject.getString("restime");
 		Constants.sleepstart = jsonObject.getString("sleepstart");
 		Constants.sleepend = jsonObject.getString("sleepend");
-		
-		Log.v("TAG",Constants.sleepstart);
-		Log.v("TAG",Constants.sleepend);
 		
 		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);
 		XmlUtils.updateSingleNode(Constants.XML_RESTIME, Constants.restime);

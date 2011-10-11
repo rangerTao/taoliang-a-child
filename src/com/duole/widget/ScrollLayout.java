@@ -1,4 +1,4 @@
-package com.duole.layout;
+package com.duole.widget;
 
 import com.duole.listener.OnScrolledListener;
 

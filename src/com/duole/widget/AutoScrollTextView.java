@@ -1,4 +1,4 @@
-package com.duole.layout;
+package com.duole.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

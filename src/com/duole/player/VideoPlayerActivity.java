@@ -1,20 +1,22 @@
 package com.duole.player;
 
+import java.net.URI;
+
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.MediaController;
-import android.widget.VideoView;
 
 import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
-import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
+import com.duole.widget.DuoleVideoView;
 
 public class VideoPlayerActivity extends PlayerBaseActivity {
 
-	int index;
+	String filename;
 	Intent intent;
-	VideoView vvPlayer;
+	DuoleVideoView vvPlayer;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,20 +25,23 @@ public class VideoPlayerActivity extends PlayerBaseActivity {
 
 		this.setContentView(R.layout.videoplayer);
 
-		vvPlayer = (VideoView) findViewById(R.id.vvVideoPlayer);
+		vvPlayer = (DuoleVideoView) findViewById(R.id.vvVideoPlayer);
 
 		intent = getIntent();
-		index = Integer.parseInt(intent.getStringExtra("index"))  - 1;
+		filename = intent.getStringExtra("filename");
 		
 		initViewPlayer();
 	}
 
 	private void initViewPlayer(){
-
-		Asset asset = Constants.AssetList.get(index);
-		String path = asset.getUrl();
 		
-		vvPlayer.setVideoPath(Constants.CacheDir + Constants.RES_VIDEO + path.substring(path.lastIndexOf("/")));
+		if(filename.startsWith("http")){
+			Uri uri = Uri.parse(filename);
+			vvPlayer.setVideoURI(uri);
+		}else{
+			vvPlayer.setVideoPath(Constants.CacheDir + Constants.RES_VIDEO + filename);
+		}
+		
 
 		MediaController mc = new MediaController(this);
 
@@ -44,4 +49,20 @@ public class VideoPlayerActivity extends PlayerBaseActivity {
 
 		vvPlayer.start();
 	}
+
+	@Override
+	protected void onPause() {
+		finish();
+		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		vvPlayer.destroyDrawingCache();
+		super.onDestroy();
+	}
+	
+	
+	
+	
 }

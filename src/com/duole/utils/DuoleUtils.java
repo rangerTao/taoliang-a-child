@@ -366,6 +366,7 @@ public class DuoleUtils {
 			bis.close();
 			return true;
 		} catch (Exception e) {
+			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + url.toString());
 			e.printStackTrace();
 			if(file != null){
 				file.delete();
@@ -764,5 +765,20 @@ public class DuoleUtils {
 		}
 		
 		return false;
+	}
+	
+	
+	public static int parseMillsToMinutes(long period){
+		
+		if(period == 0){
+			return 20;
+		}
+		
+		int mins = (int) (period / 60000);
+		if(period % 1000 > 0){
+			mins += 1;
+		}
+		
+		return mins;
 	}
 }

@@ -12,6 +12,8 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import com.duole.R;
+import com.duole.utils.Constants;
 
 public class SystemTweakActivity extends BaseActivity implements
 		OnClickListener {
@@ -50,7 +53,7 @@ public class SystemTweakActivity extends BaseActivity implements
 		btnClose.setOnClickListener(this);
 		batteryStatus = (TextView) findViewById(R.id.BatteryStatus);
 
-		connectSavedWifi();
+		initWifiSetting();
 
 		registerReceiver(batteryChangedReceiver, new IntentFilter(
 				Intent.ACTION_BATTERY_CHANGED));
@@ -58,6 +61,16 @@ public class SystemTweakActivity extends BaseActivity implements
 		volumeTweak();
 		
 		brightnessTweak();
+	}
+	
+	private void initWifiSetting() {
+		wifiManager = (WifiManager) appref
+				.getSystemService(Context.WIFI_SERVICE);
+
+		detectWifiStatus(wifiManager,wifiStatus);
+		
+		connectSavedWifi();
+
 	}
 
 	private void connectSavedWifi() {
@@ -76,7 +89,7 @@ public class SystemTweakActivity extends BaseActivity implements
 			if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
 				int level = intent.getIntExtra("level", 0);
 				int scale = intent.getIntExtra("scale", 100);
-				batteryStatus.setText("电池电量：" + (level * 100 / scale) + "%");
+				batteryStatus.setText(appref.getString(R.string.batterylevel) +  (level * 100 / scale) + "%");
 			}
 		}
 	};
@@ -88,56 +101,36 @@ public class SystemTweakActivity extends BaseActivity implements
 		public void onReceive(Context context, Intent intent) {
 
 			Log.v("TAG", intent.getAction());
-
-			if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent
-					.getAction())) {
-				handleStateChanged(WifiInfo
-						.getDetailedStateOf((SupplicantState) intent
-								.getParcelableExtra(WifiManager.EXTRA_NEW_STATE)));
-			} else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent
-					.getAction())) {
-				switch (wifiManager.getWifiState()) {
-				case WifiManager.WIFI_STATE_DISABLED:
-					wifiStatus.setText(appref.getString(R.string.wifi_closed));
-					break;
-				case WifiManager.WIFI_STATE_DISABLING:
-					wifiStatus.setText(appref.getString(R.string.wifi_closing));
-					break;
-				case WifiManager.WIFI_STATE_ENABLED:
-					wifiInfo = wifiManager.getConnectionInfo();
-					if (wifiInfo.getNetworkId() != -1) {
-						wifiStatus.setText(getString(R.string.wifi_enabled)
-								+ wifiInfo.getSSID());
-					} else {
-						wifiStatus.setText(getString(R.string.wifi_opened));
-					}
-					break;
-				case WifiManager.WIFI_STATE_ENABLING:
-					wifiInfo = wifiManager.getConnectionInfo();
-					wifiStatus.setText(appref.getString(R.string.wifi_enabling)
-							+ wifiInfo.getSSID());
-					break;
-				case WifiManager.WIFI_STATE_UNKNOWN:
-					break;
-				}
-			} else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent
-					.getAction())) {
-				handleStateChanged(((NetworkInfo) intent
-						.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO))
-						.getDetailedState());
-			}
+			
+			detectWifiStatus(wifiManager,wifiStatus);
 
 		}
-
 	};
-
-	private void handleStateChanged(NetworkInfo.DetailedState state) {
-		// WifiInfo is valid if and only if Wi-Fi is enabled.
-		// Here we use the state of the check box as an optimization.
-		WifiInfo info = wifiManager.getConnectionInfo();
-		if (info != null) {
-			Log.v("TAG", state.name() + "     " + state.ordinal());
-			wifiStatus.setText(Summary.get(appref, info.getSSID(), state));
+	
+	public void detectWifiStatus(WifiManager wifiManager, TextView tView) {
+		switch (wifiManager.getWifiState()) {
+		case WifiManager.WIFI_STATE_DISABLED:
+			tView.setText(appref.getString(R.string.wifi_closed));
+			break;
+		case WifiManager.WIFI_STATE_DISABLING:
+			tView.setText(appref.getString(R.string.wifi_closing));
+			break;
+		case WifiManager.WIFI_STATE_ENABLED:
+			wifiInfo = wifiManager.getConnectionInfo();
+			if (wifiInfo.getNetworkId() != -1) {
+				tView.setText(getString(R.string.wifi_enabled)
+						+ wifiInfo.getSSID());
+			} else {
+				tView.setText(getString(R.string.wifi_opened));
+			}
+			break;
+		case WifiManager.WIFI_STATE_ENABLING:
+			wifiInfo = wifiManager.getConnectionInfo();
+			tView.setText(appref.getString(R.string.wifi_enabling)
+					+ wifiInfo.getSSID());
+			break;
+		case WifiManager.WIFI_STATE_UNKNOWN:
+			break;
 		}
 	}
 
@@ -238,5 +231,13 @@ public class SystemTweakActivity extends BaseActivity implements
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	protected void onPause() {
+		finish();
+		super.onPause();
+	}
+	
+	
 
 }

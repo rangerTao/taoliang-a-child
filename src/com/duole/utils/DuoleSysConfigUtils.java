@@ -38,35 +38,6 @@ public class DuoleSysConfigUtils {
 				.getSystemService(context.WIFI_SERVICE);
 		
 		wm.setWifiEnabled(true);
-		try{
-			List<WifiConfiguration> lws = wm.getConfiguredNetworks();
-			
-			wm.startScan();
-			List<ScanResult> scanResults = wm.getScanResults();
-			boolean isConfiged = false;
-			for (WifiConfiguration temp : lws) {
-
-				if (isConfiged == true) {
-					break;
-				}
-
-				for (ScanResult sr : scanResults) {
-					if (temp.SSID.equals("\"" + sr.SSID + "\"")) {
-						if(temp.status == WifiConfiguration.Status.ENABLED){
-							if (wm.enableNetwork(temp.networkId, true)) {
-								isConfiged = true;
-							}
-						}
-						
-					}
-				}
-			}
-		}catch(Exception exception){
-			exception.printStackTrace();
-		}
-		
-		
-
 		return true;
 	}
 }
