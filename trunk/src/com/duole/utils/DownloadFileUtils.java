@@ -47,7 +47,6 @@ public class DownloadFileUtils extends Thread {
 		try {
 			asset = Constants.DownLoadTaskList.get(index);
 			
-			Log.v("TAG", "download file " + asset.getUrl());
 			//Download thumbnail.
 			DuoleUtils.downloadPic(asset,asset.getThumbnail());
 			

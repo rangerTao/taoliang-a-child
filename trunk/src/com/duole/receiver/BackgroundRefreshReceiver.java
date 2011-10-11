@@ -51,34 +51,40 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				Log.v("TAG", date.toString());
 				Log.v("TAG",dateEnd.toString());
 				
-				if(date.after(dateStart) || date.before(dateEnd)){
-					if (!Constants.musicPlayerIsRunning) {
-						Constants.SLEEP_TIME = true;
-						
-//						DuoleSysConfigUtils.disableWifi(context);
-						
-						Intent intent1 = new Intent(Duole.appref,
-								MusicPlayerActivity.class);
-						intent1.putExtra("index", "1");
+				if(date.after(dateStart)){
+					if(date.before(dateEnd)){
+						if (!Constants.musicPlayerIsRunning) {
+							Constants.SLEEP_TIME = true;
+							
+							DuoleSysConfigUtils.disableWifi(context);
+							
+							//Take main task to front
+							Intent intentMain = new Intent(Duole.appref,Duole.class);
+							Duole.appref.startActivity(intentMain);
+							
+							Duole.appref.uploadGamePeriod();
+							
+							Intent intent1 = new Intent(Duole.appref,
+									MusicPlayerActivity.class);
+							intent1.putExtra("index", "1");
 
-						Duole.appref.startActivity(intent1);
-						Constants.musicPlayerIsRunning = true;
+							Duole.appref.startActivity(intent1);
+							Constants.musicPlayerIsRunning = true;
+						}
+						
+						String curHour = Constants.sdf_hour.format(date);
+						String uptime = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME);
+						if(curHour.equals(uptime.substring(0, 2))){
+							DuoleUtils.instalUpdateApk(context);
+						}
+					}else if(Constants.SLEEP_TIME){
+						Constants.SLEEP_TIME = false;
+						
+						DuoleSysConfigUtils.enableWifi(context);
+						
+						Duole.appref.sendBroadcast(new Intent("com.duole.restime.out"));
+						Constants.musicPlayerIsRunning = false;
 					}
-					
-					String curHour = Constants.sdf_hour.format(date);
-					String uptime = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME);
-					Log.v("TAG","curhour + uptime" + curHour + "   " + uptime);
-					if(curHour.equals(uptime.substring(0, 2))){
-						DuoleUtils.instalUpdateApk(context);
-					}
-					
-				}else if(Constants.SLEEP_TIME){
-					Constants.SLEEP_TIME = false;
-					
-//					DuoleSysConfigUtils.enableWifi(context);
-					
-					Duole.appref.sendBroadcast(new Intent("com.duole.restime.out"));
-					Constants.musicPlayerIsRunning = false;
 				}
 			}catch(Exception e){
 				Constants.SLEEP_TIME = false;

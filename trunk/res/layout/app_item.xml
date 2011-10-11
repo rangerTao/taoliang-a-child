@@ -11,7 +11,7 @@
 			android:layout_height="133px" />
 
 	</AbsoluteLayout>
-	<com.duole.layout.AutoScrollTextView
+	<com.duole.widget.AutoScrollTextView
 		android:id="@+id/tvAppName" android:layout_width="fill_parent"
 		android:gravity="center_horizontal" android:layout_alignLeft="@+id/alIcon"
 		android:layout_alignRight="@+id/alIcon" android:layout_below="@+id/alIcon"

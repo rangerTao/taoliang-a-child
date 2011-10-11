@@ -7,13 +7,13 @@ import java.util.Date;
 import com.duole.Duole;
 import com.duole.R;
 import com.duole.Duole.PageDiv;
-import com.duole.layout.ScrollLayout;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.XmlUtils;
+import com.duole.widget.ScrollLayout;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

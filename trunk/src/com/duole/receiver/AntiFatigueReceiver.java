@@ -18,7 +18,13 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 	public void onReceive(Context context, Intent intent) {
 		if(intent.getAction().equals(Constants.Event_AppStart)){
 			antiFatigueConfiguration();
-			Duole.appref.gameCountDown.resume();
+			
+			if(Duole.appref.gameCountDown != null){
+				Duole.appref.gameCountDown.resume();
+			}else{
+				Duole.appref.initCountDownTimer();
+				Duole.appref.gameCountDown.resume();
+			}
 		}
 		if(intent.getAction().equals(Constants.Event_AppEnd)){
 			Duole.appref.gameCountDown.pause();

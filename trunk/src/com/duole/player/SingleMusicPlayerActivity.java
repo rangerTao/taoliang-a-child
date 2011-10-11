@@ -74,7 +74,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 			} else {
 				try {
 					DuoleUtils.downloadSingleFile(new URL(Constants.Duole
-							+ Constants.bgRestUrl), bg);
+							+ mpbg), bg);
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -105,18 +105,6 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 			url = filename;
 		} else {
 			url = Constants.CacheDir + Constants.RES_AUDIO + filename;
-		}
-
-		LinearLayout llMusicPlayer = (LinearLayout) findViewById(R.id.llMusicPlayer);
-
-		if (!Constants.bgRestUrl.equals("")) {
-			File file = new File(Constants.CacheDir
-					+ Constants.bgRestUrl.substring(Constants.bgRestUrl
-							.lastIndexOf("/")));
-			if (file.exists()) {
-				llMusicPlayer.setBackgroundDrawable(Drawable
-						.createFromPath(file.getAbsolutePath()));
-			}
 		}
 
 		try {
