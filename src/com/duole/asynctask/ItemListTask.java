@@ -5,20 +5,14 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.duole.Duole;
-import com.duole.R;
 import com.duole.pojos.asset.Asset;
 import com.duole.thread.DeleteAssetFilesThread;
 import com.duole.utils.Constants;
@@ -59,6 +53,10 @@ public class ItemListTask extends AsyncTask {
 		
 		if(!Constants.DOWNLOAD_RUNNING){
 			Constants.DOWNLOAD_RUNNING = true;
+			
+			//upload local client version
+			DuoleNetUtils.uploadLocalVersion();
+			
 			gettedSourceList = getSourceList();
 			if(!gettedSourceList){
 				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
@@ -172,26 +170,4 @@ public class ItemListTask extends AsyncTask {
 		}
 
 	}
-
-	private static boolean checkUserName(){
-		
-		
-		
-		return true;
-	}
-	
-	private static void initBindDeviceView(View view){
-		
-		tvDeviceId = (TextView) view.findViewById(R.id.tvDeviceID);
-		tvUserName = (TextView) view.findViewById(R.id.tvUserName);
-		tvPassword = (TextView) view.findViewById(R.id.tvPassword);
-		etUserName = (EditText) view.findViewById(R.id.etUserName);
-		etPassword = (EditText) view.findViewById(R.id.etPassword);
-		
-		tvDeviceId.setText(Duole.appref.getString(R.string.strDeviceId) + " £º" + DuoleUtils.getAndroidId());
-		tvUserName.setText(R.string.strUserName);
-		tvPassword.setText(R.string.strPassword);
-		
-	}
-	
 }

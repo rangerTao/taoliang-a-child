@@ -24,7 +24,11 @@ public class JsonUtils {
 		if(!version.equals(Constants.System_ver)){
 			client = new File(Constants.CacheDir + "client.apk");
 			Log.v("TAG", "apk version " + DuoleUtils.getPackageVersion(client));
-			if((!client.exists() || !version.equals("1.05.0004")) && !Constants.clientApkDownloaded){
+			if(client.exists()){
+				if(!version.equals(DuoleUtils.getPackageVersion(client)) && !Constants.clientApkDownloaded){
+					DuoleUtils.updateClient();
+				}
+			}else{
 				DuoleUtils.updateClient();
 			}
 		}else{

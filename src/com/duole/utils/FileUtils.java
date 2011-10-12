@@ -1,9 +1,20 @@
 package com.duole.utils;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+
+import android.util.Log;
 
 public class FileUtils {
 
@@ -35,13 +46,12 @@ public class FileUtils {
 			int bytesum = 0;
 			int byteread = 0;
 			File oldfile = new File(oldPathFile);
-			if (oldfile.exists()) { // 文件存在时
+			if (oldfile.exists()) {
 				InputStream inStream = new FileInputStream(oldPathFile); // 读入原文件
 				FileOutputStream fs = new FileOutputStream(newPathFile);
 				byte[] buffer = new byte[512];
 				while ((byteread = inStream.read(buffer)) != -1) {
-					bytesum += byteread; // 字节数 文件大小
-					System.out.println(bytesum);
+					bytesum += byteread; 
 					fs.write(buffer, 0, byteread);
 				}
 				inStream.close();
@@ -51,4 +61,59 @@ public class FileUtils {
 			e.printStackTrace();
 		}
 	}
+
+	public static void readTxt(ArrayList<String[]> ids,String filepath){
+		
+		FileInputStream fis;
+		try {
+			File file = new File(filepath);
+			if(file.exists()){
+				fis = new FileInputStream(file);
+				
+				InputStreamReader isr = new InputStreamReader(fis);
+				
+				BufferedReader br = new BufferedReader(isr);
+				
+				String temp = br.readLine();
+				int index = 0;
+				while(temp != null){
+					String[] tem = temp.split(" ");
+					ids.add(tem);
+					temp = br.readLine();
+					index ++;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public static void saveTxt(String[] ids,String filepath){
+		
+		try{
+			File file = new File(filepath);
+			if(!file.exists())
+				file.createNewFile();
+			FileWriter fw = new FileWriter(file, true);
+			
+			if(ids == null){
+				fw.write("");
+			}else{
+				fw.write(ids[0] + " " + ids[1] + " " + ids[2] + "\n");
+			}
+			
+			fw.close();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
 }

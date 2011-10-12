@@ -220,18 +220,24 @@ public class Duole extends BaseActivity {
 		long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
 		
 		long poor = System.currentTimeMillis() - current;
-		long now = (poor) % (entime + restime);
+		long total = entime + restime;
+		long now = (poor) % (total);
 		
 		now = Math.abs(now);
 
 		Log.v("TAG", now + "");
-		if(now > 0 && now < entime){
-			entime -= now;
-			Log.v("TAG", entime + "entime");
-		}else if(now > 0 && now < entime + restime){
-			appref.startMusicPlay();
-			Log.v("TAG", restime + "entime");
+		
+		if(poor < total){
+			if(now > 0 && now < entime){
+				entime -= now;
+			}else if(now > 0 && now < entime + restime){
+				restime -= now;
+				appref.startMusicPlay();
+			}
 		}
+		
+		Log.v("TAG","entiem " + entime);
+		Log.v("TAG","restime " + restime);
 
 		gameCountDown = new DuoleCountDownTimer(entime, Constants.countInterval) {
 
@@ -436,7 +442,6 @@ public class Duole extends BaseActivity {
 
 				} else if(assItem.getType().equals(Constants.RES_APK)){
 					
-					
 					intent = new Intent();
 					intent.setComponent(new ComponentName(assItem.getPackag(),assItem.getActivity()));
 					intent.setAction(Intent.ACTION_MAIN);  
@@ -479,8 +484,6 @@ public class Duole extends BaseActivity {
 						
 					}
 					
-					
-					
 				}else if(assItem.getType().equals(Constants.RES_CONFIG)){
 					intent = new Intent(appref,PasswordActivity.class);
 					intent.putExtra("type", "0");
@@ -515,7 +518,6 @@ public class Duole extends BaseActivity {
 				if(!Constants.ENTIME_OUT){
 					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
 				}
-				
 
 				if(!assItem.getType().equals(Constants.RES_APK)){
 					mContext.startActivity(intent);

@@ -83,11 +83,11 @@ public class DuoleUtils {
 		if(!file.exists()){
 			file.mkdir();
 		}
-
-		// Whether itemlist.xml exists.
-		file = new File(Constants.CacheDir + "/itemlist.xml");
-		if (!file.exists()) {
-			// return false;
+		
+		//Create the log 
+		file = new File(Constants.CacheDir + "/log/");
+		if(!file.exists()){
+			file.mkdir();
 		}
 		
 		return true;
@@ -557,6 +557,7 @@ public class DuoleUtils {
 			String ver = json.getString("ver");
 			path = json.getString("path");
 			String updateHour = json.getString("uptime");
+			
 			if(!path.equals("null") || !path.equals("")){
 				File client = new File(Constants.CacheDir + "client.apk");
 		    	File newClient = new File(Constants.CacheDir + "/temp/" + path.substring(path.lastIndexOf("/")));
@@ -571,9 +572,9 @@ public class DuoleUtils {
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME,updateHour);
 		    				Constants.clientApkDownloaded = true;
 		    				
-		    				url = Constants.ClientUpdate + "?cver=" + ver + "&cmcode=" + mCode;
-		    				
-		    				DuoleNetUtils.connect(url);
+//		    				url = Constants.ClientUpdate + "?cver=" + ver + "&cmcode=" + mCode;
+//		    				
+//		    				DuoleNetUtils.connect(url);
 		    				
 		    			}
 		    		}else{
@@ -752,7 +753,7 @@ public class DuoleUtils {
 			if(!DuoleUtils.getVersion(context).equals(info.versionName)){
 				Log.v("TAG", "upate client");
 				try{
-//					XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE, Constants.FALSE);
+					XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, Constants.FALSE);
 					Log.v("TAG", "pm install -r" + client.getAbsolutePath());
 					DuoleUtils.installApkFromFile(client);
 				}catch(Exception e){
@@ -761,6 +762,8 @@ public class DuoleUtils {
 				
 				
 				return true;
+			}else{
+				client.delete();
 			}
 		}
 		

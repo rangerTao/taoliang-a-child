@@ -1,7 +1,11 @@
 package com.duole.activity;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONException;
@@ -26,6 +30,7 @@ import com.duole.player.MusicPlayerActivity;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
+import com.duole.utils.FileUtils;
 import com.duole.utils.XmlUtils;
 
 public class BaseActivity extends Activity {
@@ -95,64 +100,31 @@ public class BaseActivity extends Activity {
 		return true;
 	}
 	
-	public boolean uploadGamePeriod(){
-		
+	public boolean uploadGamePeriod() {
+
 		long playEnd = System.currentTimeMillis();
 		long period = playEnd - playStart;
-		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+
 		int min = DuoleUtils.parseMillsToMinutes(period);
-		
-		if(null!=resourceId && !"".equals(resourceId)){
-			String[] ids = new String[]{resourceId};
-			int[] mins = new int[]{min};
-			new UploadGamePeriod(ids,mins).start();
-		}
+
+		String[] var = new String[3];
+
+		if (!"".equals(resourceId)) {
+			var[0] = resourceId;
+			var[1] = min + "";
+			var[2] = sdf.format(new Date(playStart));
 			
+			Date date = new Date(System.currentTimeMillis());
+			SimpleDateFormat sdfFileName = new SimpleDateFormat("yyyy-MM-dd");
+			String currentday = sdfFileName.format(date);
+
+			FileUtils.saveTxt(var, Constants.CacheDir + "log/" + currentday);
+		}
+
 		
+
 		return true;
-		
-		
-	}
-}
 
-class UploadGamePeriod extends Thread{
-	
-	String[] ids;
-	int[] mins;
-	
-	public UploadGamePeriod(String[] ids,int[] mins){
-		this.ids = ids;
-		this.mins = mins;
 	}
-
-	@Override
-	public void run() {
-		
-		StringBuffer url = new StringBuffer();
-		url.append(Constants.UploadGamePeriod);
-		
-		for(int i = 0;i<ids.length;i++){
-			url.append("favaid=" + ids[i] + "&usetime=" + mins[i]);
-		}
-		
-		Log.v("TAG", "¨¹pload url" + url.toString());
-		String result = DuoleNetUtils.connect(url.toString());
-		
-		try {
-			JSONObject jsonObject = new JSONObject(result);
-			
-			String status = null;
-			
-			status = jsonObject.getString("status");
-			
-			Log.v("TAG", "¨¹pload status" + status);
-			
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		super.run();
-	}
-	
 }
