@@ -19,7 +19,7 @@ public class Constants {
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
 	public static final String Duole = "http://www.duoleyuan.com";
-	public static final String UploadGamePeriod = Duole + "/e/member/fava/childuseup.php?";
+	public static final String UploadGamePeriod = Duole + "/e/member/fava/childuseup.php";
 	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
 	
 	public static final String ItemList = CacheDir + "itemlist.xml";
@@ -102,6 +102,7 @@ public class Constants {
 	public static final String XML_UPDATE = "update";
 	public static final String XML_UPDATE_TIME = "uptime";
 	public static final String XML_LASTENSTART = "lastenstart";
+	public static final String XML_CLIENTVERSIONUPLOAD = "clientversionupload";
 	
 	
 	//refresh frequences.

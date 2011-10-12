@@ -15,12 +15,12 @@
 	<TextView android:id="@+id/tvVolumeTweak"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:text="@string/volume_tweak" android:paddingLeft="10px"/>
-	<SeekBar android:id="@+id/sbVolume" android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingLeft="20px" android:paddingRight="20px"/>
+	<SeekBar android:id="@+id/sbVolume" android:layout_width="fill_parent" android:layout_height="30px" android:paddingLeft="20px" android:paddingRight="20px"/>
 
 	<TextView android:id="@+id/tvBrightnessTweak"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:text="@string/bright_tweak" android:paddingLeft="10px"/>
-	<SeekBar android:id="@+id/sbBrightness" android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingLeft="20px" android:paddingRight="20px"/>
+	<SeekBar android:id="@+id/sbBrightness" android:layout_width="fill_parent" android:layout_height="30px" android:paddingLeft="20px" android:paddingRight="20px"/>
 	<RelativeLayout android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 		<Button android:id="@+id/btnClose" android:layout_width="wrap_content"

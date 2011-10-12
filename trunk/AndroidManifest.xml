@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.duole" android:versionCode="1" android:versionName="1.05.0009">
+	package="com.duole" android:versionCode="1" android:versionName="1.05.0011">
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:sharedUserId="android.uid.system" android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 		<activity android:name="Duole" android:label="@string/app_name"

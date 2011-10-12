@@ -6,6 +6,7 @@ import java.util.Date;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.duole.Duole;
 import com.duole.utils.Constants;
@@ -38,16 +39,21 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 	public void antiFatigueConfiguration(){
 		
 		String temp = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
+		Log.v("TAG", "last start" +  temp);
 		long lastDay = Long.parseLong(temp.equals("") ? "0" : temp);
 		
-		Date lastDateInstance = new Date(lastDay);
-		Date todayDate = new Date(System.currentTimeMillis());
-		String lastDate = sdf.format(lastDateInstance);
-		String today = sdf.format(todayDate);
-		if(!lastDate.equals(today)){
-			if(todayDate.after(lastDateInstance)){
-				XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
-			}
+		long current = System.currentTimeMillis();
+		
+		Log.v("TAG", "current millis" + current);
+		
+		Log.v("TAG", "poor" + Math.abs((current - lastDay)));
+		Log.v("TAG", "period " + ((Integer.parseInt(Constants.entime) + Integer.parseInt(Constants.restime)) * 60 * 1000));
+		if((int)Math.abs((current - lastDay)) > (Integer.parseInt(Constants.entime) + Integer.parseInt(Constants.restime)) * 60 * 1000){
+			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
+			
+			Log.v("TAG", "enstart changed " + System.currentTimeMillis());
+			
 		}
+		
 	}
 }

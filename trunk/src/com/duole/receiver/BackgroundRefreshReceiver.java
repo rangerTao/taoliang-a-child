@@ -8,6 +8,7 @@ import com.duole.Duole;
 import com.duole.asynctask.ItemListTask;
 import com.duole.player.MusicPlayerActivity;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleSysConfigUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.XmlUtils;
@@ -51,40 +52,45 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				Log.v("TAG", date.toString());
 				Log.v("TAG",dateEnd.toString());
 				
-				if(date.after(dateStart)){
-					if(date.before(dateEnd)){
-						if (!Constants.musicPlayerIsRunning) {
-							Constants.SLEEP_TIME = true;
-							
-							DuoleSysConfigUtils.disableWifi(context);
-							
-							//Take main task to front
-							Intent intentMain = new Intent(Duole.appref,Duole.class);
-							Duole.appref.startActivity(intentMain);
-							
-							Duole.appref.uploadGamePeriod();
-							
-							Intent intent1 = new Intent(Duole.appref,
-									MusicPlayerActivity.class);
-							intent1.putExtra("index", "1");
+				boolean isSleepTime = checkSleepTime(date,dateStart,dateEnd);
+				
+				if (isSleepTime) {
+					if (!Constants.musicPlayerIsRunning) {
+						Constants.SLEEP_TIME = true;
 
-							Duole.appref.startActivity(intent1);
-							Constants.musicPlayerIsRunning = true;
-						}
-						
-						String curHour = Constants.sdf_hour.format(date);
-						String uptime = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME);
-						if(curHour.equals(uptime.substring(0, 2))){
-							DuoleUtils.instalUpdateApk(context);
-						}
-					}else if(Constants.SLEEP_TIME){
-						Constants.SLEEP_TIME = false;
-						
-						DuoleSysConfigUtils.enableWifi(context);
-						
-						Duole.appref.sendBroadcast(new Intent("com.duole.restime.out"));
-						Constants.musicPlayerIsRunning = false;
+						DuoleSysConfigUtils.disableWifi(context);
+
+						// Take main task to front
+						Intent intentMain = new Intent(Duole.appref,
+								Duole.class);
+						Duole.appref.startActivity(intentMain);
+
+						Duole.appref.uploadGamePeriod();
+
+						Intent intent1 = new Intent(Duole.appref,
+								MusicPlayerActivity.class);
+						intent1.putExtra("index", "1");
+
+						Duole.appref.startActivity(intent1);
+						Constants.musicPlayerIsRunning = true;
 					}
+
+					String curHour = Constants.sdf_hour.format(date);
+					String uptime = XmlUtils.readNodeValue(
+							Constants.SystemConfigFile,
+							Constants.XML_UPDATE_TIME);
+					
+					if (curHour.equals(uptime.substring(0, 2))) {
+						DuoleUtils.instalUpdateApk(context);
+					}
+				} else if (Constants.SLEEP_TIME) {
+					Constants.SLEEP_TIME = false;
+
+					DuoleSysConfigUtils.enableWifi(context);
+
+					Duole.appref.sendBroadcast(new Intent(
+							"com.duole.restime.out"));
+					Constants.musicPlayerIsRunning = false;
 				}
 			}catch(Exception e){
 				Constants.SLEEP_TIME = false;
@@ -93,6 +99,26 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 			if(!Constants.DOWNLOAD_RUNNING){
 				new ItemListTask().execute();
 			}
+			
+			//upload game time
+			DuoleNetUtils.uploadGamePeriodLength();
 		}
+	}
+	
+	public boolean checkSleepTime(Date date,Date dateStart,Date dateEnd){
+	
+		if(dateStart.before(dateEnd)){
+			if(date.after(dateStart) && date.before(dateEnd)){
+				return true;
+			}
+		}
+		
+		if(dateStart.after(dateEnd)){
+			if(date.after(dateStart) || date.before(dateEnd)){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }
