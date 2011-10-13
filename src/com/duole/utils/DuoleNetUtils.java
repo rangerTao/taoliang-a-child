@@ -27,6 +27,7 @@ import com.duole.Duole;
 import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
+import android.database.CursorJoiner.Result;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
@@ -257,24 +258,29 @@ public class DuoleNetUtils {
 			}
 		}
 
-		String result = DuoleNetUtils.dopost(url.toString(), records);
+		if(records.size() > 0){
+			String result = DuoleNetUtils.dopost(url.toString(), records);
 
-		try {
-			JSONObject jsonObject = new JSONObject(result);
+			Log.v("TAG", "upload result " + result);
+			
+			try {
+				JSONObject jsonObject = new JSONObject(result);
 
-			String status = null;
-			status = jsonObject.getString("status");
-			Log.v("TAG", status + "  game time status");
+				String status = null;
+				status = jsonObject.getString("status");
+				Log.v("TAG", status + "  game time status");
 
-			if ("1".equals(status)) {
-				for (File file : logs) {
-					file.delete();
+				if ("1".equals(status)) {
+					for (File file : logs) {
+						file.delete();
+					}
 				}
-			}
 
-		} catch (JSONException e) {
-			e.printStackTrace();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
+		
 
 	}
 }

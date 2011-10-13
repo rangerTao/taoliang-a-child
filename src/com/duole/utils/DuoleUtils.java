@@ -770,7 +770,7 @@ public class DuoleUtils {
 		return false;
 	}
 	
-	
+	//get how many minutes.
 	public static int parseMillsToMinutes(long period){
 		
 		if(period == 0){

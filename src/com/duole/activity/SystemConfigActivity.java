@@ -2,6 +2,7 @@ package com.duole.activity;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.List;
 
 import org.json.JSONException;
@@ -111,6 +112,23 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		preStorage = this.findPreference(Constants.Pre_Storage);
 
+		//Get the usage of sd card.
+		getUsageOfSdcard();
+		
+		//init the settings of wifi.
+		initWifiSetting();
+
+		//get the detail info of user.
+		getUserInfo();
+		
+		//init the content of anti fatigure views.
+		initAntiFatigureViews();
+	}
+	
+	/**
+	 * Get the usage of sdcard.
+	 */
+	private void getUsageOfSdcard(){
 		//if tf card is ejected.
 		if (!DuoleUtils.checkTFCard()) {
 			preStorage.setTitle(getString(R.string.tf_unmounted));
@@ -118,10 +136,11 @@ public class SystemConfigActivity extends PreferenceActivity {
 			//get the info of tf card.
 			File sdcard = Environment.getExternalStorageDirectory();
 			StatFs statfs = new StatFs(sdcard.getAbsolutePath());
-			long totalSize = statfs.getBlockCount() * statfs.getBlockSize()
-					/ 1024 / 1024;
+			
+			long totalSize = countUp(statfs.getBlockCount(),statfs.getBlockSize());
+			Log.v("TAG", totalSize + "totalSize");
 			long usedSize = totalSize
-					- (statfs.getFreeBlocks() * statfs.getBlockSize() / 1024 / 1024);
+					- countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
 			if (totalSize > 1024) {
 				float total = totalSize / (float) 1024;
 				float used = usedSize / (float) 1024;
@@ -136,17 +155,11 @@ public class SystemConfigActivity extends PreferenceActivity {
 						+ "MB");
 			}
 		}
-
-		//init the settings of wifi.
-		initWifiSetting();
-
-		//get the detail info of user.
-		getUserInfo();
-		
-		//init the content of anti fatigure views.
-		initAntiFatigureViews();
 	}
 	
+	/**
+	 * init the anti fatigure infos.
+	 */
 	private void initAntiFatigureViews(){
 		
 		preTimeEclipsed = findPreference("preTimeEclipsed");
@@ -160,6 +173,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 		
 	}
 
+	/**
+	 * init the view of wifi settings.
+	 */
 	private void initWifiSetting() {
 		preWifi = (CheckBoxPreference) findPreference(Constants.Pre_Wifi);
 		wifiManager = (WifiManager) appref
@@ -199,6 +215,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 	}
 
+	/**
+	 * when selected to connect a saved wifi connection.
+	 */
 	private void connectSavedWifi() {
 
 		IntentFilter intentFilter = new IntentFilter(
@@ -282,6 +301,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 		super.onResume();
 	}
 
+	/**
+	 * Get the info of user related to this machine.
+	 */
 	public void getUserInfo() {
 		if (!isGetted) {
 			if (DuoleNetUtils.isNetworkAvailable(appref)) {
@@ -351,10 +373,26 @@ public class SystemConfigActivity extends PreferenceActivity {
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}
 	
+	/**
+	 * Get the size of used and free space on sdcard.
+	 * @param block counts.
+	 * @param block size.
+	 * @return
+	 */
+	private long countUp(int a, int b){
+		BigDecimal bc = new BigDecimal(a);
+		BigDecimal bs = new BigDecimal(b);
+		return Integer.parseInt(bc.multiply(bs).divide(new BigDecimal(1000).multiply(new BigDecimal(1000))).setScale(0,BigDecimal.ROUND_UP).toString());
+	}
+	
+	/**
+	 * Config wifi connections.
+	 */
 	private void configWifi(){
 		ListView lvWifi = new ListView(appref);
 		lvWifi.setCacheColorHint(Color.parseColor("#00000000"));
 
+		//The dialog of connections.
 		adWifi = new AlertDialog.Builder(appref)
 				.setTitle("Wifi")
 				.setView(lvWifi)
@@ -373,6 +411,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 		scanResults = wifiManager.getScanResults();
 		lvWifi.setAdapter(new WifiNetworkAdapter(scanResults, appref));
 
+		//When click one of the connections show in the dialog.
 		lvWifi.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -384,6 +423,8 @@ public class SystemConfigActivity extends PreferenceActivity {
 						.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD| InputType.TYPE_CLASS_TEXT);
 				List<WifiConfiguration> wificonfigs = wifiManager
 						.getConfiguredNetworks();
+				
+				//find out whether there is any wifi is configured.
 				for (WifiConfiguration temp : wificonfigs) {
 					
 					if (temp.SSID.equals("\"" + sr.SSID + "\"")) {
@@ -402,6 +443,8 @@ public class SystemConfigActivity extends PreferenceActivity {
 							adWifi.dismiss();
 					}
 				}
+				
+				//if none
 				if (!isConfiged) {
 					wifiPass = new AlertDialog.Builder(appref)
 							.setTitle(R.string.password)

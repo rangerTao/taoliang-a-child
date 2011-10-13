@@ -73,6 +73,8 @@ public class Constants {
 	public static String sleepstart = "";
 	public static String sleepend = "";
 	public static String ke = "";
+	public static String resourceId = "";
+	public static long gameStartMillis = 0l;
 	
 	//XmlNode
 	public static final String XML_ITEMS = "items";
@@ -106,7 +108,7 @@ public class Constants {
 	
 	
 	//refresh frequences.
-	public static final int frequence = 60000;
+	public static final int frequence = 300000;
 	
 	public static final long countInterval = 1000;
 	

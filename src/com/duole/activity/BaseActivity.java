@@ -18,6 +18,8 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -54,7 +56,7 @@ public class BaseActivity extends Activity {
 		}
 		
 	};
-
+	
 	public void startMusicPlay(){
 		Intent MusicPlay = new Intent(this,MusicPlayerActivity.class);
 		MusicPlay.putExtra("index", "1");
@@ -103,18 +105,20 @@ public class BaseActivity extends Activity {
 	public boolean uploadGamePeriod() {
 
 		long playEnd = System.currentTimeMillis();
-		long period = playEnd - playStart;
+		long period = playEnd - Constants.gameStartMillis;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
 
 		int min = DuoleUtils.parseMillsToMinutes(period);
 
 		String[] var = new String[3];
-
-		if (!"".equals(resourceId)) {
+		resourceId = Constants.resourceId;
+		
+		if (!"".equals(resourceId) && null != resourceId) {
 			var[0] = resourceId;
 			var[1] = min + "";
-			var[2] = sdf.format(new Date(playStart));
+			var[2] = sdf.format(new Date(Constants.gameStartMillis));
 			
+			Log.v("TAG", "times "+ var[0] + "  " + var[1] + "    " + var[2]);
 			Date date = new Date(System.currentTimeMillis());
 			SimpleDateFormat sdfFileName = new SimpleDateFormat("yyyy-MM-dd");
 			String currentday = sdfFileName.format(date);

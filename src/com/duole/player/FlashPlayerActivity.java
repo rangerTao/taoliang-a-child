@@ -89,6 +89,7 @@ public class FlashPlayerActivity extends PlayerBaseActivity{
 	@Override
 	protected void onDestroy() {
 		wvPlay.destroy();
+		uploadGamePeriod();
 		super.onDestroy();
 	}
 	
