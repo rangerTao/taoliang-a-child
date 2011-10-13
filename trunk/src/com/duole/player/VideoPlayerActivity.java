@@ -41,8 +41,6 @@ public class VideoPlayerActivity extends PlayerBaseActivity {
 		}else{
 			vvPlayer.setVideoPath(Constants.CacheDir + Constants.RES_VIDEO + filename);
 		}
-		
-
 		MediaController mc = new MediaController(this);
 
 		vvPlayer.setMediaController(mc);
@@ -59,6 +57,7 @@ public class VideoPlayerActivity extends PlayerBaseActivity {
 	@Override
 	protected void onDestroy() {
 		vvPlayer.destroyDrawingCache();
+		uploadGamePeriod();
 		super.onDestroy();
 	}
 	

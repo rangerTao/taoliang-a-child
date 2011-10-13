@@ -144,6 +144,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 	@Override
 	protected void onDestroy() {
 		mp.stop();
+		uploadGamePeriod();
 		super.onDestroy();
 	}
 

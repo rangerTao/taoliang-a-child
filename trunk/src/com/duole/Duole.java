@@ -428,8 +428,8 @@ public class Duole extends BaseActivity {
 				long id) {
 			// TODO Auto-generated method stub
 			Asset assItem = (Asset) parent.getItemAtPosition(position);
-			playStart = System.currentTimeMillis();
-			resourceId = assItem.getId();
+			Constants.gameStartMillis = System.currentTimeMillis();
+			Constants.resourceId = assItem.getId();
 			Intent intent = null;
 			try {
 				// launcher the package
@@ -548,10 +548,11 @@ public class Duole extends BaseActivity {
 	protected void onResume(){
 		
 		Log.v("TAG", "on resume");
-		if(pkgName != null && !pkgName.equals(""))
+		if(pkgName != null && !pkgName.equals("")){
 			forceStopActivity();
-		
-		uploadGamePeriod();
+			uploadGamePeriod();
+		}
+			
 		
 		if(this.mScrollLayout.getChildCount() <= 0){
 			try {
