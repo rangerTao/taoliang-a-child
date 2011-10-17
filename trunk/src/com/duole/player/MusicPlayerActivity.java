@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -46,6 +49,7 @@ import com.duole.widget.MusicGallery;
 public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusChangeListener, OnItemSelectedListener, OnClickListener, OnItemClickListener, OnCompletionListener{
 
 	MediaPlayer mp;
+	MediaPlayer mp2;
 	RelativeLayout llMain;
 	String url = "";
 	int index;
@@ -54,9 +58,12 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	public MusicPlayerActivity appref;
 	private AnimationSet manimationSet; 
 	
+	int homeCount = 0;
+	
 	ProgressBar pbCountDown;
 	
 	public boolean clicked = false;
+	public boolean isTopOfStack = false;
 	
 	Button btnPlay;
 
@@ -92,8 +99,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		if(Constants.MusicList.size() > 0){
 			setMusicData(index);
 		}
-		
-		
+				
 		btnPlay.setOnClickListener(this);
 		mp.setOnCompletionListener(this);
 		
@@ -103,6 +109,34 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 
 	}
 	
+	private void playTipSound() {
+
+		try {
+			File file = new File(Constants.CacheDir + Constants.TIPSTARTNAME);
+			if(file.exists()){
+
+				mp2 = new MediaPlayer();
+				
+				mp2.setDataSource(this,
+						Uri.fromFile(file));
+
+				mp2.prepare();
+				mp2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+					public void onPrepared(MediaPlayer mp) {
+						mp2.start();
+					}
+				});
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
+	}
+	
+	/**
+	 * Init the progress of progress bar.
+	 */
 	private void initProgressBar(){
 		
 		Duole.appref.gameCountDown.pause();
@@ -116,14 +150,15 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 			Duole.appref.restCountDown.setPb(pbCountDown);
 			
 			Duole.appref.restCountDown.start();
+			
+			playTipSound();
 		}
 		
 	}
 
 	private void registerReceiver(){
 		
-		IntentFilter intentFilter = new IntentFilter(
-		"com.duole.restime.out");
+		IntentFilter intentFilter = new IntentFilter("com.duole.restime.out");
 		registerReceiver(timeOutReceiver, intentFilter);
 		
 	}
@@ -193,6 +228,11 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		case KeyEvent.KEYCODE_HOME:
 			
 			musicControl();
+			if(homeCount < 3){
+				mp2.seekTo(0);
+				mp2.start();
+				homeCount ++;
+			}
 			break;
 		}
 		return true;
@@ -254,8 +294,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		});
 	}
 	
-	
-
 	public void onNothingSelected(AdapterView<?> arg0) {
 	}
 	
@@ -283,6 +321,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		}
 		
 	}
+	
 	private void playMusic(){
 		btnPlay.setBackgroundResource(R.drawable.pause);
 		mp.start();
@@ -304,12 +343,35 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 
 	@Override
 	protected void onPause() {
-		Constants.musicPlayerIsRunning = false;
+		
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		
+		if(pm.isScreenOn()){
+			Constants.musicPlayerIsRunning = false;
+		}
+
 		super.onPause();
 	}
 	
+	@Override
+	protected void onResume() {
+		
+		KeyguardManager km = (KeyguardManager) Duole.appref.getSystemService(Context.KEYGUARD_SERVICE);
+		KeyguardLock kl = km.newKeyguardLock("com.duole");
+		kl.reenableKeyguard();
+		super.onResume();
+	}
+
+	public void topOfStack(){
+		isTopOfStack = true;
+	}
 	
+	public void notTopOfStack(){
+		isTopOfStack = false;
+	}
 	
-	
+	public boolean IsTopOfStack(){
+		return isTopOfStack;
+	}
 	
 }

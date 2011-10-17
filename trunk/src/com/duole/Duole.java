@@ -291,17 +291,23 @@ public class Duole extends BaseActivity {
 	}
 
 	public void setBackground() {
-		
-		LinearLayout llMain = (LinearLayout)findViewById(R.id.llMain);
+
+		LinearLayout llMain = (LinearLayout) findViewById(R.id.llMain);
 		if (!Constants.bgurl.equals("")) {
 			File bg = new File(Constants.CacheDir
 					+ Constants.bgurl.substring(Constants.bgurl
 							.lastIndexOf("/")));
 			if (bg.exists()) {
-				Drawable d = Drawable.createFromPath(bg
-						.getAbsolutePath());
-				if(d != null){
-					llMain.setBackgroundDrawable(d);
+				try {
+					Drawable d = Drawable.createFromPath(bg.getAbsolutePath());
+					if (d != null) {
+						llMain.setBackgroundDrawable(d);
+					}else{
+						bg.delete();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+
 				}
 			}
 		}
@@ -330,6 +336,7 @@ public class Duole extends BaseActivity {
 		}
 
 		alAIA = new ArrayList<AssetItemAdapter>();
+		
 		for (int i = 0; i < PageCount; i++) {
 			GridView appPage = new GridView(Duole.appref);
 			// get the "i" page data
@@ -547,7 +554,6 @@ public class Duole extends BaseActivity {
 	@Override
 	protected void onResume(){
 		
-		Log.v("TAG", "on resume");
 		if(pkgName != null && !pkgName.equals("")){
 			forceStopActivity();
 			uploadGamePeriod();
@@ -569,7 +575,6 @@ public class Duole extends BaseActivity {
 		public ImageView ivPageDiv;
 		public TextView tvIndex;
 	}
-
 }
 
 

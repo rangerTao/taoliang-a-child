@@ -17,7 +17,7 @@ import android.util.Log;
 public class UnLockScreenService extends Service{
 
 	WakeLock mWakeLock;
-	
+	BroadcastReceiver brScreenOn;
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -30,6 +30,16 @@ public class UnLockScreenService extends Service{
 		acquireWakeLock();
 		IntentFilter intentFilter = new IntentFilter(
 				"android.intent.action.SCREEN_ON");
+		brScreenOn = new BroadcastReceiver(){
+
+			@Override
+			public void onReceive(Context arg0, Intent arg1) {
+				KeyguardManager keyguardManager = (KeyguardManager) Duole.appref.getSystemService(Context.KEYGUARD_SERVICE);
+				KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("");
+				keyguardLock.disableKeyguard();
+			}
+			
+		};
 		Duole.appref.registerReceiver(brScreenOn, intentFilter);
 
 		super.onStart(intent, startId);
@@ -51,6 +61,7 @@ public class UnLockScreenService extends Service{
 	
 	@Override
 	public void onDestroy() {
+		unregisterReceiver(brScreenOn);
 		releaseWakeLock();
 		super.onDestroy();
 	}
@@ -61,16 +72,4 @@ public class UnLockScreenService extends Service{
 			mWakeLock = null;
 		}
 	}
-	
-	
-	BroadcastReceiver brScreenOn = new BroadcastReceiver(){
-
-		@Override
-		public void onReceive(Context arg0, Intent arg1) {
-			KeyguardManager keyguardManager = (KeyguardManager) Duole.appref.getSystemService(Context.KEYGUARD_SERVICE);
-			KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("");
-			keyguardLock.disableKeyguard();
-		}
-		
-	};
 }

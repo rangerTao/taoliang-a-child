@@ -24,6 +24,8 @@ public class Constants {
 	
 	public static final String ItemList = CacheDir + "itemlist.xml";
 	public static final String SystemConfigFile = CacheDir + "config.xml";
+	public static String restart = "";
+	public static final String TIPSTARTNAME = "restart.mp3";
 	
 	public static final String defaultPasswd = "duoleyuan";
 	
@@ -105,10 +107,11 @@ public class Constants {
 	public static final String XML_UPDATE_TIME = "uptime";
 	public static final String XML_LASTENSTART = "lastenstart";
 	public static final String XML_CLIENTVERSIONUPLOAD = "clientversionupload";
+	public static final String XML_TIPSTART = "tipstart";
 	
 	
 	//refresh frequences.
-	public static final int frequence = 300000;
+	public static final int frequence = 60000;
 	
 	public static final long countInterval = 1000;
 	
