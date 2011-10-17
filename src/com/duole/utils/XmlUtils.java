@@ -201,6 +201,9 @@ public class XmlUtils {
 					if (Constants.XML_RESTURL.equals(parser.getName())) {
 						Constants.bgRestUrl = parser.nextText();
 					}
+					if (Constants.XML_TIPSTART.equals(parser.getName())) {
+						Constants.restart = parser.nextText();
+					}
 					if (Constants.XML_ENTIME.equals(parser.getName())) {
 						String entime = parser.nextText();
 						if(entime.equals("")){
@@ -621,6 +624,16 @@ public class XmlUtils {
 				nl.item(0).getFirstChild().setNodeValue(Constants.ke);
 			}else{
 				createNode(document,"ke",Constants.ke);
+			}
+		}
+		
+		//tipstart
+		if (!Constants.restart.equals("")) {
+			nl = document.getElementsByTagName("tipstart");
+			if(nl.getLength() > 0){
+				nl.item(0).getFirstChild().setNodeValue(Constants.restart);
+			}else{
+				createNode(document,"tipstart",Constants.restart);
 			}
 		}
 		

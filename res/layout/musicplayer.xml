@@ -15,7 +15,7 @@
 			android:layout_height="120dip" android:background="@drawable/play" />
 	</LinearLayout>
 	<ProgressBar android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:id="@+id/pbRestTime"
+		android:layout_height="5px" android:id="@+id/pbRestTime"
 		style="?android:attr/progressBarStyleHorizontal"
 		android:layout_alignParentBottom="true" android:visibility="gone"
 		android:layout_centerHorizontal="true"></ProgressBar>

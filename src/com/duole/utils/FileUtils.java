@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 public class FileUtils {
@@ -116,4 +117,9 @@ public class FileUtils {
 		
 	}
 
+	public static Bitmap decodeBMPFromURL(String bmpath){
+		
+		
+		return null;
+	}
 }

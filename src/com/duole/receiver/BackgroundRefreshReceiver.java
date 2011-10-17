@@ -14,6 +14,8 @@ import com.duole.utils.DuoleUtils;
 import com.duole.utils.XmlUtils;
 
 import android.R.xml;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -58,6 +60,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					if (!Constants.musicPlayerIsRunning) {
 						Constants.SLEEP_TIME = true;
 
+						Log.v("TAG", "musicPlayerIsRunning" + Constants.musicPlayerIsRunning);
 						DuoleSysConfigUtils.disableWifi(context);
 
 						// Take main task to front

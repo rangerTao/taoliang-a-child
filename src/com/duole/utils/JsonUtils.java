@@ -19,11 +19,11 @@ public class JsonUtils {
 		File client;
 		String version = jsonObject.getString("ver");
 		client = new File(Constants.CacheDir + "client.apk");
-		Log.v("TAG", "server version" + version);
-		Log.v("TAG", "local version" + Constants.System_ver);
+//		Log.v("TAG", "server version" + version);
+//		Log.v("TAG", "local version" + Constants.System_ver);
 		if(!version.equals(Constants.System_ver)){
 			client = new File(Constants.CacheDir + "client.apk");
-			Log.v("TAG", "apk version " + DuoleUtils.getPackageVersion(client));
+//			Log.v("TAG", "apk version " + DuoleUtils.getPackageVersion(client));
 			if(client.exists()){
 				if(!version.equals(DuoleUtils.getPackageVersion(client)) && !Constants.clientApkDownloaded){
 					DuoleUtils.updateClient();
@@ -87,15 +87,31 @@ public class JsonUtils {
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
 					+ Constants.bgRestUrl), file);
 		}
+		
+//		Log.v("TAG", Constants.restart);
+		if(!Constants.restart.equals("")){
+			file = new File(Constants.CacheDir
+					+ Constants.TIPSTARTNAME);
+		}
+		
+		if (file == null || !file.exists()
+				&& Constants.restart != jsonObject.getString("tipsd")) {
+			Constants.restart = jsonObject.getString("tipsd");
+			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
+					+ Constants.restart), file);
+		}
+		
 		Constants.entime = jsonObject.getString("entime");
 		Constants.restime = jsonObject.getString("restime");
 		Constants.sleepstart = jsonObject.getString("sleepstart");
 		Constants.sleepend = jsonObject.getString("sleepend");
+		Constants.restart = jsonObject.getString("tipsd");
 		
 		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);
 		XmlUtils.updateSingleNode(Constants.XML_RESTIME, Constants.restime);
 		XmlUtils.updateSingleNode(Constants.XML_SLEEPEND, Constants.sleepend);
 		XmlUtils.updateSingleNode(Constants.XML_SLEEPSTART, Constants.sleepstart);
+		XmlUtils.updateSingleNode(Constants.XML_TIPSTART, Constants.restart);
 		
 	}
 }

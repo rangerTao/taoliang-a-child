@@ -340,6 +340,12 @@ public class SystemConfigActivity extends PreferenceActivity {
 	}
 
 	@Override
+	protected void onDestroy() {
+		unregisterReceiver(wifiReceiver);
+		super.onDestroy();
+	}
+
+	@Override
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
 			Preference preference) {
 

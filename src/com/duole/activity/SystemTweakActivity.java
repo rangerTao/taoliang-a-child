@@ -17,6 +17,7 @@ import android.preference.Preference;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -234,10 +235,27 @@ public class SystemTweakActivity extends BaseActivity implements
 
 	@Override
 	protected void onPause() {
+		unregisterReceiver(batteryChangedReceiver);
+		unregisterReceiver(wifiReceiver);
 		finish();
 		super.onPause();
 	}
-	
-	
 
+	@Override
+	public void onAttachedToWindow() {
+		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		super.onAttachedToWindow();
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_HOME:
+
+			finish();
+			break;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 }

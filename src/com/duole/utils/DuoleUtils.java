@@ -571,11 +571,6 @@ public class DuoleUtils {
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile,Constants.XML_UPDATE, Constants.TRUE);
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME,updateHour);
 		    				Constants.clientApkDownloaded = true;
-		    				
-//		    				url = Constants.ClientUpdate + "?cver=" + ver + "&cmcode=" + mCode;
-//		    				
-//		    				DuoleNetUtils.connect(url);
-		    				
 		    			}
 		    		}else{
 		    			if(!ver.equals(DuoleUtils.getPackageVersion(client))){
@@ -707,7 +702,10 @@ public class DuoleUtils {
 
 	}
 	
-	//Get the music list from sources
+	/**
+	 * Get the music list from sources
+	 * @param assets
+	 */
 	public static void getMusicList(ArrayList<Asset> assets) {
 
 		Constants.MusicList = new ArrayList<Asset>();
