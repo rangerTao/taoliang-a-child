@@ -1,9 +1,15 @@
 package com.duole.asynctask;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.json.JSONObject;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -20,11 +26,10 @@ import com.duole.utils.DownloadFileUtils;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.JsonUtils;
+import com.duole.utils.XmlUtils;
 
 public class ItemListTask extends AsyncTask {
 
-	ArrayList<Asset> alAsset;
-	
 	static TextView tvDeviceId;
 	static TextView tvUserName;
 	static TextView tvPassword;
@@ -70,8 +75,8 @@ public class ItemListTask extends AsyncTask {
 
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
-			for (int i = 0; i < alAsset.size(); i++) {
-				Asset ass = alAsset.get(i);
+			for (int i = 0; i < Constants.alAsset.size(); i++) {
+				Asset ass = Constants.alAsset.get(i);
 				if (ass != null) {
 					hmSource.put(ass.getId(), ass);
 				}
@@ -92,7 +97,7 @@ public class ItemListTask extends AsyncTask {
 					}
 				}
 			} else {
-				for (Asset asset : alAsset) {
+				for (Asset asset : Constants.alAsset) {
 					if (DuoleUtils.checkDownloadNecessary(asset,
 							hmSource.get(asset.getId()))) {
 						Constants.DownLoadTaskList.add(asset);
@@ -123,8 +128,16 @@ public class ItemListTask extends AsyncTask {
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		}
 		
-		if(gettedSourceList && alAsset.size() > 0){
-			DuoleUtils.updateAssetListFile(alAsset);
+		if(gettedSourceList && Constants.alAsset.size() > 0){
+			DuoleUtils.updateAssetListFile(Constants.alAsset);
+			
+			try {
+				Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
+								+ "itemlist.xml");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		Constants.DOWNLOAD_RUNNING = false;
@@ -139,7 +152,7 @@ public class ItemListTask extends AsyncTask {
 			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
 			"http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 			
-			alAsset = new ArrayList<Asset>();
+			Constants.alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
 			if(result.equals("")){
 				return false;
@@ -154,7 +167,7 @@ public class ItemListTask extends AsyncTask {
 			
 			if (error == null){
 				try{
-					JsonUtils.parserJson(alAsset, jsonObject);
+					JsonUtils.parserJson(Constants.alAsset, jsonObject);
 				}catch(Exception e){
 					Constants.DOWNLOAD_RUNNING = false;
 					e.printStackTrace();

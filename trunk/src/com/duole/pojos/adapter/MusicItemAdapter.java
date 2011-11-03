@@ -83,7 +83,7 @@ public class MusicItemAdapter extends BaseAdapter{
 		// set the icon
 		
 		// set the app name
-		assItem.tvAssetName.setText(asset.getFilename());
+		assItem.tvAssetName.setText(asset.getName());
 		
 		return convertView;
 		

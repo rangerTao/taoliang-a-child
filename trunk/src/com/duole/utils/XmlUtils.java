@@ -170,7 +170,7 @@ public class XmlUtils {
 							asset.setId(parser.nextText());
 						}
 						if(Constants.XML_TITLE.equals(parser.getName())){
-							asset.setFilename(parser.nextText());
+							asset.setName(parser.nextText());
 						}
 						if(Constants.XML_THUMBNAIL.equals(parser.getName())){
 							asset.setThumbnail(parser.nextText());
@@ -260,6 +260,10 @@ public class XmlUtils {
 		}catch (Exception e){
 			e.printStackTrace();
 			createItemList();
+			Constants.entime = "25";
+			Constants.restime = "120";
+			Constants.sleepstart = "22:00";
+			Constants.sleepend = "07:00";
 //			Constants.AssetList = readFile(filePath,
 //					dBuilder);
 		}

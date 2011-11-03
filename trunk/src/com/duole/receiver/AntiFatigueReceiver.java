@@ -46,9 +46,7 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 		
 		Log.v("TAG", "current millis" + current);
 		
-		Log.v("TAG", "poor" + Math.abs((current - lastDay)));
-		Log.v("TAG", "period " + ((Integer.parseInt(Constants.entime) + Integer.parseInt(Constants.restime)) * 60 * 1000));
-		if((int)Math.abs((current - lastDay)) > (Integer.parseInt(Constants.entime) + Integer.parseInt(Constants.restime)) * 60 * 1000){
+		if((int)Math.abs((current - lastDay)) > (Integer.parseInt(Constants.entime.equals("")? "0" : Constants.entime) + Integer.parseInt(Constants.restime.equals("")?"0":Constants.restime)) * 60 * 1000){
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			
 			Log.v("TAG", "enstart changed " + System.currentTimeMillis());

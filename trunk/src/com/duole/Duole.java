@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -21,8 +22,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -83,7 +88,7 @@ public class Duole extends BaseActivity {
 	private static final String TAG = "TAG";
 	public ScrollLayout mScrollLayout;
 	private static Context mContext;
-	private static BackgroundRefreshService mBoundService;
+	public static BackgroundRefreshService mBoundService;
 	public static ArrayList<AssetItemAdapter> alAIA;
 	
 	ProgressBar pbEnTime;
@@ -323,7 +328,7 @@ public class Duole extends BaseActivity {
 		XmlUtils.readConfiguration();
 		ArrayList<Asset> temp = new ArrayList<Asset>();
 		temp.addAll(Constants.AssetList);
-		DuoleUtils.checkFilesExists(temp);
+		temp = DuoleUtils.checkFilesExists(temp);
 		DuoleUtils.addNetworkManager(temp);
 		getMusicList(temp);
 
@@ -437,68 +442,63 @@ public class Duole extends BaseActivity {
 			Asset assItem = (Asset) parent.getItemAtPosition(position);
 			Constants.gameStartMillis = System.currentTimeMillis();
 			Constants.resourceId = assItem.getId();
+
+			SharedPreferences sp = getSharedPreferences("com.duole",
+					MODE_WORLD_READABLE);
+			Editor editor = sp.edit();
+			editor.putString("antiFatigue", getString(R.string.entime) + " : "
+					+ Duole.appref.gameCountDown.getRemainTime() + ";"
+					+ getString(R.string.sleepstart) + " : "
+					+ Constants.sleepstart + ":00" + "     "
+					+ getString(R.string.sleepend) + " : " + Constants.sleepend
+					+ ":00");
+
+			editor.commit();
+
 			Intent intent = null;
 			try {
 				// launcher the package
 				if (assItem.getType().equals(Constants.RES_AUDIO)) {
 
-					intent = new Intent(appref , SingleMusicPlayerActivity.class);
+					intent = new Intent(appref, SingleMusicPlayerActivity.class);
 					int index = Constants.MusicList.indexOf(assItem);
 
 					intent.putExtra("index", index + "");
 
-				} else if(assItem.getType().equals(Constants.RES_APK)){
-					
+				} else if (assItem.getType().equals(Constants.RES_APK)) {
+
 					intent = new Intent();
-					intent.setComponent(new ComponentName(assItem.getPackag(),assItem.getActivity()));
-					intent.setAction(Intent.ACTION_MAIN);  
-					intent.addCategory(Intent.CATEGORY_LAUNCHER);  
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
-					intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);  
-					
-					pkgName = assItem.getPackag();
-					
-					boolean startactivity = true;
-					int activities = 1;
-					while(startactivity){
-						try{
-							startActivity(intent);
-							startactivity = false;
-						}catch(Exception e){
-							e.printStackTrace();
-							
-							PackageManager pm = Duole.appref.getPackageManager();
-							File file = new File(Constants.CacheDir + Constants.RES_APK + assItem.getUrl().substring(assItem.getUrl().lastIndexOf("/")));
+					intent.setAction(Intent.ACTION_MAIN);
+					intent.addCategory(Intent.CATEGORY_LAUNCHER);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
-							PackageInfo info;
-							info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
-							
-							intent.setComponent(new ComponentName(assItem.getPackag(),info.activities[activities].name));
+					try{
+						pkgName = assItem.getPackag();
+						Log.v("TAG", pkgName);
+						List<ResolveInfo> lri = DuoleUtils
+								.findActivitiesForPackage(appref, pkgName);
 
-							intent.setAction(Intent.ACTION_MAIN);  
-							intent.addCategory(Intent.CATEGORY_LAUNCHER);  
-							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
-							intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);  
-							
-							if(activities < info.activities.length - 1){
-								activities ++;
-							}else{
-								
-								startactivity = false;
+						if (lri.size() > 0) {
+							for (ResolveInfo ri : lri) {
+								Log.v("TAG", ri.activityInfo.name);
+								intent.setComponent(new ComponentName(pkgName,
+										ri.activityInfo.name));
+								startActivity(intent);
 							}
-							
 						}
-						
+					}catch(Exception e){
+						e.printStackTrace();
 					}
 					
-				}else if(assItem.getType().equals(Constants.RES_CONFIG)){
-					intent = new Intent(appref,PasswordActivity.class);
+
+				} else if (assItem.getType().equals(Constants.RES_CONFIG)) {
+					intent = new Intent(appref, PasswordActivity.class);
 					intent.putExtra("type", "0");
-				}else if(assItem.getType().equals(Constants.RES_CONFIG_STATUS)){
-						intent = new Intent(appref,SystemTweakActivity.class);
-						
-				}else if (assItem.getType().equals(Constants.RES_VIDEO) && !assItem.getUrl().endsWith(".swf") && !assItem.getUrl().endsWith(".flv")){
-					intent = new Intent(appref , VideoPlayerActivity.class);
+				} else if (assItem.getType().equals(Constants.RES_VIDEO)
+						&& !assItem.getUrl().endsWith(".swf")
+						&& !assItem.getUrl().endsWith(".flv")) {
+					intent = new Intent(appref, VideoPlayerActivity.class);
 
 					if (assItem.getUrl().startsWith("http:")) {
 						intent.putExtra("filename", assItem.getUrl());
@@ -508,7 +508,7 @@ public class Duole extends BaseActivity {
 								assItem.getUrl().substring(
 										assItem.getUrl().lastIndexOf("/")));
 					}
-				}else{
+				} else {
 
 					intent = new Intent(appref, FlashPlayerActivity.class);
 
@@ -521,12 +521,12 @@ public class Duole extends BaseActivity {
 										assItem.getUrl().lastIndexOf("/")));
 					}
 				}
-				
-				if(!Constants.ENTIME_OUT){
+
+				if (!Constants.ENTIME_OUT) {
 					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
 				}
 
-				if(!assItem.getType().equals(Constants.RES_APK)){
+				if (!assItem.getType().equals(Constants.RES_APK)) {
 					mContext.startActivity(intent);
 				}
 			} catch (ActivityNotFoundException noFound) {
@@ -536,6 +536,19 @@ public class Duole extends BaseActivity {
 		}
 
 	};
+	
+	public void unBindAutoRefreshService(){
+		try{
+			unbindService(mConnection);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void bindAutoRefreshService(){
+		Duole.appref.bindService(getIntent(), appref.mConnection,
+				Context.BIND_AUTO_CREATE);
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -557,6 +570,7 @@ public class Duole extends BaseActivity {
 		if(pkgName != null && !pkgName.equals("")){
 			forceStopActivity();
 			uploadGamePeriod();
+			pkgName = "";
 		}
 			
 		

@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.R.anim;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.ImageView;
@@ -29,6 +31,8 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 	LinearLayout llMain;
 	String url = "";
 	
+	int screen_off_timeout = 0;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -41,6 +45,13 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		int index = Integer.parseInt(intent.getStringExtra("index"));
 		
 		setBackground(index);
+		try {
+			screen_off_timeout = android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_OFF_TIMEOUT);
+		} catch (SettingNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		android.provider.Settings.System.putInt(getContentResolver(), android.provider.Settings.System.SCREEN_OFF_TIMEOUT, 1000 * 60 * 4);
 		
 		mp = new MediaPlayer();
 		
@@ -144,6 +155,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 	@Override
 	protected void onDestroy() {
 		mp.stop();
+		android.provider.Settings.System.putInt(getContentResolver(), android.provider.Settings.System.SCREEN_OFF_TIMEOUT, screen_off_timeout);
 		uploadGamePeriod();
 		super.onDestroy();
 	}
@@ -164,5 +176,4 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 	}
 	
 	
-
 }

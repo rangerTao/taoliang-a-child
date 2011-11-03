@@ -82,15 +82,6 @@ public class AssetItemAdapter extends BaseAdapter {
 			return convertView;
 		}
 		
-		if(asset.getType().equals(Constants.RES_CONFIG_STATUS)){
-			assItem.ivAssetThumb.setImageResource(R.drawable.network);
-			assItem.tvAssetName.setText(asset.getFilename());
-			
-			assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
-			
-			return convertView;
-		}
-		
 		if(Constants.alAssetCache.containsKey(asset.getId())){
 			return Constants.alAssetCache.get(asset.getId());
 		}
@@ -105,7 +96,7 @@ public class AssetItemAdapter extends BaseAdapter {
 		// set the icon
 		
 		// set the app name
-		assItem.tvAssetName.setText(asset.getFilename());
+		assItem.tvAssetName.setText(asset.getName());
 		
 		if(Constants.alAssetCache.size() < 50){
 			Constants.alAssetCache.put(asset.getId(), convertView);

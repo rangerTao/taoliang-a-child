@@ -112,21 +112,23 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	private void playTipSound() {
 
 		try {
-			File file = new File(Constants.CacheDir + Constants.TIPSTARTNAME);
-			if(file.exists()){
+			if(Constants.SCREEN_ON){
+				File file = new File(Constants.CacheDir + Constants.TIPSTARTNAME);
+				if(file.exists()){
 
-				mp2 = new MediaPlayer();
-				
-				mp2.setDataSource(this,
-						Uri.fromFile(file));
+					mp2 = new MediaPlayer();
+					
+					mp2.setDataSource(this,
+							Uri.fromFile(file));
 
-				mp2.prepare();
-				mp2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+					mp2.prepare();
+					mp2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-					public void onPrepared(MediaPlayer mp) {
-						mp2.start();
-					}
-				});
+						public void onPrepared(MediaPlayer mp) {
+							mp2.start();
+						}
+					});
+				}
 			}
 		} catch (Exception e){
 			e.printStackTrace();
