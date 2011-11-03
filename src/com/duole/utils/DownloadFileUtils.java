@@ -10,8 +10,10 @@ import java.util.RandomAccess;
 
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
+import android.content.Intent;
 import android.util.Log;
 
+import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
 
 /**
@@ -77,6 +79,9 @@ public class DownloadFileUtils extends Thread {
 					DuoleUtils.downloadApp(asset, asset.getUrl());
 				}
 			}
+			
+			Constants.newItemExists = true;
+			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			
 		} catch (Exception e) {
 			e.printStackTrace();

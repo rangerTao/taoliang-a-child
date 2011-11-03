@@ -28,7 +28,8 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		if (intent.getAction().equals(Constants.Refresh_Start)) {
+		Log.v("TAG", "get resource" + Constants.SCREEN_ON);
+		if (intent.getAction().equals(Constants.Refresh_Start) && Constants.SCREEN_ON) {
 			
 			Date date = new Date(System.currentTimeMillis());
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm ss");
@@ -99,7 +100,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				Constants.SLEEP_TIME = false;
 			}
 			
-			if(!Constants.DOWNLOAD_RUNNING){
+			if (!Constants.DOWNLOAD_RUNNING) {
 				new ItemListTask().execute();
 			}
 			

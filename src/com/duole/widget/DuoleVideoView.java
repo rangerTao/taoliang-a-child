@@ -51,6 +51,8 @@ public class DuoleVideoView extends SurfaceView implements MediaPlayerControl {
     private int screenWidth;
     private int screenHeight;
     
+    private boolean autoplay = false;
+    
     
     // all possible internal states
     private static final int STATE_ERROR              = -1;
@@ -90,14 +92,6 @@ public class DuoleVideoView extends SurfaceView implements MediaPlayerControl {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
-//        if (mVideoWidth > 0 && mVideoHeight > 0) {
-//            if ( mVideoWidth * height  > width * mVideoHeight ) {
-//                height = width * mVideoHeight / mVideoWidth;
-//            } else if ( mVideoWidth * height  < width * mVideoHeight ) {
-//                width = height * mVideoWidth / mVideoHeight;
-//            } else {
-//            }
-//        }
         screenWidth = width;
         screenHeight = height;
         setMeasuredDimension(width, height);
@@ -278,6 +272,10 @@ public class DuoleVideoView extends SurfaceView implements MediaPlayerControl {
 //                           mMediaController.show(0);
 //                       }
                    }
+                    if(autoplay){
+                    	
+                    	start();
+                    }
                 }
             } else {
                 // We don't know the video size yet, but should start anyway.
@@ -580,5 +578,9 @@ public class DuoleVideoView extends SurfaceView implements MediaPlayerControl {
 
     public boolean canSeekForward() {
         return mCanSeekForward;
+    }
+    
+    public void videoAutoPlay(){
+    	autoplay = true;
     }
 }

@@ -95,8 +95,6 @@ public class BaseActivity extends Activity {
 		
 		ActivityManager am = (ActivityManager)getSystemService(
                 Context.ACTIVITY_SERVICE);
-		List<RunningAppProcessInfo> lpids = am.getRunningAppProcesses();
-		
 		am.killBackgroundProcesses(pkgName);
 		
 		return true;
@@ -124,9 +122,9 @@ public class BaseActivity extends Activity {
 			String currentday = sdfFileName.format(date);
 
 			FileUtils.saveTxt(var, Constants.CacheDir + "log/" + currentday);
+			
+			resourceId = "";
 		}
-
-		
 
 		return true;
 

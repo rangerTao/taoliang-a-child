@@ -122,4 +122,16 @@ public class FileUtils {
 		
 		return null;
 	}
+	
+	//When all download task done.clear the temp folder
+	public static void clearTempFolder(String path){
+		
+		File tempFolder = new File(path);
+		if(tempFolder.isDirectory()){
+			for(File temp : tempFolder.listFiles()){
+				temp.delete();
+			}
+		}
+		
+	}
 }

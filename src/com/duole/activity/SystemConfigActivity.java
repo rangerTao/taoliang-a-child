@@ -353,7 +353,12 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		// wifi.
 		if (preference.getKey().equals("preListWifi")) {
-			configWifi();
+			try{
+				configWifi();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			
 		}
 
 		//password

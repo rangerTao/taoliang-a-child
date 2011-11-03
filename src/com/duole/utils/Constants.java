@@ -29,10 +29,13 @@ public class Constants {
 	
 	public static final String defaultPasswd = "duoleyuan";
 	
+	public static boolean newItemExists = false;
+	
 	public static ArrayList<Asset> AssetList;
 	public static ArrayList<Asset> MusicList;
 	public static ArrayList<Asset> DownLoadTaskList;
 	public static ArrayList<Asset> temp;
+	public static ArrayList<Asset> alAsset;
 	
 	//Bitmap constant
 	public static Bitmap bmpKe;
@@ -56,6 +59,7 @@ public class Constants {
 	//whether entainment time is run out.
 	public static boolean ENTIME_OUT = false;
 	public static boolean SLEEP_TIME = false;
+	public static boolean SCREEN_ON = true;
 	
 	//Default type of resources.
 	public static final String RES_GAME = "game";

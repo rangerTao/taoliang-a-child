@@ -18,11 +18,14 @@ import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.Settings.System;
@@ -529,11 +532,6 @@ public class DuoleUtils {
     	asset.setFilename(Duole.appref.getString(R.string.system_tweak));
     	
     	assets.add(asset);
-    	
-    	asset = new Asset();
-    	asset.setType(Constants.RES_CONFIG_STATUS);
-    	asset.setFilename(Duole.appref.getString(R.string.systemstatus));
-    	assets.add(asset);
     }
     
     /**
@@ -625,35 +623,26 @@ public class DuoleUtils {
     /**
      * To check whether file is complete
      */
-    public static void checkFilesExists(ArrayList<Asset> assets){
+    public static ArrayList<Asset> checkFilesExists(ArrayList<Asset> assets){
     	
+    	ArrayList<Asset> temp = new ArrayList<Asset>();
+    	File file;
     	for(int i =0;i<assets.size();i++){
     		Asset asset = assets.get(i);
     		
     		String type = asset.getType();
-    		String thumb = asset.getThumbnail();
     		String path = asset.getUrl();
 
-    		File file = null;
-    		if(!thumb.equals("")){
-    			file = new File(Constants.CacheDir + Constants.RES_THUMB + thumb.substring(thumb.lastIndexOf("/")));
-        		if(!file.exists()){
-        			assets.remove(i);
-        			continue;
-        		}
-    		}
-    		
     		if(!path.startsWith("http")){
     			file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
-        		if(!file.exists()){
-        			assets.remove(i);
-        			continue;
+        		if(file.exists()){
+        			temp.add(assets.get(i));
         		}
-    		}else{
-    			continue;
     		}
     		
     	}
+    	
+    	return temp;
     	
     }
     
@@ -782,4 +771,18 @@ public class DuoleUtils {
 		
 		return mins;
 	}
+	
+    /**
+     * Query the package manager for MAIN/LAUNCHER activities in the supplied package.
+     */
+    public static List<ResolveInfo> findActivitiesForPackage(Context context, String packageName) {
+        final PackageManager packageManager = context.getPackageManager();
+
+        final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        mainIntent.setPackage(packageName);
+
+        final List<ResolveInfo> apps = packageManager.queryIntentActivities(mainIntent, 0);
+        return apps != null ? apps : new ArrayList<ResolveInfo>();
+    }
 }
