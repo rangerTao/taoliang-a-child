@@ -627,7 +627,7 @@ public class DuoleUtils {
     	
     	ArrayList<Asset> temp = new ArrayList<Asset>();
     	File file;
-    	for(int i =0;i<assets.size();i++){
+    	for(int i = 0;i<assets.size();i++){
     		Asset asset = assets.get(i);
     		
     		String type = asset.getType();
@@ -636,6 +636,9 @@ public class DuoleUtils {
     		if(!path.startsWith("http")){
     			file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
         		if(file.exists()){
+        			if(type.equals(Constants.RES_APK)){
+        				DuoleUtils.installApkFromFile(file);
+        			}
         			temp.add(assets.get(i));
         		}
     		}
@@ -714,6 +717,7 @@ public class DuoleUtils {
 	 */
 	public static boolean installApkFromFile(File file){
 		try {
+			Log.v("TAG", "install apk from " + file.getAbsolutePath());
 			Process p = Runtime.getRuntime().exec("pm install -r " + file.getAbsolutePath());
 			p.waitFor();
 			int result = p.exitValue();
@@ -784,5 +788,21 @@ public class DuoleUtils {
 
         final List<ResolveInfo> apps = packageManager.queryIntentActivities(mainIntent, 0);
         return apps != null ? apps : new ArrayList<ResolveInfo>();
+    }
+    
+    /**
+     * verify the installation of a apk.
+     */
+    public static boolean verifyInstallationOfAPK(Context context , String pkgname){
+    	PackageManager pm = context.getPackageManager();
+    	
+    	List<ApplicationInfo> lai = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+    	for(ApplicationInfo ai : lai){
+    		if(ai.packageName.equals(pkgname)){
+    			return true;
+    		}
+    	}
+    	
+    	return false;
     }
 }
