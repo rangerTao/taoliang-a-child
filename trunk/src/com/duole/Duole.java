@@ -2,9 +2,7 @@ package com.duole;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,8 +11,6 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.app.ActivityManager;
-import android.app.ExpandableListActivity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -24,9 +20,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -51,7 +44,6 @@ import android.widget.Toast;
 
 import com.duole.activity.BaseActivity;
 import com.duole.activity.PasswordActivity;
-import com.duole.activity.SystemTweakActivity;
 import com.duole.asynctask.ItemListTask;
 import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
@@ -63,7 +55,6 @@ import com.duole.pojos.asset.Asset;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
 import com.duole.utils.Constants;
-import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.XmlUtils;
 import com.duole.widget.ScrollLayout;
@@ -127,6 +118,9 @@ public class Duole extends BaseActivity {
 
 		appref = this;
 		try {
+			if(!DuoleUtils.verifyInstallationOfAPK(this, "com.adobe.flashplayer")){
+				DuoleUtils.installApkFromFile(new File("/sdcard/flashplayer.apk"));
+			}
 
 			initContents();
 			
@@ -197,6 +191,9 @@ public class Duole extends BaseActivity {
 		
 	}
 	
+	/**
+	 * BroadcastReceiver to receive tf mounted event.
+	 */
 	BroadcastReceiver mountedReceiver = new BroadcastReceiver() {
 
 		@Override
@@ -215,6 +212,9 @@ public class Duole extends BaseActivity {
 		
 	};
 	
+	/**
+	 * Init count down timers.
+	 */
 	public void initCountDownTimer() {
 
 		long currentTimeMillis = System.currentTimeMillis();
@@ -295,6 +295,9 @@ public class Duole extends BaseActivity {
 
 	}
 
+	/**
+	 * Set the background of main page.
+	 */
 	public void setBackground() {
 
 		LinearLayout llMain = (LinearLayout) findViewById(R.id.llMain);
@@ -318,18 +321,33 @@ public class Duole extends BaseActivity {
 		}
 	}
 
+	/**
+	 * Init the grid scroll view.
+	 * @throws IOException
+	 * @throws TransformerException
+	 * @throws SAXException
+	 * @throws XmlPullParserException
+	 * @throws ParserConfigurationException
+	 */
 	public void initViews() throws IOException, TransformerException,
 			SAXException, XmlPullParserException, ParserConfigurationException {
 
+		//Get the current version of the system.
 		Constants.System_ver = DuoleUtils.getVersion(appref);
 		// get all apps
 		Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
 				+ "itemlist.xml");
+		
+		//Get the system configuration.
 		XmlUtils.readConfiguration();
 		ArrayList<Asset> temp = new ArrayList<Asset>();
+		//About to deal with the source list.
 		temp.addAll(Constants.AssetList);
+		//Drop the resources which is not complete.
 		temp = DuoleUtils.checkFilesExists(temp);
+		//Add the system tweak function to the list.
 		DuoleUtils.addNetworkManager(temp);
+		//Get the music list.
 		getMusicList(temp);
 
 		// the total pages
@@ -380,6 +398,11 @@ public class Duole extends BaseActivity {
 
 	}
 	
+	/**
+	 * Set the page divider.
+	 * @param last
+	 * @param index
+	 */
 	void setPageDividerSelected(final int last,final int index){
 
 		mHandler.post(new Runnable(){
@@ -417,6 +440,10 @@ public class Duole extends BaseActivity {
 	
 	}
 
+	/**
+	 * Get the music list.
+	 * @param assets
+	 */
 	public void getMusicList(ArrayList<Asset> assets) {
 
 		Constants.MusicList = new ArrayList<Asset>();
@@ -465,7 +492,9 @@ public class Duole extends BaseActivity {
 
 					intent.putExtra("index", index + "");
 
-				} else if (assItem.getType().equals(Constants.RES_APK)) {
+				} 
+				//Launch a application.
+				else if (assItem.getType().equals(Constants.RES_APK)) {
 
 					intent = new Intent();
 					intent.setAction(Intent.ACTION_MAIN);
@@ -492,10 +521,14 @@ public class Duole extends BaseActivity {
 					}
 					
 
-				} else if (assItem.getType().equals(Constants.RES_CONFIG)) {
+				} 
+				//Launch the configuration function.
+				else if (assItem.getType().equals(Constants.RES_CONFIG)) {
 					intent = new Intent(appref, PasswordActivity.class);
 					intent.putExtra("type", "0");
-				} else if (assItem.getType().equals(Constants.RES_VIDEO)
+				}
+				//Play a video.
+				else if (assItem.getType().equals(Constants.RES_VIDEO)
 						&& !assItem.getUrl().endsWith(".swf")
 						&& !assItem.getUrl().endsWith(".flv")) {
 					intent = new Intent(appref, VideoPlayerActivity.class);
@@ -508,7 +541,9 @@ public class Duole extends BaseActivity {
 								assItem.getUrl().substring(
 										assItem.getUrl().lastIndexOf("/")));
 					}
-				} else {
+				}
+				//Play a flash.
+				else {
 
 					intent = new Intent(appref, FlashPlayerActivity.class);
 
@@ -522,10 +557,12 @@ public class Duole extends BaseActivity {
 					}
 				}
 
+				//Entertainment time out.
 				if (!Constants.ENTIME_OUT) {
 					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
 				}
 
+				// If not a application.
 				if (!assItem.getType().equals(Constants.RES_APK)) {
 					mContext.startActivity(intent);
 				}
@@ -537,6 +574,9 @@ public class Duole extends BaseActivity {
 
 	};
 	
+	/**
+	 * Unbind the background auto refresh service.
+	 */
 	public void unBindAutoRefreshService(){
 		try{
 			unbindService(mConnection);

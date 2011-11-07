@@ -95,7 +95,8 @@ public class JsonUtils {
 		}
 		
 		if (file == null || !file.exists()
-				&& Constants.restart != jsonObject.getString("tipsd")) {
+				|| !Constants.restart.equals(jsonObject.getString("tipsd"))) {
+			Log.v("TAG", "new tip");
 			Constants.restart = jsonObject.getString("tipsd");
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
 					+ Constants.restart), file);
