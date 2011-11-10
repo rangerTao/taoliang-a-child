@@ -193,6 +193,12 @@ public class XmlUtils {
 						if(Constants.XML_BG.equals(parser.getName())){
 							asset.setBg(parser.nextText());
 						}
+						if(Constants.XML_FRONTID.equals(parser.getName())){
+							asset.setFrontID(parser.nextText());
+						}
+						if(Constants.XML_ISFRONT.equals(parser.getName())){
+							asset.setIsFront(parser.nextText());
+						}
 					}
 					
 					if (Constants.XML_BGURL.equals(parser.getName())) {
@@ -422,6 +428,8 @@ public class XmlUtils {
 				Text lastmodified = document.createTextNode(asset
 						.getLastmodified());
 				Text type = document.createTextNode(asset.getType());
+				Text frontId = document.createTextNode(asset.getFrontID());
+				Text isFront = document.createTextNode(asset.getIsFront());
 				
 
 				// new elements
@@ -433,6 +441,8 @@ public class XmlUtils {
 				Element newLastModifiedElement = document
 						.createElement("lastmodified");
 				Element newTypeElement = document.createElement("type");
+				Element newFrontID = document.createElement("frontid");
+				Element newIsFront = document.createElement("isfront");
 				
 				
 				newIdElement.appendChild(id);
@@ -441,6 +451,8 @@ public class XmlUtils {
 				newUrlElement.appendChild(url);
 				newLastModifiedElement.appendChild(lastmodified);
 				newTypeElement.appendChild(type);
+				newFrontID.appendChild(frontId);
+				newIsFront.appendChild(isFront);
 
 				newElement.appendChild(newIdElement);
 				newElement.appendChild(newTitleElement);
@@ -448,6 +460,8 @@ public class XmlUtils {
 				newElement.appendChild(newUrlElement);
 				newElement.appendChild(newLastModifiedElement);
 				newElement.appendChild(newTypeElement);
+				newElement.appendChild(newFrontID);
+				newElement.appendChild(newIsFront);
 				
 				if(asset.getType().equals(Constants.RES_AUDIO)){
 					Text bg = document.createTextNode(asset.getBg());

@@ -64,7 +64,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		
 	}
 	
-	private void refreshView(){
+	private synchronized void refreshView(){
 		
 		ArrayList<Asset> temp = null;
 		// get all apps
@@ -79,6 +79,8 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			temp = new ArrayList<Asset>();
 			temp.addAll(Constants.alAsset);
 			temp = DuoleUtils.checkFilesExists(temp);
+			
+			Log.v("TAG", temp.size() + "temp size");
 			
 			DuoleUtils.addNetworkManager(temp);
 			

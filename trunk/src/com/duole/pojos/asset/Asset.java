@@ -19,6 +19,8 @@ public class Asset {
 	private String packag;
 	private String activity;
 	private String bg;
+	private String isFront;
+	private String frontID;
 
 	public Asset(JSONObject json) {
 		try {
@@ -28,10 +30,14 @@ public class Asset {
 			String type = json.getString("type");
 			String id = json.getString("id");
 			String lastmodifi = json.getString("lastmodified");
+			String isfront = json.getString("isfront");
+			String frontid = json.getString("frontid");
 			if(type.equals(Constants.RES_AUDIO)){
 				String mpbg = json.getString("bg");
 				setBg(mpbg == null ? "" : mpbg);
 			}
+			setIsFront(isfront);
+			setFrontID(frontid);
 			setName(title == null ? "" : title);
 			setThumbnail(pic == null ? "" : pic);
 			setUrl(url == null ? "" : url);
@@ -138,6 +144,22 @@ public class Asset {
 
 	public void setBg(String bg) {
 		this.bg = bg;
+	}
+
+	public String getIsFront() {
+		return isFront;
+	}
+
+	public void setIsFront(String isFront) {
+		this.isFront = isFront;
+	}
+
+	public String getFrontID() {
+		return frontID;
+	}
+
+	public void setFrontID(String frontID) {
+		this.frontID = frontID;
 	}
 
 	public String toString(){

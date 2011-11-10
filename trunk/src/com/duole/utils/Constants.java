@@ -18,6 +18,9 @@ public class Constants {
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
+	public static final String PKG_FLASH = "com.adobe.flashplayer";
+	public static final String PKG_PRIORITY = "com.duole.priorityres";
+	
 	public static final String Duole = "http://www.duoleyuan.com";
 	public static final String UploadGamePeriod = Duole + "/e/member/fava/childuseup.php";
 	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
@@ -89,6 +92,8 @@ public class Constants {
 	public static final String XML_TITLE = "title";
 	public static final String XML_PIC = "pic";
 	public static final String XML_URL = "url";
+	public static final String XML_FRONTID = "frontid";
+	public static final String XML_ISFRONT = "isfront";
 	public static final String XML_PACKAGE = "package";
 	public static final String XML_ACTIVITY = "activity";
 	public static final String XML_LASTMODIFIED = "lastmodified";

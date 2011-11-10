@@ -56,6 +56,7 @@ import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleUtils;
+import com.duole.utils.FileUtils;
 import com.duole.utils.XmlUtils;
 import com.duole.widget.ScrollLayout;
 
@@ -83,6 +84,8 @@ public class Duole extends BaseActivity {
 	public static ArrayList<AssetItemAdapter> alAIA;
 	
 	ProgressBar pbEnTime;
+	
+	Asset assItem;
 
 	public static ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -118,7 +121,7 @@ public class Duole extends BaseActivity {
 
 		appref = this;
 		try {
-			if(!DuoleUtils.verifyInstallationOfAPK(this, "com.adobe.flashplayer")){
+			if(!DuoleUtils.verifyInstallationOfAPK(this, Constants.PKG_FLASH)){
 				DuoleUtils.installApkFromFile(new File("/sdcard/flashplayer.apk"));
 			}
 
@@ -171,6 +174,7 @@ public class Duole extends BaseActivity {
 				initCountDownTimer();
 				
 				initEnTimeProgressBar();
+				
 			} else {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
 			}
@@ -466,7 +470,7 @@ public class Duole extends BaseActivity {
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 			// TODO Auto-generated method stub
-			Asset assItem = (Asset) parent.getItemAtPosition(position);
+			assItem = (Asset) parent.getItemAtPosition(position);
 			Constants.gameStartMillis = System.currentTimeMillis();
 			Constants.resourceId = assItem.getId();
 
@@ -479,101 +483,161 @@ public class Duole extends BaseActivity {
 					+ Constants.sleepstart + ":00" + "     "
 					+ getString(R.string.sleepend) + " : " + Constants.sleepend
 					+ ":00");
-
 			editor.commit();
-
-			Intent intent = null;
-			try {
-				// launcher the package
-				if (assItem.getType().equals(Constants.RES_AUDIO)) {
-
-					intent = new Intent(appref, SingleMusicPlayerActivity.class);
-					int index = Constants.MusicList.indexOf(assItem);
-
-					intent.putExtra("index", index + "");
-
-				} 
-				//Launch a application.
-				else if (assItem.getType().equals(Constants.RES_APK)) {
-
-					intent = new Intent();
-					intent.setAction(Intent.ACTION_MAIN);
-					intent.addCategory(Intent.CATEGORY_LAUNCHER);
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-
-					try{
-						pkgName = assItem.getPackag();
-						Log.v("TAG", pkgName);
-						List<ResolveInfo> lri = DuoleUtils
-								.findActivitiesForPackage(appref, pkgName);
-
-						if (lri.size() > 0) {
-							for (ResolveInfo ri : lri) {
-								Log.v("TAG", ri.activityInfo.name);
-								intent.setComponent(new ComponentName(pkgName,
-										ri.activityInfo.name));
-								startActivity(intent);
-							}
-						}
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-					
-
-				} 
-				//Launch the configuration function.
-				else if (assItem.getType().equals(Constants.RES_CONFIG)) {
-					intent = new Intent(appref, PasswordActivity.class);
-					intent.putExtra("type", "0");
+			
+			String frontid = assItem.getFrontID();
+			if(frontid != null && !frontid.equals("0")){
+				if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
+					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/priority/");
 				}
-				//Play a video.
-				else if (assItem.getType().equals(Constants.RES_VIDEO)
-						&& !assItem.getUrl().endsWith(".swf")
-						&& !assItem.getUrl().endsWith(".flv")) {
-					intent = new Intent(appref, VideoPlayerActivity.class);
-
-					if (assItem.getUrl().startsWith("http:")) {
-						intent.putExtra("filename", assItem.getUrl());
-					} else {
-						intent.putExtra(
-								"filename",
-								assItem.getUrl().substring(
-										assItem.getUrl().lastIndexOf("/")));
-					}
-				}
-				//Play a flash.
-				else {
-
-					intent = new Intent(appref, FlashPlayerActivity.class);
-
-					if (assItem.getUrl().startsWith("http:")) {
-						intent.putExtra("filename", assItem.getUrl());
-					} else {
-						intent.putExtra(
-								"filename",
-								assItem.getUrl().substring(
-										assItem.getUrl().lastIndexOf("/")));
-					}
-				}
-
-				//Entertainment time out.
-				if (!Constants.ENTIME_OUT) {
-					appref.sendBroadcast(new Intent(Constants.Event_AppStart));
-				}
-
-				// If not a application.
-				if (!assItem.getType().equals(Constants.RES_APK)) {
-					mContext.startActivity(intent);
-				}
-			} catch (ActivityNotFoundException noFound) {
-				Toast.makeText(mContext, "Package not found!",
-						Toast.LENGTH_SHORT).show();
+			}else{
+				startItem(assItem);
 			}
+			
 		}
 
 	};
 	
+	private void startItem(Asset assItem) {
+		Intent intent = null;
+		try {
+			// launcher the package
+			if (assItem.getType().equals(Constants.RES_AUDIO)) {
+
+				intent = new Intent(appref, SingleMusicPlayerActivity.class);
+				int index = Constants.MusicList.indexOf(assItem);
+
+				intent.putExtra("index", index + "");
+
+			}
+			// Launch a application.
+			else if (assItem.getType().equals(Constants.RES_APK)) {
+
+				pkgName = assItem.getPackag();
+
+				startActivityByPkgName(pkgName);
+
+			}
+			// Launch the configuration function.
+			else if (assItem.getType().equals(Constants.RES_CONFIG)) {
+				intent = new Intent(appref, PasswordActivity.class);
+				intent.putExtra("type", "0");
+			}
+			// Play a video.
+			else if (assItem.getType().equals(Constants.RES_VIDEO)
+					&& !assItem.getUrl().endsWith(".swf")
+					&& !assItem.getUrl().endsWith(".flv")) {
+				intent = new Intent(appref, VideoPlayerActivity.class);
+
+				if (assItem.getUrl().startsWith("http:")) {
+					intent.putExtra("filename", assItem.getUrl());
+				} else {
+					intent.putExtra(
+							"filename",
+							assItem.getUrl().substring(
+									assItem.getUrl().lastIndexOf("/")));
+				}
+			}
+			// Play a flash.
+			else {
+
+				intent = new Intent(appref, FlashPlayerActivity.class);
+
+				if (assItem.getUrl().startsWith("http:")) {
+					intent.putExtra("filename", assItem.getUrl());
+				} else {
+					intent.putExtra(
+							"filename",
+							assItem.getUrl().substring(
+									assItem.getUrl().lastIndexOf("/")));
+				}
+			}
+
+			// Entertainment time out.
+			if (!Constants.ENTIME_OUT) {
+				appref.sendBroadcast(new Intent(Constants.Event_AppStart));
+			}
+
+			// If not a application.
+			if (!assItem.getType().equals(Constants.RES_APK)) {
+				mContext.startActivity(intent);
+			}
+		} catch (ActivityNotFoundException noFound) {
+			Toast.makeText(mContext, "Package not found!", Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+	
+	private void startActivityByPkgName(String pkgname){
+		
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_LAUNCHER);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		
+		try{
+			List<ResolveInfo> lri = DuoleUtils
+					.findActivitiesForPackage(appref, pkgName);
+
+			if (lri.size() > 0) {
+				for (ResolveInfo ri : lri) {
+					intent.setComponent(new ComponentName(pkgName,
+							ri.activityInfo.name));
+					startActivity(intent);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void startActivityForResultByPackageName(String packagename,String frontid,String basePath){
+		
+		
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_LAUNCHER);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		
+		SharedPreferences sp = getSharedPreferences("com.duole",
+				MODE_WORLD_READABLE);
+		Editor editor = sp.edit();
+		editor.putString("id", frontid);
+		editor.putString("base", basePath);
+
+		editor.commit();
+
+		try{
+			List<ResolveInfo> lri = DuoleUtils
+					.findActivitiesForPackage(appref, packagename);
+
+			Log.v("TAG", lri.size() + "    ");
+			
+			if (lri.size() > 0) {
+				for (ResolveInfo ri : lri) {
+					intent.setComponent(new ComponentName(packagename,
+							ri.activityInfo.name));
+					Log.v("TAG", ri.activityInfo.name + "    ");
+					startActivityForResult(intent, 1);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
+		startItem(assItem);
+		
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
 	/**
 	 * Unbind the background auto refresh service.
 	 */

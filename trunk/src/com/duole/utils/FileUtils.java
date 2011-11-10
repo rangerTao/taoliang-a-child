@@ -14,30 +14,36 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import de.idyl.winzipaes.AesZipFileDecrypter;
+import de.idyl.winzipaes.impl.AESDecrypterBC;
+import de.idyl.winzipaes.impl.AESDecrypterJCA;
+import de.idyl.winzipaes.impl.ExtZipEntry;
+
 import android.graphics.Bitmap;
 import android.util.Log;
 
 public class FileUtils {
 
-	
-	//whether tmep file exists
-	public static boolean isCacheFileExists(String filename){
-		
+	// whether tmep file exists
+	public static boolean isCacheFileExists(String filename) {
+
 		File file = new File(Constants.CacheDir + "/temp/" + filename);
-		
-		if(file.exists()){
+
+		if (file.exists()) {
 			return true;
 		}
-		
+
 		return false;
-		
+
 	}
-	
-	//move files
-	public static void moveFile(File source,File target){
-		try{
-			Runtime.getRuntime().exec("mv " + source.getAbsolutePath() + " " + target.getAbsolutePath());
-		}catch (Exception e) {
+
+	// move files
+	public static void moveFile(File source, File target) {
+		try {
+			Runtime.getRuntime().exec(
+					"mv " + source.getAbsolutePath() + " "
+							+ target.getAbsolutePath());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -52,7 +58,7 @@ public class FileUtils {
 				FileOutputStream fs = new FileOutputStream(newPathFile);
 				byte[] buffer = new byte[512];
 				while ((byteread = inStream.read(buffer)) != -1) {
-					bytesum += byteread; 
+					bytesum += byteread;
 					fs.write(buffer, 0, byteread);
 				}
 				inStream.close();
@@ -63,25 +69,25 @@ public class FileUtils {
 		}
 	}
 
-	public static void readTxt(ArrayList<String[]> ids,String filepath){
-		
+	public static void readTxt(ArrayList<String[]> ids, String filepath) {
+
 		FileInputStream fis;
 		try {
 			File file = new File(filepath);
-			if(file.exists()){
+			if (file.exists()) {
 				fis = new FileInputStream(file);
-				
+
 				InputStreamReader isr = new InputStreamReader(fis);
-				
+
 				BufferedReader br = new BufferedReader(isr);
-				
+
 				String temp = br.readLine();
 				int index = 0;
-				while(temp != null){
+				while (temp != null) {
 					String[] tem = temp.split(" ");
 					ids.add(tem);
 					temp = br.readLine();
-					index ++;
+					index++;
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -91,47 +97,91 @@ public class FileUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-	}
-	
-	public static void saveTxt(String[] ids,String filepath){
-		
-		try{
-			File file = new File(filepath);
-			if(!file.exists())
-				file.createNewFile();
-			FileWriter fw = new FileWriter(file, true);
-			
-			if(ids == null){
-				fw.write("");
-			}else{
-				fw.write(ids[0] + " " + ids[1] + " " + ids[2] + "\n");
-			}
-			
-			fw.close();
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
+
 	}
 
-	public static Bitmap decodeBMPFromURL(String bmpath){
-		
-		
+	public static void saveTxt(String[] ids, String filepath) {
+
+		try {
+			File file = new File(filepath);
+			if (!file.exists())
+				file.createNewFile();
+			FileWriter fw = new FileWriter(file, true);
+
+			if (ids == null) {
+				fw.write("");
+			} else {
+				fw.write(ids[0] + " " + ids[1] + " " + ids[2] + "\n");
+			}
+
+			fw.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static Bitmap decodeBMPFromURL(String bmpath) {
+
 		return null;
 	}
-	
-	//When all download task done.clear the temp folder
-	public static void clearTempFolder(String path){
-		
+
+	// When all download task done.clear the temp folder
+	public static void clearTempFolder(String path) {
+
 		File tempFolder = new File(path);
-		if(tempFolder.isDirectory()){
-			for(File temp : tempFolder.listFiles()){
+		if (tempFolder.isDirectory()) {
+			for (File temp : tempFolder.listFiles()) {
 				temp.delete();
 			}
 		}
-		
+
+	}
+
+	/**
+	 * Unzip a file
+	 * 
+	 * @param zipFile
+	 *            path
+	 * @param targetDir
+	 *            path
+	 * @param pass
+	 */
+	public static void Unzip(String zipFile, String targetDir, String pass) {
+
+		try {
+			AesZipFileDecrypter zipFile1;
+
+			AESDecrypterBC aesd = new AESDecrypterBC();
+
+			zipFile1 = new AesZipFileDecrypter(new File(zipFile), aesd);
+
+			for (ExtZipEntry entry : zipFile1.getEntryList()) {
+				File file = new File(targetDir + "/" + entry.getName());
+				if (!file.exists()) {
+					if (entry.isDirectory()) {
+						file.mkdirs();
+						System.out.println("a folder  " + file.getName());
+					} else {
+						File folder = new File(file.getAbsolutePath()
+								.substring(
+										0,
+										file.getAbsolutePath()
+												.lastIndexOf("/")));
+						if (!folder.exists()) {
+							folder.mkdirs();
+						}
+						System.out.println("a file  " + file.getName());
+						file.createNewFile();
+						zipFile1.extractEntry(entry, file, pass);
+					}
+
+				}
+			}
+
+		} catch (Exception cwj) {
+			cwj.printStackTrace();
+		}
 	}
 }
