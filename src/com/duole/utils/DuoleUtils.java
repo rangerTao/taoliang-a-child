@@ -626,16 +626,21 @@ public class DuoleUtils {
     public static ArrayList<Asset> checkFilesExists(ArrayList<Asset> assets){
     	
     	ArrayList<Asset> temp = new ArrayList<Asset>();
-    	File file;
+    	File file = null;
     	for(int i = 0;i<assets.size();i++){
     		Asset asset = assets.get(i);
     		
     		String type = asset.getType();
     		String path = asset.getUrl();
-
+    		String isfront = asset.getIsFront();
+    		
     		if(!path.startsWith("http")){
-    			file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
-        		if(file.exists()){
+    			try{
+    				file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
+    			}catch (Exception e) {
+					e.printStackTrace();
+				}
+        		if(file != null && file.exists() && isfront != null && isfront.equals("0")){
         			if(type.equals(Constants.RES_APK)){
         				DuoleUtils.installApkFromFile(file);
         			}
@@ -799,6 +804,7 @@ public class DuoleUtils {
     	List<ApplicationInfo> lai = pm.getInstalledApplications(PackageManager.GET_META_DATA);
     	for(ApplicationInfo ai : lai){
     		if(ai.packageName.equals(pkgname)){
+    			Log.v("TAG", pkgname + "   Installed.");
     			return true;
     		}
     	}

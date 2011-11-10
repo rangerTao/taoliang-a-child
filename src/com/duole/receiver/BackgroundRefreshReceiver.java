@@ -28,7 +28,6 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		Log.v("TAG", "get resource" + Constants.SCREEN_ON);
 		if (intent.getAction().equals(Constants.Refresh_Start) && Constants.SCREEN_ON) {
 			
 			Date date = new Date(System.currentTimeMillis());
