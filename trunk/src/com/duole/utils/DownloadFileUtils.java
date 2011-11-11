@@ -80,6 +80,16 @@ public class DownloadFileUtils extends Thread {
 				}
 			}
 			
+			if(asset.getType().equals(Constants.RES_FRONT)){
+				if (!asset.getUrl().startsWith("http") && asset.getUrl().endsWith(".zip")) {
+					DuoleUtils.downloadFront(asset, asset.getUrl());
+				}
+			}
+			
+			/**
+			 * To do : deal with priority resource.
+			 */
+			
 			Constants.newItemExists = true;
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			
