@@ -488,7 +488,7 @@ public class Duole extends BaseActivity {
 			String frontid = assItem.getFrontID();
 			if(frontid != null && !frontid.equals("0")){
 				if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
-					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/priority/");
+					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/");
 				}
 			}else{
 				startItem(assItem);
@@ -614,13 +614,10 @@ public class Duole extends BaseActivity {
 			List<ResolveInfo> lri = DuoleUtils
 					.findActivitiesForPackage(appref, packagename);
 
-			Log.v("TAG", lri.size() + "    ");
-			
 			if (lri.size() > 0) {
 				for (ResolveInfo ri : lri) {
 					intent.setComponent(new ComponentName(packagename,
 							ri.activityInfo.name));
-					Log.v("TAG", ri.activityInfo.name + "    ");
 					startActivityForResult(intent, 1);
 				}
 			}

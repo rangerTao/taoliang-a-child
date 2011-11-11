@@ -182,6 +182,23 @@ public class FileUtils {
 
 		} catch (Exception cwj) {
 			cwj.printStackTrace();
+			File file = new File(targetDir);
+			if(emptyFolder(file)){
+				file.delete();
+			}
 		}
+	}
+	
+	public static boolean emptyFolder(File file){
+		
+		for(File temp : file.listFiles()){
+			if(temp.isDirectory()){
+				emptyFolder(temp);
+			}else{
+				temp.delete();
+			}
+		}
+		
+		return true;
 	}
 }

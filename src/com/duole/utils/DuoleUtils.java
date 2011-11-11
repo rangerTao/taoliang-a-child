@@ -207,6 +207,41 @@ public class DuoleUtils {
 		return false;
 
 	}
+	
+	/**
+	 * Get front resource
+	 */
+	public static boolean downloadFront(Asset asset, String video) {
+		// Reorganize the url.
+		URL url = checkUrl(video);
+
+		// the file used to save the video.
+		File file = new File(Constants.CacheDir + "/front" + "/"
+				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+		
+		try {
+			//get the name of file
+			String filename = file.getName();
+			File cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
+			
+			if (FileUtils.isCacheFileExists(filename)) {
+				if (DownloadFileUtils.resumeDownloadCacheFile(url, cacheFile)) {
+					FileUtils.Unzip(cacheFile.getAbsolutePath(), Constants.CacheDir + "/front" + "/" + asset.getId(), Constants.ZiPass);
+					cacheFile.delete();
+				}
+			} else {
+				if (DownloadFileUtils.downloadCacheFile(url, cacheFile)) {
+					FileUtils.Unzip(cacheFile.getAbsolutePath(), Constants.CacheDir + "/front" + "/" + asset.getId(), Constants.ZiPass);
+					cacheFile.delete();
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + asset.getUrl());
+			Constants.AssetList.remove(asset);
+			return false;
+		}
+	}
 
 	/**
 	 * Download game from server.
@@ -419,12 +454,19 @@ public class DuoleUtils {
 		if (!asset.getUrl().equals(refer.getUrl())) {
 			return true;
 		}
-		
-
 
 		// if lastmodified is different,true.
 		if (!asset.getLastmodified().equals(refer.getLastmodified())) {
 			return true;
+		}
+		
+		if(asset.getType().equals(Constants.RES_FRONT)){
+			File front = new File(Constants.CacheDir + "/front/" + asset.getId());
+			if(!front.exists()){
+				return true;
+			}else{
+				return false;
+			}
 		}
 
 		File file;

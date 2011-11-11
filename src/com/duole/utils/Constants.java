@@ -18,6 +18,8 @@ public class Constants {
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
+	public static final String ZiPass = "dley@910";
+	
 	public static final String PKG_FLASH = "com.adobe.flashplayer";
 	public static final String PKG_PRIORITY = "com.duole.priorityres";
 	
@@ -73,6 +75,7 @@ public class Constants {
 	public static final String RES_CONFIG = "config";
 	public static final String RES_CONFIG_STATUS = "status";
 	public static final String RES_ABOUT = "about";
+	public static final String RES_FRONT = "front";
 	
 	//Configuration
 	public static String bgurl = "";

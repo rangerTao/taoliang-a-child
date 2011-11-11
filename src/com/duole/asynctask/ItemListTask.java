@@ -1,15 +1,9 @@
 package com.duole.asynctask;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -128,7 +122,7 @@ public class ItemListTask extends AsyncTask {
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		}
 		
-		if(gettedSourceList && Constants.alAsset.size() > 0){
+		if(gettedSourceList){
 			DuoleUtils.updateAssetListFile(Constants.alAsset);
 			
 			try {

@@ -490,7 +490,6 @@ public class XmlUtils {
 						newElement.appendChild(newActivity);
 						
 					}
-					
 				}
 				
 				document.getDocumentElement().appendChild(newElement);

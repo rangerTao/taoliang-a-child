@@ -80,8 +80,6 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			temp.addAll(Constants.alAsset);
 			temp = DuoleUtils.checkFilesExists(temp);
 			
-			Log.v("TAG", temp.size() + "temp size");
-			
 			DuoleUtils.addNetworkManager(temp);
 			
 			DuoleUtils.getMusicList(temp);
