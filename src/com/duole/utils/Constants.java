@@ -15,6 +15,7 @@ public class Constants {
 	//system flags
 	public static boolean musicPlayerIsRunning = false;
 	public static boolean clientApkDownloaded = false;
+	public static boolean viewrefreshenable = true;
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	

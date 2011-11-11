@@ -98,7 +98,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		String ivUrl = asset.getThumbnail();
 		String ivThumb = Constants.CacheDir + Constants.RES_THUMB + ivUrl.substring(ivUrl.lastIndexOf("/"));
 		ivMusicThumb.setImageDrawable(Drawable.createFromPath(ivThumb));
-		tvMusicTitle.setText(asset.getFilename());
+		tvMusicTitle.setText(asset.getName());
 		
 		if (!Constants.bgRestUrl.equals("")) {}
 	}

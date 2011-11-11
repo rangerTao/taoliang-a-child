@@ -514,7 +514,10 @@ public class Duole extends BaseActivity {
 			else if (assItem.getType().equals(Constants.RES_APK)) {
 
 				pkgName = assItem.getPackag();
-
+				if(pkgName == null){
+					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
+				}
+				
 				startActivityByPkgName(pkgName);
 
 			}
@@ -582,6 +585,7 @@ public class Duole extends BaseActivity {
 
 			if (lri.size() > 0) {
 				for (ResolveInfo ri : lri) {
+					Log.v("TAG", ri.activityInfo.name);
 					intent.setComponent(new ComponentName(pkgName,
 							ri.activityInfo.name));
 					startActivity(intent);
