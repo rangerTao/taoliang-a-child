@@ -14,11 +14,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import com.duole.pojos.asset.Asset;
+
 import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypterBC;
 import de.idyl.winzipaes.impl.AESDecrypterJCA;
 import de.idyl.winzipaes.impl.ExtZipEntry;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -188,6 +193,27 @@ public class FileUtils {
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * @param context
+	 * @param asset
+	 * @return
+	 */
+	public static String getPackagenameFromAPK(Context context,Asset asset){
+		PackageManager pm = context.getPackageManager();
+		File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+
+		PackageInfo info;
+		info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+
+		if(info != null){
+			return info.packageName;
+		}else{
+			return "";
+		}
+	}
+	
 	
 	public static boolean emptyFolder(File file){
 		

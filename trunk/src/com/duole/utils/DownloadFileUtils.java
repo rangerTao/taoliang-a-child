@@ -9,8 +9,13 @@ import java.net.URLConnection;
 import java.util.RandomAccess;
 
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.duole.Duole;
@@ -179,5 +184,4 @@ public class DownloadFileUtils extends Thread {
 
 	}
 	
-
 }

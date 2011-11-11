@@ -84,11 +84,12 @@ public class JsonUtils {
 		}
 		
 		
-		if (file == null || !file.exists() && Constants.bgurl != jsonObject.getString("bg")) {
+		if (file == null || !file.exists() || !Constants.bgurl.equals(jsonObject.getString("bg"))) {
 			
 			Constants.bgurl = jsonObject.getString("bg");
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole + Constants.bgurl), file);
 		}
+		
 		if(!Constants.bgRestUrl.equals("")){
 			file = new File(Constants.CacheDir
 					+ Constants.bgRestUrl.substring(Constants.bgRestUrl
@@ -108,7 +109,7 @@ public class JsonUtils {
 //		}
 		
 		if (file == null || !file.exists()
-				&& Constants.bgRestUrl != jsonObject.getString("bg1")) {
+				|| !Constants.bgRestUrl.equals(jsonObject.getString("bg1"))) {
 			Constants.bgRestUrl = jsonObject.getString("bg1");
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
 					+ Constants.bgRestUrl), file);

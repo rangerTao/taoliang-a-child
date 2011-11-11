@@ -44,8 +44,9 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 
 					public void run() {
 						
-						refreshView();
-						
+						if(Constants.viewrefreshenable){
+							refreshView();
+						}
 					}
 
 				});
@@ -66,12 +67,12 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 	
 	private synchronized void refreshView(){
 		
+		Constants.viewrefreshenable = false;
 		ArrayList<Asset> temp = null;
 		// get all apps
 		try {
 			if(Constants.alAsset.size() < 1){
-				Constants.alAsset = XmlUtils.readXML(null, Constants.CacheDir
-					+ "itemlist.xml");
+
 			}
 //			Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
 //					+ "itemlist.xml");
@@ -83,8 +84,10 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			DuoleUtils.addNetworkManager(temp);
 			
 			DuoleUtils.getMusicList(temp);
+			
+			Constants.alAsset = XmlUtils.readXML(null, Constants.CacheDir
+					+ "itemlist.xml");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -159,7 +162,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		
 		temp = null;
 	
-		
+		Constants.viewrefreshenable = true;
 	}
 	
 }

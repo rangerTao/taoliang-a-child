@@ -163,7 +163,7 @@ public class Asset {
 	}
 
 	public String toString(){
-		return "name: " + this.getName() +" "
+		return "name: " + this.getName() +"activity: " + getActivity() + " package: " + getPackag()
 	+ "thumbnail: " + this.getThumbnail() + " "
 	+ "url: "+ this.getUrl() + " "
 	+ "type: " + this.getType() + " "

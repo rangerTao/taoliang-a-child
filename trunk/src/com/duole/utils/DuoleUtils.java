@@ -684,7 +684,12 @@ public class DuoleUtils {
 				}
         		if(file != null && file.exists() && isfront != null && isfront.equals("0")){
         			if(type.equals(Constants.RES_APK)){
-        				DuoleUtils.installApkFromFile(file);
+        				String pkgname = asset.getPackag();
+        				if(pkgname == null){
+        					FileUtils.getPackagenameFromAPK(Duole.appref, asset);
+        				}
+        				if(!DuoleUtils.verifyInstallationOfAPK(Duole.appref, pkgname))
+        					DuoleUtils.installApkFromFile(file);
         			}
         			temp.add(assets.get(i));
         		}
