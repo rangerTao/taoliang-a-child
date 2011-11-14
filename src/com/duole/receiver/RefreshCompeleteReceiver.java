@@ -72,21 +72,19 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		// get all apps
 		try {
 			if(Constants.alAsset.size() < 1){
-
+				Constants.alAsset = XmlUtils.readXML(null, Constants.CacheDir
+						+ "itemlist.xml");
 			}
-//			Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
-//					+ "itemlist.xml");
 			
 			temp = new ArrayList<Asset>();
 			temp.addAll(Constants.alAsset);
+
 			temp = DuoleUtils.checkFilesExists(temp);
 			
 			DuoleUtils.addNetworkManager(temp);
 			
 			DuoleUtils.getMusicList(temp);
 			
-			Constants.alAsset = XmlUtils.readXML(null, Constants.CacheDir
-					+ "itemlist.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

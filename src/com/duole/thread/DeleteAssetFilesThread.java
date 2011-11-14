@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import com.duole.Duole;
@@ -21,6 +22,7 @@ public class DeleteAssetFilesThread extends Thread {
 	ArrayList<Asset> assets;
 
 	public DeleteAssetFilesThread(ArrayList<Asset> assets) {
+		Constants.newItemExists = true;
 		this.assets = assets;
 	}
 
@@ -87,7 +89,7 @@ public class DeleteAssetFilesThread extends Thread {
 				}
 			}
 		}
-
+		Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 	}
 
 }

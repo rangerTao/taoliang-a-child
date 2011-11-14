@@ -686,13 +686,18 @@ public class DuoleUtils {
         			if(type.equals(Constants.RES_APK)){
         				String pkgname = asset.getPackag();
         				if(pkgname == null){
-        					FileUtils.getPackagenameFromAPK(Duole.appref, asset);
+        					pkgname = FileUtils.getPackagenameFromAPK(Duole.appref, asset);
         				}
         				if(!DuoleUtils.verifyInstallationOfAPK(Duole.appref, pkgname))
         					DuoleUtils.installApkFromFile(file);
         			}
-        			temp.add(assets.get(i));
+        			temp.add(asset);
         		}
+    		}else{
+    			file = new File(Constants.CacheDir + "thumbnail/" + asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
+    			if(file != null && file.exists()){
+    				temp.add(asset);
+    			}
     		}
     		
     	}

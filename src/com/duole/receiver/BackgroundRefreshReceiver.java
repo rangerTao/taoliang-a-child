@@ -101,6 +101,8 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 			
 			if (!Constants.DOWNLOAD_RUNNING) {
 				new ItemListTask().execute();
+			}else{
+				Log.v("TAG", "download is running" );
 			}
 			
 			//upload game time
