@@ -219,6 +219,8 @@ public class DuoleUtils {
 		File file = new File(Constants.CacheDir + "/front" + "/"
 				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 		
+		Log.v("TAG", url.toString());
+		
 		try {
 			//get the name of file
 			String filename = file.getName();
@@ -330,7 +332,7 @@ public class DuoleUtils {
 				return new URL(url);
 
 			} else {
-				url = "http://www.duoleyuan.com" + url;
+				url = Constants.Duole + url;
 				return new URL(url);
 			}
 		} catch (MalformedURLException e) {
@@ -381,6 +383,7 @@ public class DuoleUtils {
 	 */
 	public static boolean downloadSingleFile(URL url, File file) {
 		try {
+			Log.v("TAG", "download a file from " + url.toString());
 			// Open a connection.
 			URLConnection conn = url.openConnection();
 			// get the size of file.
@@ -513,12 +516,24 @@ public class DuoleUtils {
 		}else if (!asset.getUrl().equals("")) {
 			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
-			
 			if(asset.getUrl().startsWith("http")){
 				return false;
 			}
+			
 			if (!file.exists()) {
 				return true;
+			}else{
+				if(asset.getMd5() == null){
+					if(!refer.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))){
+						file.delete();
+						return true;
+					}
+				}else if(asset.getMd5().equals("false")){
+					return false;
+				}else if(!asset.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))){
+					file.delete();
+					return true;
+				}
 			}
 		}
 
@@ -694,10 +709,7 @@ public class DuoleUtils {
         			temp.add(asset);
         		}
     		}else{
-    			file = new File(Constants.CacheDir + "thumbnail/" + asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
-    			if(file != null && file.exists()){
-    				temp.add(asset);
-    			}
+    			temp.add(asset);
     		}
     		
     	}
@@ -719,7 +731,7 @@ public class DuoleUtils {
 	 */
 	public static boolean getSourceList(ArrayList<Asset> alAsset) {
 		try {
-			String url = "http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
+			String url = Constants.Duole + "/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);

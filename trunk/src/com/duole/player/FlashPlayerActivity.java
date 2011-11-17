@@ -5,14 +5,18 @@ import java.io.File;
 import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleNetUtils;
+import com.duole.utils.DuoleUtils;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 public class FlashPlayerActivity extends PlayerBaseActivity{
 
@@ -33,9 +37,15 @@ public class FlashPlayerActivity extends PlayerBaseActivity{
 		String filename = intent.getStringExtra("filename");
 		String url = "";
 		if(filename.startsWith("http")){
+			if(!DuoleNetUtils.isNetworkAvailable(this)){
+				finish();
+			}
 			url = filename;
-			String id = filename.substring(filename.indexOf("sid/") + 4,filename.indexOf("/v.swf"));
-			url = "http://static.youku.com/v1.0.0134/v/swf/qplayer.swf?VideoIDS=" + id + "&embedid=&isAutoPlay=true&MMControl=false&MMout=false&embedid";
+			Log.d("TAG", "on line video url : " + url);
+			if(url.contains("youku.com")){
+				String id = filename.substring(filename.indexOf("sid/") + 4,filename.indexOf("/v.swf"));
+				url = "http://static.youku.com/v1.0.0134/v/swf/qplayer.swf?VideoIDS=" + id + "&embedid=&isAutoPlay=true&MMControl=false&MMout=false&embedid";
+			}
 		}else{
 			url = "file://" + Constants.CacheDir + "/game/" + filename;
 		}

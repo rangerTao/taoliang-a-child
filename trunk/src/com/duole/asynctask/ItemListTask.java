@@ -35,6 +35,8 @@ public class ItemListTask extends AsyncTask {
 		try {
 			treatData();
 		} catch (Exception e) {
+			e.printStackTrace();
+			Constants.DOWNLOAD_RUNNING = false;
 			return false;
 		}
 		return true;
@@ -119,6 +121,9 @@ public class ItemListTask extends AsyncTask {
 		}
 
 		if (DownloadFileUtils.downloadAll()) {
+			if(Constants.AssetList.size() != Constants.alAsset.size()){
+				Constants.newItemExists = true;
+			}
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		}
 		
@@ -129,7 +134,6 @@ public class ItemListTask extends AsyncTask {
 				Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
 								+ "itemlist.xml");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -144,7 +148,7 @@ public class ItemListTask extends AsyncTask {
 	public boolean getSourceList() {
 		try {
 			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
-			"http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
+			Constants.resourceUrl + DuoleUtils.getAndroidId();
 			
 			Constants.alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);

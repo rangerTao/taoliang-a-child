@@ -56,6 +56,8 @@ public class DownloadFileUtils extends Thread {
 			
 			String type = asset.getType().toLowerCase();
 			
+			Log.v("TAG", asset.toString());
+			
 			//Download thumbnail.
 			DuoleUtils.downloadPic(asset,asset.getThumbnail());
 			

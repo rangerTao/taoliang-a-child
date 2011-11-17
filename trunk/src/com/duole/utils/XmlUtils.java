@@ -187,6 +187,9 @@ public class XmlUtils {
 						if(Constants.XML_LASTMODIFIED.equals(parser.getName())){
 							asset.setLastmodified(parser.nextText());
 						}
+						if(Constants.XML_MD5.equals(parser.getName())){
+							asset.setMd5(parser.nextText());
+						}
 						if(Constants.XML_TYPE.equals(parser.getName())){
 							asset.setType(parser.nextText());
 						}
@@ -430,7 +433,7 @@ public class XmlUtils {
 				Text type = document.createTextNode(asset.getType());
 				Text frontId = document.createTextNode(asset.getFrontID());
 				Text isFront = document.createTextNode(asset.getIsFront());
-				
+				Text md5 = document.createTextNode(asset.getMd5());
 
 				// new elements
 				Element newElement = document.createElement("item");
@@ -443,6 +446,7 @@ public class XmlUtils {
 				Element newTypeElement = document.createElement("type");
 				Element newFrontID = document.createElement("frontid");
 				Element newIsFront = document.createElement("isfront");
+				Element newMd5 = document.createElement("md5");
 				
 				
 				newIdElement.appendChild(id);
@@ -453,6 +457,7 @@ public class XmlUtils {
 				newTypeElement.appendChild(type);
 				newFrontID.appendChild(frontId);
 				newIsFront.appendChild(isFront);
+				newMd5.appendChild(md5);
 
 				newElement.appendChild(newIdElement);
 				newElement.appendChild(newTitleElement);
@@ -462,6 +467,7 @@ public class XmlUtils {
 				newElement.appendChild(newTypeElement);
 				newElement.appendChild(newFrontID);
 				newElement.appendChild(newIsFront);
+				newElement.appendChild(newMd5);
 				
 				if(asset.getType().equals(Constants.RES_AUDIO)){
 					Text bg = document.createTextNode(asset.getBg());

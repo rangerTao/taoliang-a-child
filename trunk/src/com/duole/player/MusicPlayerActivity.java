@@ -230,7 +230,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		case KeyEvent.KEYCODE_HOME:
 			
 			musicControl();
-			if(homeCount < 3){
+			if(homeCount < 3 && mp2 != null){
 				mp2.seekTo(0);
 				mp2.start();
 				homeCount ++;
@@ -305,6 +305,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 		public void onReceive(Context arg0, Intent arg1) {
 			if(!Constants.SLEEP_TIME){
 				appref.finish();
+				Constants.ENTIME_OUT = false;
 			}
 		}
 		

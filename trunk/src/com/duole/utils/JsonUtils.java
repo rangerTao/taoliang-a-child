@@ -86,8 +86,19 @@ public class JsonUtils {
 		
 		if (file == null || !file.exists() || !Constants.bgurl.equals(jsonObject.getString("bg"))) {
 			
-			Constants.bgurl = jsonObject.getString("bg");
-			DuoleUtils.downloadSingleFile(new URL(Constants.Duole + Constants.bgurl), file);
+			String bgurl = jsonObject.getString("bg");
+			try{
+				file.delete();
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			file = new File(Constants.CacheDir
+					+bgurl.substring(bgurl
+							.lastIndexOf("/")));
+			DuoleUtils.downloadSingleFile(new URL(Constants.Duole + bgurl), file);
+			Constants.bgurl = bgurl;
+			
+			Constants.newItemExists = true;
 		}
 		
 		if(!Constants.bgRestUrl.equals("")){
@@ -110,9 +121,20 @@ public class JsonUtils {
 		
 		if (file == null || !file.exists()
 				|| !Constants.bgRestUrl.equals(jsonObject.getString("bg1"))) {
-			Constants.bgRestUrl = jsonObject.getString("bg1");
+			String bgurl = jsonObject.getString("bg1");
+			try{
+				file.delete();
+				file = new File(Constants.CacheDir
+						+bgurl.substring(bgurl
+								.lastIndexOf("/")));
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
 			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
-					+ Constants.bgRestUrl), file);
+					+ bgurl), file);
+			Constants.bgRestUrl = bgurl;
+			
+			Constants.newItemExists = true;
 		}
 		
 //		Log.v("TAG", Constants.restart);

@@ -155,6 +155,7 @@ public class FileUtils {
 	 */
 	public static void Unzip(String zipFile, String targetDir, String pass) {
 
+		Log.v("TAG", "Unzip file:" + zipFile + " to:" + " " + targetDir);
 		try {
 			AesZipFileDecrypter zipFile1;
 
@@ -162,12 +163,17 @@ public class FileUtils {
 
 			zipFile1 = new AesZipFileDecrypter(new File(zipFile), aesd);
 
+			File foldertemp = new File(targetDir);
+			if(foldertemp.exists()){
+				emptyFolder(foldertemp);
+				foldertemp.delete();
+			}
+			
 			for (ExtZipEntry entry : zipFile1.getEntryList()) {
 				File file = new File(targetDir + "/" + entry.getName());
 				if (!file.exists()) {
 					if (entry.isDirectory()) {
 						file.mkdirs();
-						System.out.println("a folder  " + file.getName());
 					} else {
 						File folder = new File(file.getAbsolutePath()
 								.substring(
@@ -177,7 +183,6 @@ public class FileUtils {
 						if (!folder.exists()) {
 							folder.mkdirs();
 						}
-						System.out.println("a file  " + file.getName());
 						file.createNewFile();
 						zipFile1.extractEntry(entry, file, pass);
 					}
@@ -220,6 +225,7 @@ public class FileUtils {
 		for(File temp : file.listFiles()){
 			if(temp.isDirectory()){
 				emptyFolder(temp);
+				temp.delete();
 			}else{
 				temp.delete();
 			}

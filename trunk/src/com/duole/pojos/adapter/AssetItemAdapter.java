@@ -1,5 +1,6 @@
 package com.duole.pojos.adapter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,9 +88,15 @@ public class AssetItemAdapter extends BaseAdapter {
 		}
 		
 		if(!asset.getThumbnail().equals("")){
-			assItem.ivAssetThumb.setImageBitmap(BitmapFactory
-					.decodeFile(Constants.CacheDir
-							+ "/thumbnail/"	+ asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/"))));
+			File file = new File(Constants.CacheDir
+							+ "/thumbnail/"	+ asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
+			if(file.exists()){
+				assItem.ivAssetThumb.setImageBitmap(BitmapFactory
+						.decodeFile(file.getAbsolutePath()));
+			}else{
+				assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
+			}
+			
 		}
 		
 		assItem.ivKe.setImageBitmap(Constants.bmpKe);

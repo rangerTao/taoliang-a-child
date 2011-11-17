@@ -21,6 +21,7 @@ public class Asset {
 	private String bg;
 	private String isFront;
 	private String frontID;
+	private String md5;
 
 	public Asset(JSONObject json) {
 		try {
@@ -28,32 +29,44 @@ public class Asset {
 			String pic = json.getString("pic");
 			String url = json.getString("url");
 			String type = json.getString("type");
+			type = type.toLowerCase();
 			String id = json.getString("id");
 			String lastmodifi = json.getString("lastmodified");
 			String isfront = json.getString("isfront");
 			String frontid = json.getString("frontid");
 			if(type.equals(Constants.RES_AUDIO)){
-				String mpbg = json.getString("bg");
-				setBg(mpbg == null ? "" : mpbg);
+				try{
+					String mpbg = json.getString("bg");
+					setBg(mpbg == null ? "" : mpbg);
+				}catch(Exception e){
+					setBg("");
+				}
 			}
 			setIsFront(isfront);
 			setFrontID(frontid);
 			setName(title == null ? "" : title);
 			setThumbnail(pic == null ? "" : pic);
 			setUrl(url == null ? "" : url);
-			setType(type == null ? "" : type);
+			setType(type == null ? "" : type.toLowerCase());
 			setId(id == null ? "" : id);
 			setLastmodified(lastmodifi == null ? "" : lastmodifi);
 			setFilename(url.substring(url.lastIndexOf("/")));
-			
+			setMd5(json.getString("urlmd5"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public Asset() {
 		// TODO Auto-generated constructor stub
+	}
+
+	public String getMd5() {
+		return md5;
+	}
+
+	public void setMd5(String md5) {
+		this.md5 = md5;
 	}
 
 	public String getName() {
@@ -135,8 +148,6 @@ public class Asset {
 	public void setActivity(String activity) {
 		this.activity = activity;
 	}
-	
-	
 
 	public String getBg() {
 		return bg;
