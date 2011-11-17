@@ -566,8 +566,6 @@ public class Duole extends BaseActivity {
 				mContext.startActivity(intent);
 			}
 		} catch (ActivityNotFoundException noFound) {
-			Toast.makeText(mContext, "Package not found!", Toast.LENGTH_SHORT)
-					.show();
 		}
 	}
 	
@@ -597,6 +595,12 @@ public class Duole extends BaseActivity {
 		
 	}
 	
+	/**
+	 * Start a activity result of package.
+	 * @param packagename
+	 * @param frontid
+	 * @param basePath
+	 */
 	private void startActivityForResultByPackageName(String packagename,String frontid,String basePath){
 		
 		
@@ -631,6 +635,9 @@ public class Duole extends BaseActivity {
 		
 	}
 	
+	/**
+	 * Activity result.
+	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
@@ -650,11 +657,17 @@ public class Duole extends BaseActivity {
 		}
 	}
 	
+	/**
+	 * Bind a auto refresh service.
+	 */
 	public void bindAutoRefreshService(){
 		Duole.appref.bindService(getIntent(), appref.mConnection,
 				Context.BIND_AUTO_CREATE);
 	}
 
+	/**
+	 * When activity destroed.
+	 */
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
@@ -669,6 +682,9 @@ public class Duole extends BaseActivity {
 		super.onDestroy();
 	}
 	
+	/**
+	 * On resume.
+	 */
 	@Override
 	protected void onResume(){
 		
@@ -690,6 +706,11 @@ public class Duole extends BaseActivity {
 		super.onResume();
 	}
 	
+	/**
+	 * The class of divider.
+	 * @author taoliang
+	 *
+	 */
 	public class PageDiv {
 		public ImageView ivPageDiv;
 		public TextView tvIndex;

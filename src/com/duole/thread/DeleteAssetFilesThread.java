@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
+import com.duole.utils.FileUtils;
 
 /**
  * Delete useless asset.
@@ -85,6 +86,15 @@ public class DeleteAssetFilesThread extends Thread {
 				file = new File(Constants.CacheDir + Constants.RES_VIDEO
 						+ ass.getUrl().substring(ass.getUrl().lastIndexOf("/")));
 				if (file.exists()) {
+					file.delete();
+				}
+			}
+			
+			// if is a asset of front.
+			if (ass.getType().equals(Constants.RES_FRONT)) {
+				file = new File(Constants.CacheDir + "/front" + "/" + ass.getId());
+				if (file.exists()) {
+					FileUtils.emptyFolder(file);
 					file.delete();
 				}
 			}

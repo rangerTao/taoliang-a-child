@@ -57,35 +57,39 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				boolean isSleepTime = checkSleepTime(date,dateStart,dateEnd);
 				
 				if (isSleepTime) {
-					if (!Constants.musicPlayerIsRunning) {
-						Constants.SLEEP_TIME = true;
+					Constants.SLEEP_TIME = true;
+					try{
+						if (!Constants.musicPlayerIsRunning) {
 
-						Log.v("TAG", "musicPlayerIsRunning" + Constants.musicPlayerIsRunning);
-						DuoleSysConfigUtils.disableWifi(context);
+							DuoleSysConfigUtils.disableWifi(context);
 
-						// Take main task to front
-						Intent intentMain = new Intent(Duole.appref,
-								Duole.class);
-						Duole.appref.startActivity(intentMain);
+							// Take main task to front
+							Intent intentMain = new Intent(Duole.appref,
+									Duole.class);
+							Duole.appref.startActivity(intentMain);
 
-						Duole.appref.uploadGamePeriod();
+							Duole.appref.uploadGamePeriod();
 
-						Intent intent1 = new Intent(Duole.appref,
-								MusicPlayerActivity.class);
-						intent1.putExtra("index", "1");
+							Intent intent1 = new Intent(Duole.appref,
+									MusicPlayerActivity.class);
+							intent1.putExtra("index", "1");
 
-						Duole.appref.startActivity(intent1);
-						Constants.musicPlayerIsRunning = true;
+							Duole.appref.startActivity(intent1);
+							Constants.musicPlayerIsRunning = true;
+						}
+
+						String curHour = Constants.sdf_hour.format(date);
+						String uptime = XmlUtils.readNodeValue(
+								Constants.SystemConfigFile,
+								Constants.XML_UPDATE_TIME);
+
+						if (curHour.equals(uptime.substring(0, 2))) {
+							DuoleUtils.instalUpdateApk(context);
+						}
+					}catch (Exception e) {
+						e.printStackTrace();
 					}
-
-					String curHour = Constants.sdf_hour.format(date);
-					String uptime = XmlUtils.readNodeValue(
-							Constants.SystemConfigFile,
-							Constants.XML_UPDATE_TIME);
 					
-					if (curHour.equals(uptime.substring(0, 2))) {
-						DuoleUtils.instalUpdateApk(context);
-					}
 				} else if (Constants.SLEEP_TIME) {
 					Constants.SLEEP_TIME = false;
 
@@ -96,6 +100,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					Constants.musicPlayerIsRunning = false;
 				}
 			}catch(Exception e){
+				e.printStackTrace();
 				Constants.SLEEP_TIME = false;
 			}
 			

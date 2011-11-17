@@ -5,17 +5,18 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import android.R.anim;
+import android.R.integer;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings.SettingNotFoundException;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.duole.R;
@@ -28,8 +29,10 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 
 	
 	MediaPlayer mp;
-	LinearLayout llMain;
+	View llMain;
+	View rl;
 	String url = "";
+	TextView tvMusicTitle;
 	
 	int screen_off_timeout = 0;
 	
@@ -61,14 +64,15 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 	
 	public void setBackground(int index) {
 
-		llMain = (LinearLayout) findViewById(R.id.llMusicPlayer);
-		ImageView ivMusicThumb = (ImageView)findViewById(R.id.ivMusicThumb);
-		TextView tvMusicTitle = (TextView)findViewById(R.id.tvMusicTitle);
+		llMain = findViewById(R.id.llMusicPlayer);
+		rl = findViewById(R.id.relativeLayout1);
+		ImageButton ivMusicThumb = (ImageButton)findViewById(R.id.ivMusicThumb);
+		tvMusicTitle = (TextView)findViewById(R.id.tvMusicTitle);
 		Asset asset = Constants.MusicList.get(index);
 		
 		String mpbg = asset.getBg();
 		
-		if( mpbg != null || mpbg != ""){
+		if( mpbg != null && !mpbg.equals("")){
 
 			File bg = new File(Constants.CacheDir
 					+ Constants.RES_THUMB + mpbg.substring(mpbg
@@ -101,6 +105,78 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		tvMusicTitle.setText(asset.getName());
 		
 		if (!Constants.bgRestUrl.equals("")) {}
+		
+		ivMusicThumb.setOnTouchListener(new OnTouchListener() {
+			
+			int lastX, lastY;
+
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					lastX = (int) event.getRawX();
+					lastY = (int) event.getRawY();
+					break;
+				case MotionEvent.ACTION_MOVE:
+					int dx = (int) event.getRawX() - lastX;
+					int dy = (int) event.getRawY() - lastY;
+					// int dy = 0;//y方向不需要
+
+					int left = v.getLeft() + dx;
+					int top = v.getTop() + dy;
+					int right = v.getRight() + dx;
+					int bottom = v.getBottom() + dy;
+					
+//					int textleft = tvMusicTitle.getLeft() + dx;
+//					int texttop = tvMusicTitle.getTop() + dy;
+//					int textright = tvMusicTitle.getRight() + dx;
+//					int textbottom = tvMusicTitle.getBottom() + dy;
+
+					if (left < 0) {
+						left = 0;
+						right = left + v.getWidth();
+//						textright = textleft + tvMusicTitle.getWidth();
+					}
+
+					if (right > rl.getMeasuredWidth()) {
+						right = rl.getMeasuredWidth();
+						left = right - v.getWidth();
+//						textleft = textright - tvMusicTitle.getWidth();
+					}
+
+					if (top < 0) {
+						top = 0;
+						bottom = top + v.getHeight();
+//						textbottom = texttop + tvMusicTitle.getHeight();
+					}
+
+					if (bottom > rl.getMeasuredHeight()) {
+						bottom = rl.getMeasuredHeight();
+						top = bottom - v.getHeight();
+//						texttop = textbottom - tvMusicTitle.getHeight();
+					}
+					// v.measure(right - left, bottom - top);
+					v.layout(left, top, right, bottom);
+					
+					int tvLeft = (v.getWidth() - tvMusicTitle.getWidth()) / 2 + left;
+					int tvTop = top + v.getHeight();
+					tvMusicTitle.layout(tvLeft, tvTop, tvLeft + tvMusicTitle.getWidth(), tvTop + tvMusicTitle.getHeight());
+
+					lastX = (int) event.getRawX();
+					lastY = (int) event.getRawY();
+					v.postInvalidate();
+					tvMusicTitle.postInvalidate();
+					break;
+				case MotionEvent.ACTION_UP:
+					break;
+
+				default:
+					break;
+				}
+				return false;
+			}
+		});
+		
 	}
 	
 	public void setMusicData(int index) {

@@ -24,9 +24,10 @@ public class Constants {
 	public static final String PKG_FLASH = "com.adobe.flashplayer";
 	public static final String PKG_PRIORITY = "com.duole.priorityres";
 	
-	public static final String Duole = "http://www.duoleyuan.com";
+	public static final String Duole = "http://wvw.duoleyuan.com";
 	public static final String UploadGamePeriod = Duole + "/e/member/fava/childuseup.php";
 	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
+	public static final String resourceUrl = Duole  + "/e/member/child/ancJn.php?cc=";
 	
 	public static final String ItemList = CacheDir + "itemlist.xml";
 	public static final String SystemConfigFile = CacheDir + "config.xml";
@@ -101,6 +102,7 @@ public class Constants {
 	public static final String XML_PACKAGE = "package";
 	public static final String XML_ACTIVITY = "activity";
 	public static final String XML_LASTMODIFIED = "lastmodified";
+	public static final String XML_MD5 = "md5";
 	public static final String XML_TYPE = "type";
 	public static final String XML_BG = "bg";
 	public static final String XML_RESTBG = "bg1";

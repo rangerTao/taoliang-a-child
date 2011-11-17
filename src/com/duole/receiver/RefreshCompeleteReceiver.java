@@ -67,6 +67,8 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 	
 	private synchronized void refreshView(){
 		
+		Log.d("TAG", "refresh view started");
+		
 		Constants.viewrefreshenable = false;
 		ArrayList<Asset> temp = null;
 		// get all apps
@@ -161,6 +163,9 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		temp = null;
 	
 		Constants.viewrefreshenable = true;
+		
+		Log.d("TAG", "refresh view finished.");
+		
 	}
 	
 }
