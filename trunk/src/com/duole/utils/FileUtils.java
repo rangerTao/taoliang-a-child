@@ -87,12 +87,10 @@ public class FileUtils {
 				BufferedReader br = new BufferedReader(isr);
 
 				String temp = br.readLine();
-				int index = 0;
 				while (temp != null) {
 					String[] tem = temp.split(" ");
 					ids.add(tem);
 					temp = br.readLine();
-					index++;
 				}
 			}
 		} catch (FileNotFoundException e) {
