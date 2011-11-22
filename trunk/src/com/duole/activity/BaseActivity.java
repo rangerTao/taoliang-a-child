@@ -93,6 +93,7 @@ public class BaseActivity extends Activity {
 	
 	public boolean forceStopActivity(){
 		
+		Log.d("TAG", "force to stop a activity :  name " + pkgName);
 		ActivityManager am = (ActivityManager)getSystemService(
                 Context.ACTIVITY_SERVICE);
 		am.killBackgroundProcesses(pkgName);

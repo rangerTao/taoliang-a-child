@@ -244,7 +244,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements OnFocusCh
 	protected void onDestroy() {
 		mp.stop();
 		unregisterReceiver(timeOutReceiver);
-
 		super.onDestroy();
 	}
 

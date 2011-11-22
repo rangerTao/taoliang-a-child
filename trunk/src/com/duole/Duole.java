@@ -569,6 +569,7 @@ public class Duole extends BaseActivity {
 			// If not a application.
 			if (!assItem.getType().equals(Constants.RES_APK)) {
 				mContext.startActivity(intent);
+				overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 			}
 		} catch (ActivityNotFoundException noFound) {
 		}
@@ -592,6 +593,7 @@ public class Duole extends BaseActivity {
 					intent.setComponent(new ComponentName(pkgName,
 							ri.activityInfo.name));
 					startActivity(intent);
+					overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 				}
 			}
 		}catch(Exception e){
@@ -632,6 +634,7 @@ public class Duole extends BaseActivity {
 					intent.setComponent(new ComponentName(packagename,
 							ri.activityInfo.name));
 					startActivityForResult(intent, 1);
+					overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 				}
 			}
 		}catch(Exception e){
@@ -692,7 +695,7 @@ public class Duole extends BaseActivity {
 	 */
 	@Override
 	protected void onResume(){
-		
+		overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 		if(pkgName != null && !pkgName.equals("")){
 			forceStopActivity();
 			uploadGamePeriod();
