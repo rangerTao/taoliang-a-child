@@ -90,15 +90,24 @@ public class DuoleNetUtils {
 			if(pars.size() > 0 ){
 				for (int i = 0; i < size; i++) {
 					String[] tem = pars.get(i);
-					if (size - 1 > i) {
-						favaid.append(tem[0] + ",");
-						usetime.append(tem[1] + ",");
-						lastime.append(tem[2] + ",");
-					} else {
-						favaid.append(tem[0]);
-						usetime.append(tem[1]);
-						lastime.append(tem[2]);
+					try{
+						Integer.parseInt(tem[0]);
+						
+						if (size - 1 > i) {
+							favaid.append(tem[0] + ",");
+							usetime.append(tem[1] + ",");
+							lastime.append(tem[2] + ",");
+						} else {
+							favaid.append(tem[0]);
+							usetime.append(tem[1]);
+							lastime.append(tem[2]);
+						}
+						
+					}catch (Exception e) {
+						Log.v("TAG", tem[0]);
+						break;
 					}
+					
 				}
 				
 				pairs.add(new BasicNameValuePair("favaid", favaid.toString()));

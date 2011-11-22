@@ -122,7 +122,12 @@ public class Duole extends BaseActivity {
 		appref = this;
 		try {
 			if(!DuoleUtils.verifyInstallationOfAPK(this, Constants.PKG_FLASH)){
-				DuoleUtils.installApkFromFile(new File("/sdcard/flashplayer.apk"));
+				File file = new File("/sdcard/");
+				for(File tempapk : file.listFiles()){
+					if(tempapk.getName().toLowerCase().endsWith(".apk")){
+						DuoleUtils.installApkFromFile(tempapk);
+					}
+				}
 			}
 
 			initContents();
