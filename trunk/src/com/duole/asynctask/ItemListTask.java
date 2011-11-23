@@ -172,6 +172,10 @@ public class ItemListTask extends AsyncTask {
 					return false;
 				}
 				
+			}else{
+				Log.d("TAG", "error occurs");
+				Constants.DOWNLOAD_RUNNING = false;
+				return false;
 			}
 
 			return true;
