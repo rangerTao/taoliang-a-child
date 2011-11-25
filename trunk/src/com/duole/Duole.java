@@ -85,6 +85,8 @@ public class Duole extends BaseActivity {
 	
 	ProgressBar pbEnTime;
 	
+	public int curPageDiv = 0;
+	
 	Asset assItem;
 
 	public static ServiceConnection mConnection = new ServiceConnection() {
@@ -143,7 +145,7 @@ public class Duole extends BaseActivity {
 
 			@Override
 			public void scrolled(final int last, final int index) {
-				setPageDividerSelected(last,index);
+				setPageDividerSelected(index);
 			}
 		});
 	}
@@ -239,8 +241,6 @@ public class Duole extends BaseActivity {
 		
 		now = Math.abs(now);
 
-		Log.v("TAG", now + "");
-		
 		if(poor < total){
 			if(now > 0 && now < entime){
 				entime -= now;
@@ -401,7 +401,7 @@ public class Duole extends BaseActivity {
 			llPageDivider.addView(view);
 		}
 		
-		setPageDividerSelected(0,0);
+		setPageDividerSelected(0);
 		
 		DuoleUtils.setChildrenDrawingCacheEnabled(mScrollLayout, true);
 
@@ -412,14 +412,15 @@ public class Duole extends BaseActivity {
 	 * @param last
 	 * @param index
 	 */
-	void setPageDividerSelected(final int last,final int index){
+	void setPageDividerSelected(final int index){
 
 		mHandler.post(new Runnable(){
 
 			public void run() {
 				try{
-					if(last != index){
-						view = llPageDivider.getChildAt(last);
+					
+					if(curPageDiv != index){
+						view = llPageDivider.getChildAt(curPageDiv);
 						if(view != null){
 							pageDiv = (PageDiv) view.getTag();
 							pageDiv.ivPageDiv.setImageBitmap(bmp);
@@ -436,6 +437,8 @@ public class Duole extends BaseActivity {
 						}
 
 					}
+					
+					curPageDiv = index;
 				}catch(Exception e){
 					e.printStackTrace();
 				}
@@ -682,7 +685,6 @@ public class Duole extends BaseActivity {
 		try {
 			unbindService(mConnection);
 			
-			Log.v("TAG", "power off");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

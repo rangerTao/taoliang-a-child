@@ -37,16 +37,19 @@ public class FlashPlayerActivity extends PlayerBaseActivity{
 		String filename = intent.getStringExtra("filename");
 		String url = "";
 		if(filename.startsWith("http")){
-			if(!DuoleNetUtils.isNetworkAvailable(this)){
-				finish();
-			}
+//			if (!DuoleNetUtils.isNetworkAvailable(this)) {
+//				finish();
+//			}
 			url = filename;
 			Log.d("TAG", "on line video url : " + url);
-			if(url.contains("youku.com")){
-				String id = filename.substring(filename.indexOf("sid/") + 4,filename.indexOf("/v.swf"));
-				url = "http://static.youku.com/v1.0.0134/v/swf/qplayer.swf?VideoIDS=" + id + "&embedid=&isAutoPlay=true&MMControl=false&MMout=false&embedid";
+			if (url.contains("youku.com")) {
+				String id = filename.substring(filename.indexOf("sid/") + 4,
+						filename.indexOf("/v.swf"));
+				url = "http://static.youku.com/v1.0.0134/v/swf/qplayer.swf?VideoIDS="
+						+ id
+						+ "&embedid=&isAutoPlay=true&MMControl=false&MMout=false&embedid";
 			}
-		}else{
+		} else {
 			url = "file://" + Constants.CacheDir + "/game/" + filename;
 		}
 		

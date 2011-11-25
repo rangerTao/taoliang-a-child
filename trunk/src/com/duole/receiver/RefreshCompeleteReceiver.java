@@ -58,7 +58,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			Constants.newItemExists = false;
 			
 			//Clear the temp folder
-			FileUtils.clearTempFolder(Constants.CacheDir + "/temp/");
+//			FileUtils.clearTempFolder(Constants.CacheDir + "/temp/");
 
 		}
 		
