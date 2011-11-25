@@ -58,6 +58,8 @@ public class Constants {
 	public static int COLUMNS = 4;
 	//
 	public static final int REST_TIME = 1;
+	public static final int STOP_ACTIVITY = 999;
+	
 	
 	//Whether app is running.
 	public static boolean APP_RUNNING = true;

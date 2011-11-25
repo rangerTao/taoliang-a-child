@@ -4,6 +4,7 @@ import com.duole.listener.OnScrolledListener;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -35,7 +36,7 @@ public class ScrollLayout extends ViewGroup {
 	private float mLastMotionY;
 	private int last;
 	private int index;
-
+	
 	public ScrollLayout(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
 		// TODO Auto-generated constructor stub
@@ -121,8 +122,7 @@ public class ScrollLayout extends ViewGroup {
     		mCurScreen = whichScreen;
     		
     		invalidate();		// Redraw the layout
-    		
-    		scrolled.scrolled(last, index);
+    		scrolled.scrolled(last, mCurScreen);
     	}
     }
     
@@ -147,10 +147,10 @@ public class ScrollLayout extends ViewGroup {
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
 		
-		if (mVelocityTracker == null) {
-			mVelocityTracker = VelocityTracker.obtain();
-		}
-		mVelocityTracker.addMovement(event);
+//		if (mVelocityTracker == null) {
+//			mVelocityTracker = VelocityTracker.obtain();
+//		}
+//		mVelocityTracker.addMovement(event);
 		
 		final int action = event.getAction();
 		final float x = event.getX();
@@ -158,32 +158,45 @@ public class ScrollLayout extends ViewGroup {
 		
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
-			if (!mScroller.isFinished()){
+			if (mVelocityTracker == null) {
+				mVelocityTracker = VelocityTracker.obtain();
+				mVelocityTracker.addMovement(event);
+			}
+
+			if (!mScroller.isFinished()) {
 				mScroller.abortAnimation();
 			}
+        
 			mLastMotionX = x;
 			break;
 			
 		case MotionEvent.ACTION_MOVE:
-			int deltaX = (int)(mLastMotionX - x);
-			mLastMotionX = x;
-			
-            scrollBy(deltaX, 0);
+			int deltaX = (int) (mLastMotionX - x);
+
+			if (IsCanMove(deltaX)) {
+				if (mVelocityTracker != null) {
+					mVelocityTracker.addMovement(event);
+				}
+
+				mLastMotionX = x;
+
+				scrollBy(deltaX, 0);
+			}
 			break;
 			
 		case MotionEvent.ACTION_UP:
             // if (mTouchState == TOUCH_STATE_SCROLLING) {   
-            final VelocityTracker velocityTracker = mVelocityTracker;   
-            velocityTracker.computeCurrentVelocity(1000);   
-            int velocityX = (int) velocityTracker.getXVelocity();   
+			int velocityX = 0;
+			if (mVelocityTracker != null) {
+				mVelocityTracker.addMovement(event);
+				mVelocityTracker.computeCurrentVelocity(1000);
+				velocityX = (int) mVelocityTracker.getXVelocity();
+			}
 
-            
             if (velocityX > SNAP_VELOCITY && mCurScreen > 0) {   
                 // Fling enough to move left   
-
 				last = mCurScreen;
 				index = mCurScreen - 1;
-            	
                 snapToScreen(mCurScreen - 1);   
             } else if (velocityX < -SNAP_VELOCITY   
                     && mCurScreen < getChildCount() - 1) {   
@@ -254,5 +267,18 @@ public class ScrollLayout extends ViewGroup {
 	
 	public void setOnScrolledListener(com.duole.listener.OnScrolledListener scrolled){
 		this.scrolled = scrolled;
+	}
+
+	private boolean IsCanMove(int deltaX) {
+
+		if (getScrollX() <= 0 && deltaX < 0) {
+			return false;
+		}
+
+		if (getScrollX() >= (getChildCount() - 1) * getWidth() && deltaX > 0) {
+			return false;
+		}
+
+		return true;
 	}
 }

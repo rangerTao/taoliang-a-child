@@ -153,6 +153,7 @@ public class ItemListTask extends AsyncTask {
 			Constants.alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
 			if(result.equals("")){
+				Log.d("TAG", "connection time out");
 				return false;
 			}
 			JSONObject jsonObject = new JSONObject(result);
@@ -160,6 +161,7 @@ public class ItemListTask extends AsyncTask {
 			try {
 				error = jsonObject.getString("errstr");
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			

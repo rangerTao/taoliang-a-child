@@ -3,6 +3,8 @@ package com.duole.activity;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,9 +20,11 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,6 +45,8 @@ public class BaseActivity extends Activity {
 	
 	public long playStart = 0;
 	public String resourceId = "";
+	
+	private static ActivityManager gDefault;
 	
 	public Handler mHandler = new Handler(){
 
@@ -94,10 +100,18 @@ public class BaseActivity extends Activity {
 	public boolean forceStopActivity(){
 		
 		Log.d("TAG", "force to stop a activity :  name " + pkgName);
-		ActivityManager am = (ActivityManager)getSystemService(
-                Context.ACTIVITY_SERVICE);
-		am.killBackgroundProcesses(pkgName);
-		
+		if(pkgName != null && !pkgName.equals("")){
+			ActivityManager am = (ActivityManager)getSystemService(
+	                Context.ACTIVITY_SERVICE);
+			
+			Method method;
+			try {
+				method = Class.forName("android.app.ActivityManager").getMethod("forceStopPackage", String.class);
+				method.invoke(am, pkgName);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		}
 		return true;
 	}
 	

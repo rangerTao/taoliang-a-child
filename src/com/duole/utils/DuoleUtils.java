@@ -495,6 +495,17 @@ public class DuoleUtils {
 			if (!file.exists()) {
 				return true;
 			}else if(file.exists()){
+				if(asset.getMd5() == null){
+					if(!refer.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))){
+						file.delete();
+						return true;
+					}
+				}else if(asset.getMd5().equals("false")){
+					return false;
+				}else if(!asset.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))){
+					file.delete();
+					return true;
+				}
 				return false;
 			}else{
 				PackageManager pm = Duole.appref.getPackageManager();
@@ -698,6 +709,7 @@ public class DuoleUtils {
 					e.printStackTrace();
 				}
         		if(file != null && file.exists() && isfront != null && isfront.equals("0")){
+        			
         			if(type.equals(Constants.RES_APK)){
         				String pkgname = asset.getPackag();
         				if(pkgname == null){
