@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:gravity="center_horizontal"
+	android:layout_width="wrap_content" android:paddingTop="5dp"
+	android:layout_height="wrap_content">
+	<AbsoluteLayout android:layout_width="wrap_content"
+		android:id="@+id/alIcon" android:layout_height="wrap_content">
+		<ImageView android:id="@+id/ivAppIcon" android:layout_width="128px"
+			android:layout_height="128px" />
+		<ImageView android:id="@+id/ivKe" android:layout_width="133px"
+			android:layout_height="133px" />
+
+	</AbsoluteLayout>
+	<com.duole.widget.AutoScrollTextView
+		android:id="@+id/tvAppName" android:layout_width="fill_parent"
+		android:gravity="center_horizontal" android:layout_alignLeft="@+id/alIcon"
+		android:layout_alignRight="@+id/alIcon" android:layout_below="@+id/alIcon"
+		android:layout_height="wrap_content" android:textColor="#000000"
+		android:shadowColor="#ffFFFFFF" android:ellipsize="marquee"
+		android:marqueeRepeatLimit="1" android:shadowRadius="1"
+		android:shadowDx="1" android:singleLine="true" />
+</RelativeLayout>

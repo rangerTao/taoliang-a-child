@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/llMusicPlayer" android:orientation="vertical"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:weightSum="1" android:background="@drawable/bg86">
+	<Gallery android:id="@+id/musicGallery" android:layout_width="fill_parent"
+		android:layout_height="250dip" android:layout_alignParentTop="true"
+		android:layout_marginTop="50dip" android:spacing="40dip" />
+	<LinearLayout android:id="@+id/musicControl"
+		android:layout_centerHorizontal="true" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:gravity="center_vertical"
+		android:orientation="horizontal" android:layout_marginBottom="100dip"
+		android:layout_alignParentBottom="true">
+		<Button android:id="@+id/btnPlay" android:layout_width="120dip"
+			android:layout_height="120dip" android:background="@drawable/play" />
+	</LinearLayout>
+	<ProgressBar android:layout_width="fill_parent"
+		android:layout_height="5px" android:id="@+id/pbRestTime"
+		style="?android:attr/progressBarStyleHorizontal"
+		android:layout_alignParentBottom="true" android:visibility="gone"
+		android:layout_centerHorizontal="true"></ProgressBar>
+</RelativeLayout>

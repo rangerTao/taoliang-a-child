@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="wifi_status">
+        
+        <item>\u51c6\u5907\u8fde\u63a5</item>
+        <item>\u6b63\u5728\u626b\u63cf\u002e\u002e\u002e</item>
+        <item>\u6b63\u5728\u8fde\u63a5\u5230</item>
+        <item>\u6b63\u5728\u8fdb\u884c\u8eab\u4efd\u9a8c\u8bc1\u3002</item>
+        <item>\u6b63\u5728\u4ece\u83b7\u53d6\u0049\u0050\u5730\u5740\u002e\u002e\u002e</item>
+        <item>\u5df2\u8fde\u63a5\u5230\u3002</item>
+        <item>\u8fde\u63a5\u88ab\u4e2d\u65ad</item>
+        
+        <item>\u6b63\u5728\u65ad\u5f00\u8fde\u63a5</item>
+        <item>\u5df2\u65ad\u5f00\u8fde\u63a5</item>
+        <item>\u8fde\u63a5\u5931\u8d25</item>
+        
+    </string-array>
+    <string-array name="wifi_status_with_ssid">
+        
+        <item>\u51c6\u5907\u8fde\u63a5</item> <!-- 0 -->
+        <item>\u6b63\u5728\u626b\u63cf\u002e\u002e\u002e</item>
+        <item>\u6b63\u5728\u8fde\u63a5\u5230%s</item>
+        <item>\u6b63\u5728\u901a\u8fc7%s\u8fdb\u884c\u8eab\u4efd\u9a8c\u8bc1\u3002</item>
+        <item>\u6b63\u5728\u4ece%s\u83b7\u53d6\u0049\u0050\u5730\u5740\u002e\u002e\u002e</item>
+        <item>\u5df2\u8fde\u63a5\u5230%s\u3002</item>
+        <item>\u8fde\u63a5\u88ab\u4e2d\u65ad</item>
+        <item>\u6b63\u5728\u4ece%s\u65ad\u5f00\u8fde\u63a5</item>
+        <item>\u5df2\u65ad\u5f00\u8fde\u63a5</item>
+        <item>\u8fde\u63a5\u5931\u8d25</item>
+        
+    </string-array>
+    
+</resources>

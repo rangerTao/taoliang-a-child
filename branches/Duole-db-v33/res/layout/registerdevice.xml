@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/relativeLayout1"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<TextView android:text="TextView" android:layout_height="wrap_content"
+		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+		android:layout_width="match_parent" android:id="@+id/tvDeviceID"></TextView>
+	<TextView android:text="TextView" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@+id/tvDeviceID"
+		android:layout_alignParentLeft="true" android:id="@+id/tvUserName" android:textSize="20dip"></TextView>
+	<TextView android:text="TextView" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@+id/etUserName" android:textSize="20dip"
+		android:layout_alignParentLeft="true" android:id="@+id/tvPassword"></TextView>
+	<EditText android:layout_height="wrap_content" android:id="@+id/etUserName"
+		android:layout_alignTop="@+id/tvUserName" android:layout_toRightOf="@+id/tvUserName"
+		android:layout_alignParentRight="true" android:layout_width="match_parent"></EditText>
+	<EditText android:layout_height="wrap_content" android:id="@+id/etPassword"
+		android:inputType="textPassword" android:layout_alignTop="@+id/tvPassword"
+		android:layout_alignLeft="@+id/etUserName" android:layout_width="match_parent">
+	</EditText>
+</RelativeLayout>
