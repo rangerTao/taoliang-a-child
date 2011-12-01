@@ -11,6 +11,7 @@ import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleSysConfigUtils;
 import com.duole.utils.DuoleUtils;
+import com.duole.utils.FileUtils;
 import com.duole.utils.XmlUtils;
 
 import android.R.xml;
@@ -58,6 +59,9 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				
 				if (isSleepTime) {
 					Constants.SLEEP_TIME = true;
+					
+					//swipe the cache dir.
+					FileUtils.clearUselessResource();
 					try{
 						if (!Constants.musicPlayerIsRunning) {
 
@@ -111,7 +115,16 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 			}
 			
 			//upload game time
-			DuoleNetUtils.uploadGamePeriodLength();
+			new Thread(){
+
+				@Override
+				public void run() {
+					DuoleNetUtils.uploadGamePeriodLength();
+					super.run();
+				}
+				
+			}.start();
+			
 		}
 	}
 	

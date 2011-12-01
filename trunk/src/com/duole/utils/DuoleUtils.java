@@ -599,6 +599,8 @@ public class DuoleUtils {
     	
     	asset.setFilename(Duole.appref.getString(R.string.system_tweak));
     	
+    	asset.setUrl("");
+    	
     	assets.add(asset);
     }
     
@@ -681,7 +683,6 @@ public class DuoleUtils {
     	try {
 			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

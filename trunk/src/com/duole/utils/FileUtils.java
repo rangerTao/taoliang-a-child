@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.duole.pojos.asset.Asset;
 
@@ -140,6 +141,92 @@ public class FileUtils {
 			}
 		}
 
+	}
+	
+	/**
+	 * Swipe the cache dir.
+	 */
+	public static boolean clearUselessResource() {
+
+		//Clear the temp folder.
+		clearTempFolder(Constants.CacheDir + "/temp/");
+
+		try {
+			
+			Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
+					+ "itemlist.xml");
+			if(Constants.AssetList.size() < 1){
+				return false;
+			}
+
+			HashMap<String, String> usefulFile = new HashMap<String, String>();
+
+			for (Asset asset : Constants.AssetList) {
+				usefulFile.put(
+						asset.getThumbnail().substring(
+								asset.getThumbnail().lastIndexOf("/") + 1),
+						asset.getId());
+				usefulFile.put(
+						asset.getUrl().substring(
+								asset.getUrl().lastIndexOf("/") + 1),
+						asset.getId());
+
+				if (asset.getType().equals("front")) {
+					usefulFile.put(asset.getId(), asset.getType());
+				}
+			}
+
+			usefulFile.put(Constants.bgRestUrl.substring(Constants.bgRestUrl
+					.lastIndexOf("/") + 1), "bgrest");
+			usefulFile.put(Constants.bgurl.substring(Constants.bgurl
+					.lastIndexOf("/") + 1), "bg");
+
+			File mainFolder = new File(Constants.CacheDir);
+			File[] files = mainFolder.listFiles();
+
+			for (File temp : files) {
+				if (temp.getName().equals("picture")
+						|| temp.getName().equals("log")) {
+					continue;
+				}
+				if (temp.isDirectory()) {
+					File[] dirFiles = temp.listFiles();
+					for (File inDir : dirFiles) {
+						if (!usefulFile.containsKey(inDir.getName())) {
+							inDir.delete();
+							Log.d("TAG", "Useless file :" + inDir.getAbsolutePath());
+						}
+					}
+				}
+				if (isPic(temp)) {
+					if (!usefulFile.containsKey(temp.getName())) {
+						temp.delete();
+						Log.d("TAG", "Useless file :" + temp.getAbsolutePath());
+					}
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+	
+	
+	/**
+	 * Is a pic file.
+	 * @param file
+	 * @return
+	 */
+	public static boolean isPic(File file) {
+		if (file.getName().toLowerCase().endsWith(".jpg")
+				|| file.getName().toLowerCase().endsWith(".jpeg")
+				|| file.getName().toLowerCase().endsWith("png")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

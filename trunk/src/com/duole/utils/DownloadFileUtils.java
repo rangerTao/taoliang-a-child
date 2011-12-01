@@ -44,6 +44,7 @@ public class DownloadFileUtils extends Thread {
 		}catch(Exception e){
 			Log.v("TAG", e.getMessage());
 		}
+		Log.d("TAG", "download finish");
 		return true;
 	}
 
@@ -134,6 +135,7 @@ public class DownloadFileUtils extends Thread {
 			
 			return true;
 		}catch(Exception e){
+			e.printStackTrace();
 			return false;
 		}
 		

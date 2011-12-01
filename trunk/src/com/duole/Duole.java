@@ -11,6 +11,7 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.R.integer;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -236,10 +237,25 @@ public class Duole extends BaseActivity {
 		long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
 		
 		long poor = System.currentTimeMillis() - current;
-		long total = entime + restime;
+		
+		String pool = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_TIMEPOOL);
+		
+		long total = 0;
+		try{
+			total = Integer.parseInt(pool);
+		}catch (Exception e) {
+			total = entime + restime;
+		}
+
+		Constants.timePool = total;
 		long now = (poor) % (total);
 		
 		now = Math.abs(now);
+		
+		Log.d("TAG", enstart);
+		Log.d("TAG", poor + " poor");
+		Log.d("TAG", total + " total");
+		Log.d("TAG", now + " now");
 
 		if(poor < total){
 			if(now > 0 && now < entime){
@@ -248,6 +264,8 @@ public class Duole extends BaseActivity {
 				restime -= now;
 				appref.startMusicPlay();
 			}
+			
+			Log.d("TAG", entime + " entime , " + restime + " rest time");
 		}
 		
 		Log.v("TAG","entiem " + entime);
@@ -271,7 +289,11 @@ public class Duole extends BaseActivity {
 				this.stop();
 				getPb().setMax(time);
 				getPb().setProgress(0);
-				if(!Constants.SLEEP_TIME){
+				if(restCountDown != null){
+					time = Integer.parseInt(Constants.restime == "" ? "120" : Constants.restime) * 60 * 1000;
+					restCountDown.setTotalTime(time);
+				}
+				if (!Constants.SLEEP_TIME) {
 					appref.startMusicPlay();
 				}
 			}
@@ -497,6 +519,8 @@ public class Duole extends BaseActivity {
 			if(frontid != null && !frontid.equals("0")){
 				if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
 					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/");
+				}else{
+					startItem(assItem);
 				}
 			}else{
 				startItem(assItem);
@@ -510,7 +534,7 @@ public class Duole extends BaseActivity {
 		Intent intent = null;
 		try {
 			// launcher the package
-			if (assItem.getType().equals(Constants.RES_AUDIO)) {
+			if (assItem.getUrl().toLowerCase().endsWith(Constants.RES_AUDIO)) {
 
 				intent = new Intent(appref, SingleMusicPlayerActivity.class);
 				int index = Constants.MusicList.indexOf(assItem);
@@ -519,7 +543,7 @@ public class Duole extends BaseActivity {
 
 			}
 			// Launch a application.
-			else if (assItem.getType().equals(Constants.RES_APK)) {
+			if (assItem.getUrl().toLowerCase().endsWith(Constants.RES_APK)) {
 
 				pkgName = assItem.getPackag();
 				if(pkgName == null){
@@ -530,12 +554,12 @@ public class Duole extends BaseActivity {
 
 			}
 			// Launch the configuration function.
-			else if (assItem.getType().equals(Constants.RES_CONFIG)) {
+			if (assItem.getType().equals(Constants.RES_CONFIG)) {
 				intent = new Intent(appref, PasswordActivity.class);
 				intent.putExtra("type", "0");
 			}
 			// Play a video.
-			else if (assItem.getType().equals(Constants.RES_VIDEO)
+			if (assItem.getType().equals(Constants.RES_VIDEO)
 					&& !assItem.getUrl().endsWith(".swf")
 					&& !assItem.getUrl().endsWith(".flv")) {
 				intent = new Intent(appref, VideoPlayerActivity.class);
@@ -550,7 +574,7 @@ public class Duole extends BaseActivity {
 				}
 			}
 			// Play a flash.
-			else {
+			if (assItem.getUrl().toLowerCase().endsWith("swf") || assItem.getUrl().toLowerCase().endsWith("flv")) {
 
 				intent = new Intent(appref, FlashPlayerActivity.class);
 
