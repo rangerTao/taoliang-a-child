@@ -46,8 +46,19 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 		
 		Log.v("TAG", "current millis" + current);
 		
-		if((int)Math.abs((current - lastDay)) > (Integer.parseInt(Constants.entime.equals("")? "0" : Constants.entime) + Integer.parseInt(Constants.restime.equals("")?"0":Constants.restime)) * 60 * 1000){
+		if((int)Math.abs((current - lastDay)) > Constants.timePool){
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
+			
+			long time1 = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+			Duole.appref.gameCountDown.setTotalTime(time1);
+			long time2 = Integer.parseInt(Constants.restime == "" ? "120" : Constants.restime) * 60 * 1000;
+			Duole.appref.restCountDown.setTotalTime(time2);
+			
+			Constants.timePool = time1 + time2;
+			
+			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_TIMEPOOL, Constants.timePool + "");
+			
+			Log.d("TAG", Constants.timePool + "  time pool");
 			
 			Log.v("TAG", "enstart changed " + System.currentTimeMillis());
 			

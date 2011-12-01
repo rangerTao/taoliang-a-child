@@ -30,6 +30,7 @@ import android.content.Context;
 import android.database.CursorJoiner.Result;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.util.Log;
 
@@ -184,6 +185,22 @@ public class DuoleNetUtils {
         }  
         return false;  
     }  
+    
+    /**
+     * Get the security of a scan result.
+     * @param result
+     * @return
+     */
+    public static int getSecurity(ScanResult result) {
+        if (result.capabilities.contains("WEP")) {
+            return 1;
+        } else if (result.capabilities.contains("PSK")) {
+            return 2;
+        } else if (result.capabilities.contains("EAP")) {
+            return 3;
+        }
+        return 0;
+    }
     
     /**
      * Set WifiConfiguration

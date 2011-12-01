@@ -22,6 +22,7 @@ import android.net.NetworkInfo.DetailedState;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiConfiguration.KeyMgmt;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -457,52 +458,82 @@ public class SystemConfigActivity extends PreferenceActivity {
 				
 				//if none
 				if (!isConfiged) {
-					wifiPass = new AlertDialog.Builder(appref)
-							.setTitle(R.string.password)
-							.setView(etPassword)
-							.setNegativeButton(
-									getString(R.string.btnNegative),
-									new OnClickListener() {
 
-										public void onClick(
-												DialogInterface arg0,
-												int arg1) {
+					int res = 0;
+					if (DuoleNetUtils.getSecurity(sr) == 0) {
+						WifiConfiguration config = new WifiConfiguration();
+						config.SSID = "\"" + sr.SSID + "\"";
+						config.allowedKeyManagement.set(KeyMgmt.NONE);
+						int networkId = wifiManager.addNetwork(config);
+						if(networkId != -1){
+							wifiManager.enableNetwork(networkId, false);
+							wifiManager.saveConfiguration();
+							if (adWifi != null) {
+								adWifi.dismiss();
+							}
+						}
+						
+						
+						
+					} else {
 
-										}
+						wifiPass = new AlertDialog.Builder(appref)
+								.setTitle(R.string.password)
+								.setView(etPassword)
+								.setNegativeButton(
+										getString(R.string.btnNegative),
+										new OnClickListener() {
 
-									})
-							.setPositiveButton(
-									getString(R.string.btnPositive),
-									new OnClickListener() {
+											public void onClick(
+													DialogInterface arg0,
+													int arg1) {
 
-										public void onClick(
-												DialogInterface arg0,
-												int arg1) {
-											if (etPassword.getText()
-													.toString().length() <= 0) {
-												Toast.makeText(
-														appref,
-														R.string.password_cannot_null,
-														2000).show();
-											} else {
+											}
+
+										})
+								.setPositiveButton(
+										getString(R.string.btnPositive),
+										new OnClickListener() {
+
+											public void onClick(
+													DialogInterface arg0,
+													int arg1) {
+												// if (etPassword.getText()
+												// .toString().length() <= 0) {
+												// Toast.makeText(
+												// appref,
+												// R.string.password_cannot_null,
+												// 2000).show();
+												// } else {
+
+												String strWifiPass;
+
+												if (etPassword.getText()
+														.toString().length() <= 0) {
+													strWifiPass = "";
+												} else {
+													strWifiPass = etPassword
+															.getText()
+															.toString();
+												}
+
 												WifiConfiguration wc = new WifiConfiguration();
 												// wc.BSSID = sr.BSSID;
-												wc.SSID = "\"" + sr.SSID
-														+ "\"";
-												
+												wc.SSID = "\"" + sr.SSID + "\"";
+
 												wc.hiddenSSID = true;
 
 												wc.status = WifiConfiguration.Status.ENABLED;
-												
+
 												DuoleNetUtils
 														.setWifiConfigurationSettings(
 																wc,
-																sr.capabilities,etPassword.getText().toString());
+																sr.capabilities,
+																strWifiPass);
 												int res = wifiManager
 														.addNetwork(wc);
 
-												Log.v("TAG", "network id"
-														+ res);
+												Log.v("TAG", "network id" + res);
 												if (res == -1) {
 													Toast.makeText(
 															appref,
@@ -510,24 +541,27 @@ public class SystemConfigActivity extends PreferenceActivity {
 															2000).show();
 												} else {
 													if (wifiManager
-															.enableNetwork(
-																	res,
+															.enableNetwork(res,
 																	true)) {
 														wifiManager
 																.saveConfiguration();
 														wifiPass.dismiss();
-														if(adWifi != null){
+														if (adWifi != null) {
 															adWifi.dismiss();
 														}
 													} else {
-														Toast.makeText(appref, "can not connect", 2000).show();
+														Toast.makeText(
+																appref,
+																"can not connect",
+																2000).show();
 													}
 												}
+												// }
 											}
-										}
 
-									}).create();
-					wifiPass.show();
+										}).create();
+						wifiPass.show();
+					}
 
 				}
 			}

@@ -90,6 +90,7 @@ public class Constants {
 	public static String sleepend = "";
 	public static String ke = "";
 	public static String resourceId = "";
+	public static long timePool = 0;
 	public static long gameStartMillis = 0l;
 	
 	//XmlNode
@@ -123,6 +124,7 @@ public class Constants {
 	public static final String XML_UPDATE = "update";
 	public static final String XML_UPDATE_TIME = "uptime";
 	public static final String XML_LASTENSTART = "lastenstart";
+	public static final String XML_TIMEPOOL = "timepool";
 	public static final String XML_CLIENTVERSIONUPLOAD = "clientversionupload";
 	public static final String XML_TIPSTART = "tipstart";
 	
