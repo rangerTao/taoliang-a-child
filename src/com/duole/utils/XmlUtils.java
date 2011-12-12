@@ -268,7 +268,7 @@ public class XmlUtils {
 			}
 		}catch (Exception e){
 			e.printStackTrace();
-			createItemList();
+//			createItemList();
 			Constants.entime = "25";
 			Constants.restime = "120";
 			Constants.sleepstart = "22:00";

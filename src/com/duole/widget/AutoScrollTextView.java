@@ -16,12 +16,4 @@ public class AutoScrollTextView extends TextView{
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public boolean isFocused() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-	
-	
-
 }

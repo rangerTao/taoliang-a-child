@@ -29,6 +29,8 @@ public class Constants {
 	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
 	public static final String resourceUrl = Duole  + "/e/member/child/ancJn.php?cc=";
 	
+	public static final String DuoleSite = "duoleyuan";
+	
 	public static final String ItemList = CacheDir + "itemlist.xml";
 	public static final String SystemConfigFile = CacheDir + "config.xml";
 	public static String restart = "";

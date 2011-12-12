@@ -57,8 +57,7 @@ public class DownloadFileUtils extends Thread {
 			
 			String type = asset.getType().toLowerCase();
 			
-			Log.v("TAG", asset.toString());
-			
+			String url = asset.getUrl().toLowerCase();
 			//Download thumbnail.
 			DuoleUtils.downloadPic(asset,asset.getThumbnail());
 			
@@ -73,25 +72,26 @@ public class DownloadFileUtils extends Thread {
 			
 			//Download game.
 			if(type.equals(Constants.RES_GAME)){
-				if(!asset.getUrl().startsWith("http")){
+//				if(!asset.getUrl().startsWith("http") || url.contains(Constants.DuoleSite)){
 					DuoleUtils.downloadGame(asset,asset.getUrl());
-				}
+//				}
 			}
 			
 			//Download video.
 			if(type.equals(Constants.RES_VIDEO)){
-				if (!asset.getUrl().startsWith("http")) {
+				if (!asset.getUrl().startsWith("http") || url.contains(Constants.DuoleSite)) {
 					DuoleUtils.downloadVideo(asset, asset.getUrl());
 				}
 			}
 			if(type.equals(Constants.RES_APK)){
-				if (!asset.getUrl().startsWith("http")) {
+//				if (!asset.getUrl().startsWith("http") || url.contains(Constants.DuoleSite)) {
 					DuoleUtils.downloadApp(asset, asset.getUrl());
-				}
+//				}
 			}
 			
 			if(type.equals(Constants.RES_FRONT)){
-				if (!asset.getUrl().startsWith("http") && asset.getUrl().endsWith(".zip")) {
+				if ((!url.startsWith("http") || url.contains(Constants.DuoleSite) ) && asset.getUrl().endsWith(".zip")) {
+//				if(asset.getUrl().endsWith(".zip")){
 					DuoleUtils.downloadFront(asset, asset.getUrl());
 				}
 			}

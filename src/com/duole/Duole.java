@@ -1,6 +1,7 @@
 package com.duole;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,6 +153,7 @@ public class Duole extends BaseActivity {
 	}
 	
 	private void enableWifiState(){
+		
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		if(!wm.isWifiEnabled()){
 			wm.setWifiEnabled(true);
@@ -159,7 +161,6 @@ public class Duole extends BaseActivity {
 	}
 	
 	private void initEnTimeProgressBar(){
-		
 		pbEnTime = (ProgressBar)findViewById(R.id.pbEnTime);
 		
 		pbEnTime.setMax(appref.gameCountDown.getTotalTime());
@@ -169,19 +170,17 @@ public class Duole extends BaseActivity {
 	}
 	
 	public void initContents()  throws Exception{
-		
 		// Check whether tf card exists.
 		if (DuoleUtils.checkTFCard()) {
 			// init the cache folders.
 			if (DuoleUtils.checkCacheFiles()) {
 				// init the main view.
+				
 				initViews();
 
 				setBackground();
 				
 				initCountDownTimer();
-				
-				initEnTimeProgressBar();
 				
 			} else {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
@@ -210,14 +209,11 @@ public class Duole extends BaseActivity {
 
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
-			
 			try {
 				if(appref.mScrollLayout.getChildCount() == 0){
 					initContents();
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			
 		}
@@ -228,10 +224,9 @@ public class Duole extends BaseActivity {
 	 * Init count down timers.
 	 */
 	public void initCountDownTimer() {
-
 		long currentTimeMillis = System.currentTimeMillis();
 		String enstart = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
-		final long current = Long.parseLong(enstart.equals("") ? currentTimeMillis+"" : enstart);
+		long current = Long.parseLong(enstart.equals("") ? currentTimeMillis+"" : enstart);
 
 		long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
 		long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
@@ -252,17 +247,12 @@ public class Duole extends BaseActivity {
 		
 		now = Math.abs(now);
 		
-		Log.d("TAG", enstart);
-		Log.d("TAG", poor + " poor");
-		Log.d("TAG", total + " total");
-		Log.d("TAG", now + " now");
-
 		if(poor < total){
-			if(now > 0 && now < entime){
-				entime -= now;
-			}else if(now > 0 && now < entime + restime){
-				restime -= now;
-				appref.startMusicPlay();
+			if(poor > 0 && poor < entime){
+				entime -= poor;
+			}else if(poor > 0 && poor < total){
+				restime = total - poor;
+				Constants.ENTIME_OUT = true;
 			}
 			
 			Log.d("TAG", entime + " entime , " + restime + " rest time");
@@ -320,17 +310,18 @@ public class Duole extends BaseActivity {
 				this.stop();
 				getPb().setMax(time);
 				getPb().setProgress(0);
+				Log.i("TAG", "rest time stop " + System.currentTimeMillis());
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
 		};
-
+		
+		initEnTimeProgressBar();
 	}
 
 	/**
 	 * Set the background of main page.
 	 */
 	public void setBackground() {
-
 		LinearLayout llMain = (LinearLayout) findViewById(R.id.llMain);
 		if (!Constants.bgurl.equals("")) {
 			File bg = new File(Constants.CacheDir
@@ -346,7 +337,6 @@ public class Duole extends BaseActivity {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-
 				}
 			}
 		}
@@ -362,7 +352,6 @@ public class Duole extends BaseActivity {
 	 */
 	public void initViews() throws IOException, TransformerException,
 			SAXException, XmlPullParserException, ParserConfigurationException {
-
 		//Get the current version of the system.
 		Constants.System_ver = DuoleUtils.getVersion(appref);
 		// get all apps
@@ -426,6 +415,8 @@ public class Duole extends BaseActivity {
 		setPageDividerSelected(0);
 		
 		DuoleUtils.setChildrenDrawingCacheEnabled(mScrollLayout, true);
+		
+		mScrollLayout.refresh();
 
 	}
 	
@@ -435,7 +426,6 @@ public class Duole extends BaseActivity {
 	 * @param index
 	 */
 	void setPageDividerSelected(final int index){
-
 		mHandler.post(new Runnable(){
 
 			public void run() {
@@ -479,7 +469,6 @@ public class Duole extends BaseActivity {
 	 * @param assets
 	 */
 	public void getMusicList(ArrayList<Asset> assets) {
-
 		Constants.MusicList = new ArrayList<Asset>();
 
 		for (Asset asset : assets) {
@@ -589,9 +578,9 @@ public class Duole extends BaseActivity {
 			}
 
 			// Entertainment time out.
-			if (!Constants.ENTIME_OUT) {
+//			if (!Constants.ENTIME_OUT) {
 				appref.sendBroadcast(new Intent(Constants.Event_AppStart));
-			}
+//			}
 
 			// If not a application.
 			if (!assItem.getType().equals(Constants.RES_APK)) {
@@ -737,6 +726,10 @@ public class Duole extends BaseActivity {
 			}
 		}
         this.mScrollLayout.refresh();
+        
+		if (Constants.ENTIME_OUT) {
+			startMusicPlay();
+		}
 		super.onResume();
 	}
 	

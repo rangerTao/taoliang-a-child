@@ -1,7 +1,9 @@
 package com.duole.widget;
 
+import com.duole.listener.OnMultiTouchListener;
 import com.duole.listener.OnScrolledListener;
 
+import android.R.integer;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,6 +21,7 @@ public class ScrollLayout extends ViewGroup {
 	private VelocityTracker mVelocityTracker;
 	
 	private OnScrolledListener scrolled;
+	private OnMultiTouchListener mMultiTouch;
 	
 	private boolean change = true;
 	
@@ -89,9 +92,6 @@ public class ScrollLayout extends ViewGroup {
         }   
   
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);   
-//        if (heightMode != MeasureSpec.EXACTLY) {   
-//            throw new IllegalStateException("ScrollLayout only can run at EXACTLY mode!");
-//        }   
   
         // The children are given the same width and height as the scrollLayout   
         final int count = getChildCount();   
@@ -147,21 +147,17 @@ public class ScrollLayout extends ViewGroup {
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
 		
-//		if (mVelocityTracker == null) {
-//			mVelocityTracker = VelocityTracker.obtain();
-//		}
-//		mVelocityTracker.addMovement(event);
-		
+		if (mVelocityTracker == null) {
+			mVelocityTracker = VelocityTracker.obtain();
+		}
+		mVelocityTracker.addMovement(event);
+
 		final int action = event.getAction();
 		final float x = event.getX();
 		final float y = event.getY();
 		
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
-			if (mVelocityTracker == null) {
-				mVelocityTracker = VelocityTracker.obtain();
-				mVelocityTracker.addMovement(event);
-			}
 
 			if (!mScroller.isFinished()) {
 				mScroller.abortAnimation();
@@ -185,7 +181,7 @@ public class ScrollLayout extends ViewGroup {
 			break;
 			
 		case MotionEvent.ACTION_UP:
-            // if (mTouchState == TOUCH_STATE_SCROLLING) {   
+			
 			int velocityX = 0;
 			if (mVelocityTracker != null) {
 				mVelocityTracker.addMovement(event);
@@ -239,9 +235,7 @@ public class ScrollLayout extends ViewGroup {
 		case MotionEvent.ACTION_MOVE:
 			final int xDiff = (int)Math.abs(mLastMotionX-x);
 			if (xDiff>mTouchSlop) {
-				
 				mTouchState = TOUCH_STATE_SCROLLING;
-				
 			}
 			break;
 			
@@ -265,7 +259,7 @@ public class ScrollLayout extends ViewGroup {
 		change = true;
 	}
 	
-	public void setOnScrolledListener(com.duole.listener.OnScrolledListener scrolled){
+	public void setOnScrolledListener(OnScrolledListener scrolled){
 		this.scrolled = scrolled;
 	}
 
@@ -274,11 +268,13 @@ public class ScrollLayout extends ViewGroup {
 		if (getScrollX() <= 0 && deltaX < 0) {
 			return false;
 		}
-
 		if (getScrollX() >= (getChildCount() - 1) * getWidth() && deltaX > 0) {
 			return false;
 		}
-
 		return true;
+	}
+	
+	public void setOnMultiTouchListener(OnMultiTouchListener multi){
+		mMultiTouch = multi;
 	}
 }

@@ -62,6 +62,7 @@
 	<string name="tf_unmounted">\u5b58\u50a8\u5361\u5df2\u5f39\u51fa</string>
 	<string name="tf_total">\u5b58\u50a8\u5361\u603b\u5bb9\u91cf\uff1a</string>
 	<string name="tf_used">\u5df2\u4f7f\u7528\uff1a</string>
+	<string name="drag_change_volume">\u5de6\u53f3\u62d6\u52a8\u64ad\u653e\u6309\u94ae\uff0c\u53ef\u4ee5\u8c03\u8282\u97f3\u91cf\u5927\u5c0f\u3002</string>
 	
 	<!-- password -->
 	<string name="input_password">\u8f93\u5165\u5bc6\u7801</string>

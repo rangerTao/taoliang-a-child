@@ -99,7 +99,13 @@ public class AssetItemAdapter extends BaseAdapter {
 			
 		}
 		
-		assItem.ivKe.setImageBitmap(Constants.bmpKe);
+		if(asset.getType().toLowerCase().equals(Constants.RES_AUDIO)){
+			assItem.ivKe.setImageResource(R.drawable.ke_music);
+		}else{
+			assItem.ivKe.setImageBitmap(Constants.bmpKe);
+		}
+		
+		
 		// set the icon
 		
 		// set the app name

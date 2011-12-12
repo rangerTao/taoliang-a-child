@@ -118,6 +118,10 @@ public abstract class DuoleCountDownTimer {
     	return "00:" + sb.toString();
     }
     
+    public int getRemainMills(){
+    	return (int) (mRemainTime / 1000);
+    }
+    
     public int getTotalTime(){
     	return (int) mTotalTime;
     }

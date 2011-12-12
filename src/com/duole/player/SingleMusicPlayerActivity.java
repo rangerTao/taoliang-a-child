@@ -9,6 +9,7 @@ import android.R.integer;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings.SettingNotFoundException;
@@ -67,7 +68,9 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		llMain = findViewById(R.id.llMusicPlayer);
 		rl = findViewById(R.id.relativeLayout1);
 		ImageButton ivMusicThumb = (ImageButton)findViewById(R.id.ivMusicThumb);
+		
 		tvMusicTitle = (TextView)findViewById(R.id.tvMusicTitle);
+		tvMusicTitle.setVisibility(View.INVISIBLE);
 		Asset asset = Constants.MusicList.get(index);
 		
 		String mpbg = asset.getBg();
@@ -127,35 +130,25 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 					int right = v.getRight() + dx;
 					int bottom = v.getBottom() + dy;
 					
-//					int textleft = tvMusicTitle.getLeft() + dx;
-//					int texttop = tvMusicTitle.getTop() + dy;
-//					int textright = tvMusicTitle.getRight() + dx;
-//					int textbottom = tvMusicTitle.getBottom() + dy;
-
 					if (left < 0) {
 						left = 0;
 						right = left + v.getWidth();
-//						textright = textleft + tvMusicTitle.getWidth();
 					}
 
 					if (right > rl.getMeasuredWidth()) {
 						right = rl.getMeasuredWidth();
 						left = right - v.getWidth();
-//						textleft = textright - tvMusicTitle.getWidth();
 					}
 
 					if (top < 0) {
 						top = 0;
 						bottom = top + v.getHeight();
-//						textbottom = texttop + tvMusicTitle.getHeight();
 					}
 
 					if (bottom > rl.getMeasuredHeight()) {
 						bottom = rl.getMeasuredHeight();
 						top = bottom - v.getHeight();
-//						texttop = textbottom - tvMusicTitle.getHeight();
 					}
-					// v.measure(right - left, bottom - top);
 					v.layout(left, top, right, bottom);
 					
 					int tvLeft = (v.getWidth() - tvMusicTitle.getWidth()) / 2 + left;
@@ -198,7 +191,13 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 			
 			mp.setDataSource(this, Uri.fromFile(new File(url)));
 			mp.prepare();
-			mp.start();
+			mp.setOnPreparedListener(new OnPreparedListener() {
+				
+				public void onPrepared(MediaPlayer mp) {
+					mp.start();
+				}
+			});
+//			mp.start();
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
