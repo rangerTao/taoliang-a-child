@@ -179,6 +179,8 @@ public class DuoleUtils {
 		// Reorganize the url.
 		URL url = checkUrl(video);
 
+		Log.v("TAG", url.toString());
+		
 		// the file used to save the video.
 		File file = new File(Constants.CacheDir
 				+ "/apk"
@@ -331,6 +333,8 @@ public class DuoleUtils {
 
 				return new URL(url);
 
+			} else if (url.contains("duoleyuan")) {
+				return new URL("http://" + url);
 			} else {
 				url = Constants.Duole + url;
 				return new URL(url);
@@ -489,7 +493,7 @@ public class DuoleUtils {
 			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
 			
-			if(asset.getUrl().startsWith("http")){
+			if(asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")){
 				return false;
 			}
 			if (!file.exists()) {
@@ -527,7 +531,7 @@ public class DuoleUtils {
 		}else if (!asset.getUrl().equals("")) {
 			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
-			if(asset.getUrl().startsWith("http")){
+			if(asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")){
 				return false;
 			}
 			
@@ -703,7 +707,7 @@ public class DuoleUtils {
     		String path = asset.getUrl();
     		String isfront = asset.getIsFront();
     		
-    		if(!path.startsWith("http")){
+    		if(!path.startsWith("http") || path.contains("duoleyuan")){
     			try{
     				file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
     			}catch (Exception e) {
@@ -716,10 +720,16 @@ public class DuoleUtils {
         				if(pkgname == null){
         					pkgname = FileUtils.getPackagenameFromAPK(Duole.appref, asset);
         				}
-        				if(!DuoleUtils.verifyInstallationOfAPK(Duole.appref, pkgname))
-        					DuoleUtils.installApkFromFile(file);
+						if (!DuoleUtils.verifyInstallationOfAPK(Duole.appref,pkgname)) {
+							installThread it = new installThread(file);
+							it.start();
+						}else{
+							temp.add(asset);
+						}
+        			}else{
+        				temp.add(asset);
         			}
-        			temp.add(asset);
+        			
         		}
     		}else{
     			temp.add(asset);
@@ -810,7 +820,7 @@ public class DuoleUtils {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		return false;
 	}
 	
@@ -874,6 +884,8 @@ public class DuoleUtils {
     
     /**
      * verify the installation of a apk.
+     * installed true.
+     * not installed false.
      */
     public static boolean verifyInstallationOfAPK(Context context , String pkgname){
     	PackageManager pm = context.getPackageManager();
@@ -888,4 +900,16 @@ public class DuoleUtils {
     	
     	return false;
     }
+}
+
+class installThread extends Thread{
+
+	File installFile;
+	public installThread(File file){
+		installFile = file;
+	}
+	public void run() {
+		DuoleUtils.installApkFromFile(installFile);
+	}
+	
 }

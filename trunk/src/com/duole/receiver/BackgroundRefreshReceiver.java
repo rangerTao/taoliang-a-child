@@ -98,9 +98,11 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					Constants.SLEEP_TIME = false;
 
 					DuoleSysConfigUtils.enableWifi(context);
-
+					
 					Duole.appref.sendBroadcast(new Intent(
 							"com.duole.restime.out"));
+					
+					Duole.appref.initCountDownTimer();
 					Constants.musicPlayerIsRunning = false;
 				}
 			}catch(Exception e){

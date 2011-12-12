@@ -6,14 +6,14 @@
 	<Gallery android:id="@+id/musicGallery" android:layout_width="fill_parent"
 		android:layout_height="250dip" android:layout_alignParentTop="true"
 		android:layout_marginTop="50dip" android:spacing="40dip" />
-	<LinearLayout android:id="@+id/musicControl"
-		android:layout_centerHorizontal="true" android:layout_width="wrap_content"
+	<RelativeLayout android:id="@+id/musicControl"
+		android:layout_centerHorizontal="true" android:layout_width="fill_parent"
 		android:layout_height="wrap_content" android:gravity="center_vertical"
 		android:orientation="horizontal" android:layout_marginBottom="100dip"
 		android:layout_alignParentBottom="true">
-		<Button android:id="@+id/btnPlay" android:layout_width="120dip"
+		<Button android:id="@+id/btnPlay" android:layout_width="120dip" android:layout_centerInParent="true"
 			android:layout_height="120dip" android:background="@drawable/play" />
-	</LinearLayout>
+	</RelativeLayout>
 	<ProgressBar android:layout_width="fill_parent"
 		android:layout_height="5px" android:id="@+id/pbRestTime"
 		style="?android:attr/progressBarStyleHorizontal"

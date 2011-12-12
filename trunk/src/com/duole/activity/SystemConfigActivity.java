@@ -581,7 +581,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		@Override
 		protected Object doInBackground(Object... arg0) {
-			String url = "http://www.duoleyuan.com/e/member/child/ancJinfo.php?cc="
+			String url = "http://wvw.duoleyuan.com/e/member/child/ancJinfo.php?cc="
 					+ DuoleUtils.getAndroidId();
 
 			String result = DuoleNetUtils.connect(url);
