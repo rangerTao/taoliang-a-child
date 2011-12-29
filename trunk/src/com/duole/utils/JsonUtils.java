@@ -20,21 +20,26 @@ public class JsonUtils {
 		String version = jsonObject.getString("ver");
 		if(!version.equals("null") && !version.equals("")){
 			client = new File(Constants.CacheDir + "client.apk");
-			if(!version.equals(Constants.System_ver)){
-				client = new File(Constants.CacheDir + "client.apk");
-				if(client.exists()){
-					if(!version.equals(DuoleUtils.getPackageVersion(client)) && !Constants.clientApkDownloaded){
+			try{
+				if(!version.equals(Constants.System_ver)){
+					client = new File(Constants.CacheDir + "client.apk");
+					if(client.exists()){
+						if(!version.equals(DuoleUtils.getPackageVersion(client)) && !Constants.clientApkDownloaded){
+							DuoleUtils.updateClient();
+						}
+					}else{
 						DuoleUtils.updateClient();
 					}
 				}else{
-					DuoleUtils.updateClient();
+					client = new File(Constants.CacheDir + "client.apk");
+					if(client.exists()){
+						client.delete();
+					}
 				}
-			}else{
-				client = new File(Constants.CacheDir + "client.apk");
-				if(client.exists()){
-					client.delete();
-				}
+			}catch (Exception e) {
+				Log.e("TAG", "Error occurs when getting updates.");
 			}
+			
 		}
 		
 		if(jsonObject.has("front")){

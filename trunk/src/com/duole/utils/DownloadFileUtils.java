@@ -154,8 +154,6 @@ public class DownloadFileUtils extends Thread {
 			
 			// Open a connection.
 			URLConnection conn = url.openConnection();
-
-			
 			
 			conn.setAllowUserInteraction(true); 
 			conn.setRequestProperty("RANGE","bytes=" + localSize + "-");
@@ -163,15 +161,18 @@ public class DownloadFileUtils extends Thread {
 			Log.v("TAG", cacheFile.getName() + localSize);
 			// get the size of file.
 			int fileSize = conn.getContentLength();
-
+			
+			Log.v("TAG", fileSize + ":filesize " + localSize + localSize);
 			
 			//set the resume point of the file
 			if(fileSize != localSize){
 				
-				
 				byte[] buffer = new byte[8 * 1024];
 
 				bis = conn.getInputStream();
+				if(!cacheFile.exists()){
+					cacheFile.createNewFile();
+				}
 				fos = new FileOutputStream(cacheFile);
 				int len = 0;
 				while ((len = bis.read(buffer)) != -1) {
@@ -184,7 +185,8 @@ public class DownloadFileUtils extends Thread {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.v("TAG",e.getMessage());
+			Log.e("TAG",e.getMessage());
+			Log.e("TAG", cacheFile.getAbsolutePath());
 			return false;
 		}
 
