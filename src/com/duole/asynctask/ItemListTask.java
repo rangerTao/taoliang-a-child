@@ -67,7 +67,7 @@ public class ItemListTask extends AsyncTask {
 			return false;
 		}
 		
-		
+		Log.e("TAG", gettedSourceList + "   whether source list is getted");
 
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
@@ -77,7 +77,7 @@ public class ItemListTask extends AsyncTask {
 					hmSource.put(ass.getId(), ass);
 				}
 			}
-
+			
 			alAssetDeleteList = DuoleUtils.getAssetDeleteList(
 					hmSource, Constants.AssetList);
 			
@@ -161,13 +161,13 @@ public class ItemListTask extends AsyncTask {
 			try {
 				error = jsonObject.getString("errstr");
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.e("TAG", "No error!");
 			}
 
-			
 			if (error == null){
 				try{
 					JsonUtils.parserJson(Constants.alAsset, jsonObject);
+					
 				}catch(Exception e){
 					Constants.DOWNLOAD_RUNNING = false;
 					e.printStackTrace();

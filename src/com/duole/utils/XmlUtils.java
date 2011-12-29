@@ -40,6 +40,8 @@ import com.duole.pojos.asset.Asset;
 
 public class XmlUtils {
 	public static String filePath = Constants.CacheDir + "/itemlist.xml";
+	
+	public static int errorcount = 0;
 
 	// public static FileInputStream iStream = null;
 
@@ -142,12 +144,12 @@ public class XmlUtils {
 	}
 
 	public static ArrayList<Asset> readFile(String filePath,
-			DocumentBuilder dBuilder) throws SAXException, IOException, XmlPullParserException, TransformerException, ParserConfigurationException {
+			DocumentBuilder dBuilder,boolean update) throws SAXException, IOException, XmlPullParserException, TransformerException, ParserConfigurationException {
 
 		ArrayList<Asset> result = new ArrayList<Asset>();
 		
 		FileInputStream iStream = new FileInputStream(new File(
-				XmlUtils.filePath));
+				filePath));
 
 		XmlPullParser parser = Xml.newPullParser();
 		
@@ -268,15 +270,25 @@ public class XmlUtils {
 			}
 		}catch (Exception e){
 			e.printStackTrace();
-//			createItemList();
 			Constants.entime = "25";
 			Constants.restime = "120";
 			Constants.sleepstart = "22:00";
 			Constants.sleepend = "07:00";
-//			Constants.AssetList = readFile(filePath,
-//					dBuilder);
+
+			if(errorcount < 1){
+				errorcount ++;
+				Log.d("TAG", "reading xml error");
+				return readFile(filePath+".bak", dBuilder,false);
+				
+			}else {
+				return result;
+			}
 		}
-		 
+		if(update){
+			Log.d("TAG", "Update the backup xml file");
+			new File(filePath + ".bak").delete();
+			FileUtils.copyFile(filePath, filePath + ".bak");
+		}
 		return result;
 	}
 	
@@ -343,16 +355,16 @@ public class XmlUtils {
 				initFile(is, dBuilder, file);
 			}
 
-			result = readFile(filePath, dBuilder);
+			result = readFile(filePath, dBuilder,true);
 
 		} catch (ParserConfigurationException e) {
 			file.delete();
 			createItemList();
-			result = readFile(filePath, dBuilder);
+			result = readFile(filePath, dBuilder,true);
 		} catch (SAXException e) {
 			file.delete();
 			createItemList();
-			result = readFile(filePath, dBuilder);
+			result = readFile(filePath, dBuilder,true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (XmlPullParserException e) {
@@ -365,7 +377,7 @@ public class XmlUtils {
 		return result;
 	}
 
-	public static void deleteAllItemNodes() throws IOException {
+	public static void deleteAllItemNodes() throws Exception {
 		String[] result = null;
 		StringBuffer sbresult = new StringBuffer();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -395,18 +407,9 @@ public class XmlUtils {
 			transformer.transform(domSource, streamResult);
 
 			iStream.close();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			Log.e("TAG", e.getMessage());
+			throw new Exception(e.getMessage());			
 		}
 	}
 
@@ -510,6 +513,7 @@ public class XmlUtils {
 			DOMSource domSource = new DOMSource(document);
 
 			StreamResult streamResult = new StreamResult(new File(filePath));
+			
 			transformer.transform(domSource, streamResult);
 			iStream.close();
 		} catch (ParserConfigurationException e) {
@@ -797,7 +801,6 @@ public class XmlUtils {
 			newElement.appendChild(value);
 			
 			document.appendChild(newElement);
-//			document.getDocumentElement().appendChild(newElement);
 
 			TransformerFactory transformerFactory = TransformerFactory
 					.newInstance();
@@ -807,6 +810,11 @@ public class XmlUtils {
 			StreamResult streamResult = new StreamResult(new File(filePath));
 			transformer.transform(domSource, streamResult);
 			iStream.close();
+			
+			if(Constants.AssetList.size() > 0 ){
+				addNode(Constants.AssetList);
+			}
+			
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

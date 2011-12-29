@@ -79,7 +79,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			
 			temp = new ArrayList<Asset>();
 			temp.addAll(Constants.alAsset);
-
+			
 			temp = DuoleUtils.checkFilesExists(temp);
 			
 			DuoleUtils.addNetworkManager(temp);

@@ -13,6 +13,8 @@ import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.R.integer;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -30,11 +32,13 @@ import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -90,7 +94,12 @@ public class Duole extends BaseActivity {
 	public int curPageDiv = 0;
 	
 	Asset assItem;
-
+	
+	Thread startActivityForResult;
+	
+	/**
+	 * The connection of background refresh service.
+	 */
 	public static ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 
@@ -110,7 +119,9 @@ public class Duole extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mContext = this;
-
+		
+//		Settings.Secure.putInt(getContentResolver(),Settings.Secure.LOCK_PATTERN_ENABLED, 0);
+		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
 		bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
@@ -152,6 +163,9 @@ public class Duole extends BaseActivity {
 		});
 	}
 	
+	/**
+	 * Enable the wifi.
+	 */
 	private void enableWifiState(){
 		
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -160,6 +174,9 @@ public class Duole extends BaseActivity {
 		}
 	}
 	
+	/**
+	 * Initialize the entermaintent progress bar.
+	 */
 	private void initEnTimeProgressBar(){
 		pbEnTime = (ProgressBar)findViewById(R.id.pbEnTime);
 		
@@ -169,6 +186,10 @@ public class Duole extends BaseActivity {
 		gameCountDown.setPb(pbEnTime);
 	}
 	
+	/**
+	 * Intitialize the content.
+	 * @throws Exception
+	 */
 	public void initContents()  throws Exception{
 		// Check whether tf card exists.
 		if (DuoleUtils.checkTFCard()) {
@@ -286,6 +307,8 @@ public class Duole extends BaseActivity {
 				if (!Constants.SLEEP_TIME) {
 					appref.startMusicPlay();
 				}
+				
+				initEnTimeProgressBar();
 			}
 
 		};
@@ -310,7 +333,7 @@ public class Duole extends BaseActivity {
 				this.stop();
 				getPb().setMax(time);
 				getPb().setProgress(0);
-				Log.i("TAG", "rest time stop " + System.currentTimeMillis());
+				
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
 		};
@@ -458,10 +481,6 @@ public class Duole extends BaseActivity {
 			}
 			
 		});
-		
-		
-		
-	
 	}
 
 	/**
@@ -507,7 +526,7 @@ public class Duole extends BaseActivity {
 			String frontid = assItem.getFrontID();
 			if(frontid != null && !frontid.equals("0")){
 				if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
-					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/");
+					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/",assItem);
 				}else{
 					startItem(assItem);
 				}
@@ -519,7 +538,12 @@ public class Duole extends BaseActivity {
 
 	};
 	
+	/**
+	 * Start the item selected.
+	 * @param assItem
+	 */
 	private void startItem(Asset assItem) {
+		
 		Intent intent = null;
 		try {
 			// launcher the package
@@ -538,11 +562,10 @@ public class Duole extends BaseActivity {
 				if(pkgName == null){
 					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
 				}
-				
 				startActivityByPkgName(pkgName);
 
 			}
-			// Launch the configuration function.
+			// Launch the configure function.
 			if (assItem.getType().equals(Constants.RES_CONFIG)) {
 				intent = new Intent(appref, PasswordActivity.class);
 				intent.putExtra("type", "0");
@@ -587,10 +610,15 @@ public class Duole extends BaseActivity {
 				mContext.startActivity(intent);
 				overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 			}
-		} catch (ActivityNotFoundException noFound) {
+		} catch (ActivityNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Use a package name to launch a activity installed.
+	 * @param pkgname
+	 */
 	private void startActivityByPkgName(String pkgname){
 		
 		Intent intent = new Intent();
@@ -605,7 +633,6 @@ public class Duole extends BaseActivity {
 
 			if (lri.size() > 0) {
 				for (ResolveInfo ri : lri) {
-					Log.v("TAG", ri.activityInfo.name);
 					intent.setComponent(new ComponentName(pkgName,
 							ri.activityInfo.name));
 					startActivity(intent);
@@ -624,7 +651,7 @@ public class Duole extends BaseActivity {
 	 * @param frontid
 	 * @param basePath
 	 */
-	private void startActivityForResultByPackageName(String packagename,String frontid,String basePath){
+	private void startActivityForResultByPackageName(String packagename,String frontid,String basePath, Asset asset){
 		
 		
 		Intent intent = new Intent();
@@ -649,7 +676,17 @@ public class Duole extends BaseActivity {
 				for (ResolveInfo ri : lri) {
 					intent.setComponent(new ComponentName(packagename,
 							ri.activityInfo.name));
-					startActivityForResult(intent, 1);
+					if(asset.getType().equals(Constants.RES_APK)){
+						pkgName = assItem.getPackag();
+						if(pkgName == null){
+							pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
+						}
+						editor.putString("package", pkgName);
+						editor.commit();
+						startActivity(intent);
+					}else{
+						startActivityForResult(intent, 1);
+					}
 					overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 				}
 			}
@@ -665,8 +702,12 @@ public class Duole extends BaseActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		
-		startItem(assItem);
-		
+		Log.d("TAG"	, resultCode + "   reaultde");
+		if(startActivityForResult != null){
+			startActivityForResult.notify();
+		}else{
+			startItem(assItem);
+		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
@@ -710,13 +751,22 @@ public class Duole extends BaseActivity {
 	 */
 	@Override
 	protected void onResume(){
+		
+		Log.e("TAG", "on resume");
+		
 		overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 		if(pkgName != null && !pkgName.equals("")){
 			forceStopActivity();
 			uploadGamePeriod();
 			pkgName = "";
-		}
 			
+			//Clear the package name in the shared preference.
+			SharedPreferences sp = getSharedPreferences("com.duole",
+					MODE_WORLD_READABLE);
+			Editor editor = sp.edit();
+			editor.clear();
+			editor.commit();
+		}
 		
 		if(this.mScrollLayout.getChildCount() <= 0){
 			try {

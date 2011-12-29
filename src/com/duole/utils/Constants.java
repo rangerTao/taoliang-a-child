@@ -132,7 +132,7 @@ public class Constants {
 	
 	
 	//refresh frequences.
-	public static final int frequence = 60000;
+	public static final int frequence = 120000;
 	
 	public static final long countInterval = 1000;
 	

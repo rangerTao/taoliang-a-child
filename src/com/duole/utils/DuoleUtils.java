@@ -11,7 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -222,11 +224,11 @@ public class DuoleUtils {
 				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 		
 		Log.v("TAG", url.toString());
-		
+		File cacheFile = null;
 		try {
 			//get the name of file
 			String filename = file.getName();
-			File cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
+			cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
 			
 			if (FileUtils.isCacheFileExists(filename)) {
 				if (DownloadFileUtils.resumeDownloadCacheFile(url, cacheFile)) {
@@ -243,6 +245,7 @@ public class DuoleUtils {
 		} catch (Exception e) {
 			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + asset.getUrl());
 			Constants.AssetList.remove(asset);
+			cacheFile.delete();
 			return false;
 		}
 	}
@@ -452,6 +455,11 @@ public class DuoleUtils {
 	 */
 	public static boolean checkDownloadNecessary(Asset asset, Asset refer) {
 		
+		if(refer == null){
+			Log.e("TAG", "refer is null,download the new item.");
+			return true;
+		}
+		
 		// If id is different.true.
 		if (!asset.getId().equals(refer.getId())) {
 			return true;
@@ -557,14 +565,16 @@ public class DuoleUtils {
 
 	public static boolean updateAssetListFile(ArrayList<Asset> assets) {
 
+		Log.d("TAG", "update asset list");
 		try {
 			XmlUtils.deleteAllItemNodes();
 
 			XmlUtils.addNode(assets);
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			new File(Constants.ItemList).delete();
+			FileUtils.copyFile(Constants.ItemList + ".bak", Constants.ItemList);
+			Log.d("TAG", "asset list xml error,use the bakcup to recovery the asset list.");
 		}
 
 		return true;
@@ -632,8 +642,10 @@ public class DuoleUtils {
 			
 			if(!path.equals("null") || !path.equals("")){
 				File client = new File(Constants.CacheDir + "client.apk");
-		    	File newClient = new File(Constants.CacheDir + "/temp/" + path.substring(path.lastIndexOf("/")));
+		    	
 		    	try {
+		    		File newClient = new File(Constants.CacheDir + "/temp/" + path.substring(path.lastIndexOf("/")));
+		    		
 		    		if(!client.exists()){
 		    			if(DownloadFileUtils.resumeDownloadCacheFile(new URL(Constants.Duole + path ), newClient)){
 		    				FileUtils.copyFile(newClient.getAbsolutePath(), client.getAbsolutePath());
@@ -736,6 +748,16 @@ public class DuoleUtils {
     		}
     		
     	}
+    	
+    	//Remove duplicate content
+    	for (int i = 0; i < temp.size() -1 ; i++) {
+			for (int j = i + 1; j < temp.size(); j++) {
+				if(temp.get(i).getId().equals(temp.get(j).getId())){
+					temp.remove(j);
+					j--;
+				}
+			}
+		}
     	
     	return temp;
     	
@@ -893,13 +915,32 @@ public class DuoleUtils {
     	List<ApplicationInfo> lai = pm.getInstalledApplications(PackageManager.GET_META_DATA);
     	for(ApplicationInfo ai : lai){
     		if(ai.packageName.equals(pkgname)){
-    			Log.v("TAG", pkgname + "   Installed.");
     			return true;
     		}
     	}
     	
     	return false;
     }
+    
+    /**
+     * Removal of duplicate content
+     * @param input
+     * @return
+     */
+	public synchronized static HashMap<String, Asset> deDuplicate(
+			HashMap<String, Asset> input) {
+
+		HashMap<String , Asset> output = new HashMap<String, Asset>();
+		Set<String> si = input.keySet();
+
+		Iterator it = si.iterator();
+		int i = 0;
+		while (it.hasNext()) {
+			output.put(it.next().toString(), input.get(it.next()));
+		}
+		
+		return output;
+	}
 }
 
 class installThread extends Thread{
