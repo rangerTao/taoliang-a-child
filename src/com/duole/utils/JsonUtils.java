@@ -15,15 +15,27 @@ import com.duole.pojos.asset.Asset;
 
 public class JsonUtils {
 
+	/**
+	 * Deal with the json array.
+	 * @param alAsset
+	 * @param jsonObject
+	 * @throws MalformedURLException
+	 * @throws JSONException
+	 */
 	public static void parserJson(ArrayList<Asset> alAsset ,JSONObject jsonObject) throws MalformedURLException, JSONException{
 		File client;
+		//Get the verison of client.
 		String version = jsonObject.getString("ver");
+		
 		if(!version.equals("null") && !version.equals("")){
+			//Version is exists.
 			client = new File(Constants.CacheDir + "client.apk");
 			try{
+				//whether apk is exists.
 				if(!version.equals(Constants.System_ver)){
 					client = new File(Constants.CacheDir + "client.apk");
 					if(client.exists()){
+						//exists.
 						if(!version.equals(DuoleUtils.getPackageVersion(client)) && !Constants.clientApkDownloaded){
 							DuoleUtils.updateClient();
 						}
@@ -31,6 +43,7 @@ public class JsonUtils {
 						DuoleUtils.updateClient();
 					}
 				}else{
+					//Local version is equal with the version getted.
 					client = new File(Constants.CacheDir + "client.apk");
 					if(client.exists()){
 						client.delete();
@@ -42,11 +55,14 @@ public class JsonUtils {
 			
 		}
 		
+		//Get the priority resources.
 		if(jsonObject.has("front")){
 			JSONArray jsonArray = jsonObject.getJSONArray("front");
 			
 			Log.v("TAG", jsonArray.length() + " front length");
 		}
+		
+		//Get the resource items.
 		for (int i = 0;i< jsonObject.length(); i++) {
 			try{
 				JSONObject jsonItem = jsonObject.getJSONObject("item" + i);
@@ -69,6 +85,7 @@ public class JsonUtils {
 			
 		}
 		
+		//Get the priority resource.
 		try{
 			if(jsonObject.has("front")){
 				JSONArray jsonArray = jsonObject.getJSONArray("front");
@@ -82,13 +99,14 @@ public class JsonUtils {
 		
 		
 		File file = null;
+		//Background.
 		if(!Constants.bgurl.equals("")){
 			file = new File(Constants.CacheDir
 					+ Constants.bgurl.substring(Constants.bgurl
 							.lastIndexOf("/")));
 		}
 		
-		
+		//file not exists or background has been changed.
 		if (file == null || !file.exists() || !Constants.bgurl.equals(jsonObject.getString("bg"))) {
 			
 			String bgurl = jsonObject.getString("bg");
@@ -106,24 +124,14 @@ public class JsonUtils {
 			Constants.newItemExists = true;
 		}
 		
+		//Background of rest time.
 		if(!Constants.bgRestUrl.equals("")){
 			file = new File(Constants.CacheDir
 					+ Constants.bgRestUrl.substring(Constants.bgRestUrl
 							.lastIndexOf("/")));
 		}
 		
-//		if(!Constants.ke.equals("")){
-//			file = new File(Constants.CacheDir
-//					+ Constants.ke.substring(Constants.ke
-//							.lastIndexOf("/")));
-//		}
-//		
-//		if (file == null || !file.exists() || Constants.bgurl != jsonObject.getString("bg")) {
-//			
-//			Constants.ke = jsonObject.getString("ke");
-//			DuoleUtils.downloadSingleFile(new URL(Constants.Duole + Constants.ke), file);
-//		}
-		
+		//file not exists or background has been changed.
 		if (file == null || !file.exists()
 				|| !Constants.bgRestUrl.equals(jsonObject.getString("bg1"))) {
 			String bgurl = jsonObject.getString("bg1");
@@ -142,12 +150,13 @@ public class JsonUtils {
 			Constants.newItemExists = true;
 		}
 		
-//		Log.v("TAG", Constants.restart);
+		//Get the tip sound .
 		if(!Constants.restart.equals("")){
 			file = new File(Constants.CacheDir
 					+ Constants.TIPSTARTNAME);
 		}
 		
+		//file not exists or tip has been changed.
 		if (file == null || !file.exists()
 				|| !Constants.restart.equals(jsonObject.getString("tipsd"))) {
 			Log.v("TAG", "new tip");
@@ -156,12 +165,18 @@ public class JsonUtils {
 					+ Constants.restart), file);
 		}
 		
+		//The period of entermaintent.
 		Constants.entime = jsonObject.getString("entime");
+		//The period of rest.
 		Constants.restime = jsonObject.getString("restime");
+		//when sleep time is on.
 		Constants.sleepstart = jsonObject.getString("sleepstart");
+		//when sleep time is out.
 		Constants.sleepend = jsonObject.getString("sleepend");
+		//the url of  tip sound.
 		Constants.restart = jsonObject.getString("tipsd");
 		
+		//Update the valus getted from json.
 		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);
 		XmlUtils.updateSingleNode(Constants.XML_RESTIME, Constants.restime);
 		XmlUtils.updateSingleNode(Constants.XML_SLEEPEND, Constants.sleepend);
