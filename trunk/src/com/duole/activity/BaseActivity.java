@@ -69,8 +69,8 @@ public class BaseActivity extends Activity {
 		MusicPlay.putExtra("type", "rest");
 		
 		//Take main task to front
-//		Intent intent = new Intent(this,Duole.class);
-//		startActivity(intent);
+		Intent intent = new Intent(Duole.appref,Duole.class);
+		startActivity(intent);
 		
 		startActivity(MusicPlay);
 	}

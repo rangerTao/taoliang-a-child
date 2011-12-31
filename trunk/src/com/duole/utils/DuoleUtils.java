@@ -359,20 +359,8 @@ public class DuoleUtils {
 	public static boolean downloadSingleFile(Asset asset ,URL url, File file) {
 		try {
 			//get the name of file
-			String filename = file.getName();
-			File cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
+			downloadSingleFile(url,file);
 			
-			if (FileUtils.isCacheFileExists(filename)) {
-				if (DownloadFileUtils.resumeDownloadCacheFile(url, cacheFile)) {
-					FileUtils.copyFile(cacheFile.getAbsolutePath(), file.getAbsolutePath());
-					cacheFile.delete();
-				}
-			} else {
-				if (DownloadFileUtils.downloadCacheFile(url, cacheFile)) {
-					FileUtils.copyFile(cacheFile.getAbsolutePath(), file.getAbsolutePath());
-					cacheFile.delete();
-				}
-			}
 			return true;
 		} catch (Exception e) {
 			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + asset.getUrl());
@@ -389,38 +377,28 @@ public class DuoleUtils {
 	 * @return
 	 */
 	public static boolean downloadSingleFile(URL url, File file) {
-		try {
-			Log.v("TAG", "download a file from " + url.toString());
-			// Open a connection.
-			URLConnection conn = url.openConnection();
-			// get the size of file.
-			int fileSize = conn.getContentLength();
+		
+		Log.v("TAG", "download a file from " + url.toString());
 
-			byte[] buffer = new byte[8 * 1024];
+		String filename = file.getName();
+		File cacheFile = new File(Constants.CacheDir + "/temp/"
+				+ file.getName());
 
-			InputStream bis = null;
-			FileOutputStream fos = null;
-
-			// Create a file.
-			file.createNewFile();
-
-			bis = conn.getInputStream();
-			fos = new FileOutputStream(file);
-			int len = 0;
-			while ((len = bis.read(buffer)) != -1) {
-				fos.write(buffer, 0, len);
+		if (FileUtils.isCacheFileExists(filename)) {
+			if (DownloadFileUtils.resumeDownloadCacheFile(url, cacheFile)) {
+				FileUtils.copyFile(cacheFile.getAbsolutePath(),
+						file.getAbsolutePath());
+				cacheFile.delete();
 			}
-			fos.close();
-			bis.close();
-			return true;
-		} catch (Exception e) {
-			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + url.toString());
-			e.printStackTrace();
-			if(file != null){
-				file.delete();
+		} else {
+			if (DownloadFileUtils.downloadCacheFile(url, cacheFile)) {
+				FileUtils.copyFile(cacheFile.getAbsolutePath(),
+						file.getAbsolutePath());
+				cacheFile.delete();
 			}
-			return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -563,6 +541,11 @@ public class DuoleUtils {
 		return false;
 	}
 
+	/**
+	 * Update the asset file on the sdcard.
+	 * @param assets The list of assets.
+	 * @return
+	 */
 	public static boolean updateAssetListFile(ArrayList<Asset> assets) {
 
 		Log.d("TAG", "update asset list");
@@ -580,12 +563,21 @@ public class DuoleUtils {
 		return true;
 	}
 
+	/**
+	 * Get the android of current device.
+	 * @return
+	 */
 	public static String getAndroidId() {
 		String androidId = System.getString(Duole.appref.getContentResolver(),
 				System.ANDROID_ID);
 		return (androidId + " ");
 	}
 	
+	/**
+	 * Set the childrendrawingcacheenabled.
+	 * @param vg
+	 * @param enabled
+	 */
     public static void setChildrenDrawingCacheEnabled(ViewGroup vg,boolean enabled) {  
         final int count = vg.getChildCount();  
         for (int i = 0; i < count; i++) {  
@@ -596,6 +588,10 @@ public class DuoleUtils {
         }  
     }  
     
+    /**
+     * Clear the children chache.
+     * @param vg
+     */
     public static void clearChildrenCache(ViewGroup vg) {  
     	final int count = vg.getChildCount();  
     	for (int i = 0; i < count; i++) {  
@@ -943,6 +939,11 @@ public class DuoleUtils {
 	}
 }
 
+/**
+ * A thread used to install apks.
+ * @author taoliang
+ *
+ */
 class installThread extends Thread{
 
 	File installFile;

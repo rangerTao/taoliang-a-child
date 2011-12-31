@@ -61,8 +61,7 @@ public class DownloadFileUtils extends Thread {
 			//Download thumbnail.
 			DuoleUtils.downloadPic(asset,asset.getThumbnail());
 			
-			if(asset.getBg() != null && !asset.getBg().equals("")){
-				Log.v("TAG", "download bg " + asset.getBg());
+			if(asset.getBg() != null && !asset.getBg().trim().equals("")){
 				DuoleUtils.downloadPic(asset, asset.getBg());
 			}
 			//Download audio.
@@ -104,6 +103,7 @@ public class DownloadFileUtils extends Thread {
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			
 		} catch (Exception e) {
+			Log.e("TAG", "downloading error : " + asset.toString());
 			e.printStackTrace();
 		}
 	}

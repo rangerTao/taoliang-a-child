@@ -40,13 +40,13 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 		
 		String temp = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
 		Log.v("TAG", "last start" +  temp);
-		long lastDay = Long.parseLong(temp.equals("") ? "0" : temp);
+		long lastDay = Long.parseLong(temp.equals("") || temp == null ? "0" : temp);
 		
 		long current = System.currentTimeMillis();
 		
 		Log.v("TAG", "current millis" + current);
 		
-		if((int)Math.abs((current - lastDay)) > Constants.timePool){
+		if(Math.abs((current - lastDay)) > Constants.timePool){
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			
 			long time1 = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;

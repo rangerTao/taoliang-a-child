@@ -75,7 +75,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		
 		String mpbg = asset.getBg();
 		
-		if( mpbg != null && !mpbg.equals("")){
+		if( mpbg != null && !mpbg.trim().equals("")){
 
 			File bg = new File(Constants.CacheDir
 					+ Constants.RES_THUMB + mpbg.substring(mpbg

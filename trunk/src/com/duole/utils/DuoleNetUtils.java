@@ -246,7 +246,8 @@ public class DuoleNetUtils {
     public static void uploadLocalVersion(){
     	
     	
-    	String url = Constants.ClientUpdate + "?cver=" + DuoleUtils.getVersion(Duole.appref) + "&cmcode=" + DuoleUtils.getAndroidId();
+    	String localVer = DuoleUtils.getVersion(Duole.appref);
+    	String url = Constants.ClientUpdate + "?cver=" + localVer + "&cmcode=" + DuoleUtils.getAndroidId();
 		
     	String loaded =XmlUtils.readNodeValue( Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD);
     	if(loaded.equals("false") || loaded.equals("") ){
@@ -255,7 +256,12 @@ public class DuoleNetUtils {
         	Log.v("TAG", "upload local version url : "+ url);
         	try{
         		JSONObject json = new JSONObject(result);
-        		XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "true");
+        		
+        		String version = json.getString("ver");
+        		if(version.trim().equals(localVer))
+        			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "true");
+        		else 
+        			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
         	}catch(Exception e){
         		XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
         	}

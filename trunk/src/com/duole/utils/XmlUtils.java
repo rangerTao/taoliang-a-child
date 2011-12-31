@@ -427,16 +427,16 @@ public class XmlUtils {
 				Asset asset = assetList.get(i);
 
 				// the values
-				Text id = document.createTextNode(asset.getId());
-				Text title = document.createTextNode(asset.getName());
-				Text thumbnail = document.createTextNode(asset.getThumbnail());
-				Text url = document.createTextNode(asset.getUrl());
+				Text id = document.createTextNode(asset.getId().trim());
+				Text title = document.createTextNode(asset.getName().trim());
+				Text thumbnail = document.createTextNode(asset.getThumbnail().trim());
+				Text url = document.createTextNode(asset.getUrl().trim());
 				Text lastmodified = document.createTextNode(asset
-						.getLastmodified());
-				Text type = document.createTextNode(asset.getType());
-				Text frontId = document.createTextNode(asset.getFrontID());
-				Text isFront = document.createTextNode(asset.getIsFront());
-				Text md5 = document.createTextNode(asset.getMd5());
+						.getLastmodified().trim());
+				Text type = document.createTextNode(asset.getType().trim());
+				Text frontId = document.createTextNode(asset.getFrontID().trim());
+				Text isFront = document.createTextNode(asset.getIsFront().trim());
+				Text md5 = document.createTextNode(asset.getMd5().trim());
 
 				// new elements
 				Element newElement = document.createElement("item");
@@ -473,7 +473,7 @@ public class XmlUtils {
 				newElement.appendChild(newMd5);
 				
 				if(asset.getType().equals(Constants.RES_AUDIO)){
-					Text bg = document.createTextNode(asset.getBg());
+					Text bg = document.createTextNode(asset.getBg().trim());
 					Element newBGElement = document.createElement("bg");
 					newBGElement.appendChild(bg);
 					newElement.appendChild(newBGElement);

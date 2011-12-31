@@ -33,6 +33,7 @@ public class ItemListTask extends AsyncTask {
 	@Override
 	protected Object doInBackground(Object... arg0) {
 		try {
+			
 			treatData();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,23 +43,32 @@ public class ItemListTask extends AsyncTask {
 		return true;
 	}
 
+	/*
+	 * Treat with the asset list getted from server.
+	 */
 	public boolean treatData() {
 		HashMap<String, Asset> hmSource = new HashMap<String, Asset>();
 		ArrayList<Asset> alAssetDeleteList = new ArrayList<Asset>();
 		boolean gettedSourceList = false;
 		
+		//Whether sdcard exists.
 		if(!DuoleUtils.checkTFCard()){
 			Toast.makeText(Duole.appref, "no tf", 2000);
 			return false;
 		}
 		
+		//Whether download thread is running.
 		if(!Constants.DOWNLOAD_RUNNING){
+			//Set the download thread as running.
 			Constants.DOWNLOAD_RUNNING = true;
 			
 			//upload local client version
 			DuoleNetUtils.uploadLocalVersion();
 			
+			//Get asset list from server.
 			gettedSourceList = getSourceList();
+			
+			//when error.
 			if(!gettedSourceList){
 				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			}
@@ -67,10 +77,9 @@ public class ItemListTask extends AsyncTask {
 			return false;
 		}
 		
-		Log.e("TAG", gettedSourceList + "   whether source list is getted");
-
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
+			//Put all asset into a hashmap.
 			for (int i = 0; i < Constants.alAsset.size(); i++) {
 				Asset ass = Constants.alAsset.get(i);
 				if (ass != null) {
@@ -78,10 +87,12 @@ public class ItemListTask extends AsyncTask {
 				}
 			}
 			
+			//The assets to be deleted.
 			alAssetDeleteList = DuoleUtils.getAssetDeleteList(
 					hmSource, Constants.AssetList);
 			
 			Constants.DownLoadTaskList = new ArrayList<Asset>();
+			//Get the list of assets to be download.
 			if (Constants.AssetList != null && Constants.AssetList.size() > 0) {
 				for (int i = 0; i < Constants.AssetList.size(); i++) {
 					Asset ass = Constants.AssetList.get(i);
@@ -102,6 +113,8 @@ public class ItemListTask extends AsyncTask {
 			}
 
 		} else {
+			//When asset list is not here.
+			//Check whether has files need to download.
 			for (int i = 0; i < Constants.AssetList.size(); i++) {
 				Asset ass = Constants.AssetList.get(i);
 
@@ -116,10 +129,12 @@ public class ItemListTask extends AsyncTask {
 		Log.v("TAG", Constants.DownLoadTaskList.size() + " downloads");
 		Log.v("TAG", alAssetDeleteList.size()  + " deletes");
 		
+		//there are assets need to delete.
 		if (alAssetDeleteList.size() > 0) {
 			new DeleteAssetFilesThread(alAssetDeleteList).start();
 		}
 
+		//there are assets need to download.
 		if (DownloadFileUtils.downloadAll()) {
 			if(Constants.AssetList.size() != Constants.alAsset.size()){
 				Constants.newItemExists = true;
@@ -127,7 +142,9 @@ public class ItemListTask extends AsyncTask {
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		}
 		
+		//if there is noting wrong with the asset list.
 		if(gettedSourceList){
+			//Update the assetlist.
 			DuoleUtils.updateAssetListFile(Constants.alAsset);
 			
 			try {
@@ -147,8 +164,7 @@ public class ItemListTask extends AsyncTask {
 	 */
 	public boolean getSourceList() {
 		try {
-			String url = //					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
-			Constants.resourceUrl + DuoleUtils.getAndroidId();
+			String url = Constants.resourceUrl + DuoleUtils.getAndroidId();//					"http://www.duoleyuan.com/e/member/child/ancJn.php?cc="	+ "7c71f33fce7335e4");
 			
 			Constants.alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
