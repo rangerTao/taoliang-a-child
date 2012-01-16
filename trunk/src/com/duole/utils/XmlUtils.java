@@ -47,25 +47,43 @@ public class XmlUtils {
 
 	public static void initFile(InputStream is, DocumentBuilder dBuilder,
 			File file) throws SAXException, IOException, TransformerException {
-		Document document;
-		File itemfile = new File(Constants.ItemList);
-		if(!itemfile.exists()){
-			itemfile.createNewFile();
-		}
-		FileInputStream iStream = new FileInputStream(itemfile);
-		document = dBuilder.parse(iStream);
-		DOMSource domSource = new DOMSource(document);
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
-		Transformer transformer;
-		transformer = transformerFactory.newTransformer();
-		StreamResult streamResult = new StreamResult(file);
-		transformer.transform(domSource, streamResult);
+		try{
+			Document document;
+			File itemfile = new File(Constants.ItemList);
+			if(!itemfile.exists()){
+				itemfile.createNewFile();
+			}else{
+				itemfile.delete();
+				itemfile.createNewFile();
+			}
+			FileInputStream iStream = new FileInputStream(itemfile);
+			document = dBuilder.newDocument();
+			DOMSource domSource = new DOMSource(document);
+			
+			Text value = document.createTextNode("");
+			// new elements
+			Element newElement = document.createElement("items");
 
+			newElement.appendChild(value);
+			
+			document.appendChild(newElement);
+			
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer;
+			transformer = transformerFactory.newTransformer();
+			StreamResult streamResult = new StreamResult(file);
+			transformer.transform(domSource, streamResult);
+			
+			iStream.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static void initConfiguration(String path,DocumentBuilder dBuilder,
-			File file) throws SAXException, IOException, TransformerException {
+			File file){
 
 		try {
 			File itemlist = new File(Constants.SystemConfigFile);
@@ -92,13 +110,7 @@ public class XmlUtils {
 			StreamResult streamResult = new StreamResult(itemlist);
 			transformer.transform(domSource, streamResult);
 			iStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -353,9 +365,11 @@ public class XmlUtils {
 			dBuilder = dbf.newDocumentBuilder();
 			if (!file.exists()) {
 				initFile(is, dBuilder, file);
+				
+				result = readFile(filePath+".bak", dBuilder, true);
+			}else{
+				result = readFile(filePath, dBuilder,true);
 			}
-
-			result = readFile(filePath, dBuilder,true);
 
 		} catch (ParserConfigurationException e) {
 			file.delete();
@@ -381,10 +395,13 @@ public class XmlUtils {
 		String[] result = null;
 		StringBuffer sbresult = new StringBuffer();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = null;
+		FileInputStream iStream = null;
+		File file = new File(
+				Constants.ItemList);
 		try {
-			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
-			FileInputStream iStream = new FileInputStream(new File(
-					Constants.ItemList));
+			dBuilder = dbf.newDocumentBuilder();
+			iStream = new FileInputStream(file);
 			Document document = dBuilder.parse(iStream);
 
 			NodeList nList = document.getElementsByTagName("item");
@@ -409,7 +426,8 @@ public class XmlUtils {
 			iStream.close();
 		} catch (Exception e) {
 			Log.e("TAG", e.getMessage());
-			throw new Exception(e.getMessage());			
+			initFile(iStream, dBuilder, file);
+//			throw new Exception(e.getMessage());			
 		}
 	}
 

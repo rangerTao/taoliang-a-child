@@ -31,13 +31,29 @@ public class DownloadFileUtils extends Thread {
 
 	static Asset asset;
 
+	@Override
+	public void run() {
+		
+		if(downloadAll()){
+			if(Constants.AssetList.size() != Constants.alAsset.size()){
+				Constants.newItemExists = true;
+			}
+			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
+		}
+		
+		super.run();
+	}
+
 	public static boolean downloadAll() {
 
+		Log.d("TAG","download all");
 		int listsize = Constants.DownLoadTaskList.size();
 		// If there are several task in the list.
 		try{
 			if (listsize > 0) {
+				Log.d("TAG","download all listsize   " + listsize);
 				for (int i = 0; i < listsize; i++) {
+					Log.d("TAG","download all index   " + i);
 					download(i);
 				}
 			}

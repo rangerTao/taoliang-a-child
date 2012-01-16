@@ -41,6 +41,8 @@ public class UnLockScreenService extends Service {
 			public void onReceive(Context context, Intent intent) {
 				Log.v("TAG", "Screen off");
 				Constants.SCREEN_ON = false;
+				
+//				Duole.appref.unBindAutoRefreshService();
 			}
 		};
 
@@ -48,10 +50,13 @@ public class UnLockScreenService extends Service {
 
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Log.v("TAG", "Screen on");
 				
+				Log.v("TAG", "Screen on");
+
 				Constants.SCREEN_ON = true;
 				Constants.DOWNLOAD_RUNNING = false;
+				
+//				Duole.appref.bindAutoRefreshService();
 
 				KeyguardManager keyguardManager = (KeyguardManager) Duole.appref
 						.getSystemService(Context.KEYGUARD_SERVICE);

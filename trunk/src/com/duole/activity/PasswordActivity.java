@@ -114,6 +114,8 @@ public class PasswordActivity extends BaseActivity implements OnEditorActionList
 
 										}
 									}).show();
+					
+					etOldPass.setText("");
 				}
 			}
 
@@ -166,6 +168,7 @@ public class PasswordActivity extends BaseActivity implements OnEditorActionList
 
 										}
 									}).show();
+					etOldPass.setText("");
 				} else if (newpass.equals("")) {
 					new AlertDialog.Builder(appref)
 							.setTitle(R.string.password_wrong)
@@ -194,6 +197,8 @@ public class PasswordActivity extends BaseActivity implements OnEditorActionList
 
 										}
 									}).show();
+					etNewPass.setText("");
+					etNewPassConfirm.setText("");
 				} else {
 					
 					if (XmlUtils.updateSingleNode(Constants.SystemConfigFile ,Constants.XML_PASSWORD,

@@ -1,8 +1,10 @@
 package com.duole.activity;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.MathContext;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONException;
@@ -29,14 +31,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.StatFs;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -46,13 +47,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.duole.Duole;
 import com.duole.R;
-import com.duole.player.MusicPlayerActivity;
 import com.duole.pojos.adapter.WifiNetworkAdapter;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
@@ -79,6 +77,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 	CheckBoxPreference preWifi;
 	Preference preListWifi;
 	Preference preCheckUpdate;
+	Preference preCurTime;
 	
 	Preference preTimeEclipsed;
 	Preference preSleep;
@@ -108,10 +107,13 @@ public class SystemConfigActivity extends PreferenceActivity {
 		preID = this.findPreference(Constants.Pre_deviceid);
 		preID.setSummary(DuoleUtils.getAndroidId());
 		preCheckUpdate = (Preference)findPreference("preCheckUpdate");
+		preCurTime = (Preference) findPreference("curTime");
 		
 		preCheckUpdate.setSummary("\u5f53\u524d\u7248\u672c\uff1a" + DuoleUtils.getVersion(this));
 
 		preStorage = this.findPreference(Constants.Pre_Storage);
+		
+		getCurrentTime();
 
 		//Get the usage of sd card.
 		getUsageOfSdcard();
@@ -124,6 +126,15 @@ public class SystemConfigActivity extends PreferenceActivity {
 		
 		//init the content of anti fatigure views.
 		initAntiFatigureViews();
+	}
+	
+	private void getCurrentTime(){
+		
+		//Set the time format as Year-month-day hour:minute:second.
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = sdf.format(new Date(System.currentTimeMillis()));
+		
+		preCurTime.setTitle(time);
 	}
 	
 	/**
@@ -298,7 +309,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 	@Override
 	protected void onResume() {
-		getUserInfo();
+//		getUserInfo();
 		super.onResume();
 	}
 
@@ -370,7 +381,8 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		// exit
 		if (preference.getKey().equals(Constants.Pre_Security_Exit)) {
-			android.os.Process.killProcess(android.os.Process.myPid());
+				
+			DuoleUtils.execAsRoot("reboot -p");
 		}
 
 		// check update.

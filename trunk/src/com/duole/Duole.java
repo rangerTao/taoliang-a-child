@@ -1,7 +1,9 @@
 package com.duole;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -21,10 +24,12 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ResolveInfo;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -56,6 +61,7 @@ import com.duole.pojos.asset.Asset;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
 import com.duole.utils.XmlUtils;
@@ -114,11 +120,8 @@ public class Duole extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mContext = this;
-		
-		//Disable the screen lock.
-//		Settings.Secure.putInt(getContentResolver(),Settings.Secure.LOCK_PATTERN_ENABLED, 0);
-		//Disable the auto rotation.
-		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0);
+
+		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -134,14 +137,6 @@ public class Duole extends BaseActivity {
 
 		appref = this;
 		try {
-			if(!DuoleUtils.verifyInstallationOfAPK(this, Constants.PKG_FLASH)){
-				File file = new File("/sdcard/");
-				for(File tempapk : file.listFiles()){
-					if(tempapk.getName().toLowerCase().endsWith(".apk")){
-						DuoleUtils.installApkFromFile(tempapk);
-					}
-				}
-			}
 
 			initContents();
 			
@@ -159,6 +154,23 @@ public class Duole extends BaseActivity {
 				setPageDividerSelected(index);
 			}
 		});
+	}
+	
+	private void systemSettings(){
+		
+		//Disable the screen lock.
+		Settings.Secure.putInt(getContentResolver(),Settings.Secure.LOCK_PATTERN_ENABLED, 0);
+		//disable usb debug
+		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 0);
+		//Disable the auto rotation.
+		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 1);
+		//Disable the wifi available_notification.
+		Settings.System.putInt(getContentResolver(), Settings.System.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON, 0);
+		//Enable the auto time.
+		Settings.System.putInt(getContentResolver(), Settings.System.AUTO_TIME, 1);
+		//Set the time out of screen.
+		Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 5 * 60 * 1000);
+		
 	}
 	
 	/**
@@ -184,6 +196,56 @@ public class Duole extends BaseActivity {
 		gameCountDown.setPb(pbEnTime);
 	}
 	
+	public void verifyFlashPlayerInstallation(){
+		if(!DuoleUtils.verifyInstallationOfAPK(this, Constants.PKG_FLASH)){
+			
+			boolean installed = false;
+			Log.e("TAG", "flash player not installed");
+			
+			File file = new File("/sdcard/");
+			for(File tempapk : file.listFiles()){
+				if(tempapk.getName().toLowerCase().endsWith(".apk")){
+					installed = DuoleUtils.installApkFromFile(tempapk);
+				}
+			}
+			
+			if(!installed){
+				AssetManager am = null;
+				am = getAssets();
+				
+				try {
+					InputStream is = am.open("flashplayer.apk");
+					
+					int bytesum = 0;
+					int byteread = 0;
+					if (is != null) {
+						file = new File("/sdcard/flashplayer.apk");
+						file.createNewFile();
+						FileOutputStream fs = new FileOutputStream(file);
+						byte[] buffer = new byte[512];
+						while ((byteread = is.read(buffer)) != -1) {
+							bytesum += byteread;
+							fs.write(buffer, 0, byteread);
+						}
+						is.close();
+						fs.close();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				if(file.exists()){
+					if(DuoleUtils.installApkFromFile(file)){
+						android.os.Process.killProcess(android.os.Process.myPid());
+					}
+				}else{
+					Log.e("TAG", "error redirect to assets");
+				}
+			}
+			
+		}
+	}
+	
 	/**
 	 * Intitialize the content.
 	 * @throws Exception
@@ -195,11 +257,21 @@ public class Duole extends BaseActivity {
 			if (DuoleUtils.checkCacheFiles()) {
 				// init the main view.
 				
+				//If a update is exists.install it.
+				DuoleUtils.instalUpdateApk(appref);
+				//Verify the installation of flash player.
+				verifyFlashPlayerInstallation();
+				//Init the view.
 				initViews();
 
+				//Set the background picture.
 				setBackground();
 				
+				//Init the count down timer of game and rest time.
 				initCountDownTimer();
+				
+				//Upload local version.
+				DuoleNetUtils.uploadLocalVersionForce();
 				
 			} else {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
@@ -232,6 +304,7 @@ public class Duole extends BaseActivity {
 				if(appref.mScrollLayout.getChildCount() == 0){
 					initContents();
 				}
+				
 			} catch (Exception e) {
 			}
 			
@@ -248,7 +321,7 @@ public class Duole extends BaseActivity {
 		long current = Long.parseLong(enstart.equals("") ? currentTimeMillis+"" : enstart);
 
 		long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
-		long restime = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
+		long restime = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
 		
 		long poor = System.currentTimeMillis() - current;
 		
@@ -299,7 +372,7 @@ public class Duole extends BaseActivity {
 				getPb().setMax(time);
 				getPb().setProgress(0);
 				if(restCountDown != null){
-					time = Integer.parseInt(Constants.restime == "" ? "120" : Constants.restime) * 60 * 1000;
+					time = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
 					restCountDown.setTotalTime(time);
 				}
 				if (!Constants.SLEEP_TIME) {
@@ -319,13 +392,12 @@ public class Duole extends BaseActivity {
 				if(getPb() != null){
 					this.getPb().setProgress((int)(this.getTotalTime() - millisUntilFinished));
 				}
-				
 			}
 
 			@Override
 			public void onFinish() {
 				Constants.ENTIME_OUT = false;
-				int time = Integer.parseInt(Constants.restime == "" ? "5" : Constants.restime) * 60 * 1000;
+				int time = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
 				this.setTotalTime(time);
 				this.seek(0);
 				this.stop();
@@ -545,7 +617,14 @@ public class Duole extends BaseActivity {
 		Intent intent = null;
 		try {
 			// launcher the package
-			if (assItem.getUrl().toLowerCase().endsWith(Constants.RES_AUDIO)) {
+			
+			if(assItem.getType().trim().equals("")){
+				assItem.setType(DuoleUtils.checkAssetType(assItem));
+			}
+			
+			String url = assItem.getUrl().toLowerCase();
+			
+			if (url.endsWith(Constants.RES_AUDIO)) {
 
 				intent = new Intent(appref, SingleMusicPlayerActivity.class);
 				int index = Constants.MusicList.indexOf(assItem);
@@ -554,37 +633,53 @@ public class Duole extends BaseActivity {
 
 			}
 			// Launch a application.
-			if (assItem.getUrl().toLowerCase().endsWith(Constants.RES_APK)) {
+			if (url.endsWith(Constants.RES_APK)) {
 
 				pkgName = assItem.getPackag();
 				if(pkgName == null){
 					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
 				}
 				startActivityByPkgName(pkgName);
-
 			}
 			// Launch the configure function.
 			if (assItem.getType().equals(Constants.RES_CONFIG)) {
 				intent = new Intent(appref, PasswordActivity.class);
 				intent.putExtra("type", "0");
 			}
+			
 			// Play a video.
-			if (assItem.getType().equals(Constants.RES_VIDEO)
-					&& !assItem.getUrl().endsWith(".swf")
-					&& !assItem.getUrl().endsWith(".flv")) {
+			if (url.endsWith(".flv") || url.endsWith(".rmvb")
+					|| url.endsWith(".rm") || url.endsWith(".mp4")
+					|| url.endsWith(".3gp") || url.endsWith(".mkv")
+					|| url.endsWith(".avi")) {
 				intent = new Intent(appref, VideoPlayerActivity.class);
 
+				Uri uri = null;
 				if (assItem.getUrl().startsWith("http:")) {
-					intent.putExtra("filename", assItem.getUrl());
+					uri = Uri.parse(assItem.getUrl());
 				} else {
-					intent.putExtra(
-							"filename",
-							assItem.getUrl().substring(
-									assItem.getUrl().lastIndexOf("/")));
+					uri = Uri.parse("file://" + Constants.CacheDir + "/"+ assItem.getType() +"/" + assItem.getUrl().substring(
+							assItem.getUrl().lastIndexOf("/")));
+				}
+				
+				Log.d("TAG",uri.getPath());
+				
+				intent = new Intent(Intent.ACTION_VIEW, uri);
+				intent.setType("duolevideo/*");
+				intent.setDataAndType(uri, "duolevideo/*");
+
+				try {
+					appref.startActivity(intent);
+				} catch (Exception e) {
+					new AlertDialog.Builder(appref)
+							.setTitle(R.string.player_notfound_title)
+							.setMessage(R.string.player_tip)
+							.setNegativeButton(R.string.btnClose, null)
+							.create().show();
 				}
 			}
 			// Play a flash.
-			if (assItem.getUrl().toLowerCase().endsWith("swf") || assItem.getUrl().toLowerCase().endsWith("flv")) {
+			if (assItem.getUrl().toLowerCase().endsWith("swf")) {
 
 				intent = new Intent(appref, FlashPlayerActivity.class);
 

@@ -6,7 +6,7 @@
 	<AbsoluteLayout android:layout_width="wrap_content"
 		android:id="@+id/alIcon" android:layout_height="wrap_content">
 		<ImageView android:id="@+id/ivAppIcon" android:layout_width="128px"
-			android:layout_height="128px" />
+			android:layout_height="128px"/>
 		<ImageView android:id="@+id/ivKe" android:layout_width="133px"
 			android:layout_height="133px" />
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.duole" android:versionCode="2" android:versionName="1.05.0026">
+	package="com.duole" android:versionCode="2" android:versionName="1.05.0043">
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:sharedUserId="android.uid.system" android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 		<activity android:name="Duole" android:label="@string/app_name"
@@ -34,16 +34,22 @@
 		<service android:name=".service.BackgroundRefreshService" />
 		<service android:name=".service.UnLockScreenService" />
 
-		<receiver android:name=".receiver.BootCompleteReceiver">
+<!-- 	<receiver android:name=".receiver.BootCompleteReceiver">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
-		</receiver>
+		</receiver> -->
 
 		<receiver android:name=".receiver.BackgroundRefreshReceiver">
 			<intent-filter>
 				<action android:name="com.duole.refresh.Start" />
 			</intent-filter>
+		</receiver>
+		
+		<receiver android:name=".receiver.UpdatInstallReceiver">
+		    <intent-filter >
+		        <action android:name="com.duole.update.install" />
+		    </intent-filter>
 		</receiver>
 
 		<receiver android:name=".receiver.RefreshCompeleteReceiver">

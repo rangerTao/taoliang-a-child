@@ -1,7 +1,9 @@
 package com.duole.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,17 +11,28 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+import org.xml.sax.SAXException;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +43,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.ContactsContract.Contacts.Data;
 import android.provider.Settings.System;
 import android.util.Log;
 import android.view.View;
@@ -433,10 +447,10 @@ public class DuoleUtils {
 	 */
 	public static boolean checkDownloadNecessary(Asset asset, Asset refer) {
 		
-		if(refer == null){
-			Log.e("TAG", "refer is null,download the new item.");
-			return true;
-		}
+//		if(refer == null){
+//			Log.e("TAG", "refer is null,download the new item.");
+//			return true;
+//		}
 		
 		// If id is different.true.
 		if (!asset.getId().equals(refer.getId())) {
@@ -545,8 +559,11 @@ public class DuoleUtils {
 	 * Update the asset file on the sdcard.
 	 * @param assets The list of assets.
 	 * @return
+	 * @throws TransformerException 
+	 * @throws IOException 
+	 * @throws SAXException 
 	 */
-	public static boolean updateAssetListFile(ArrayList<Asset> assets) {
+	public static boolean updateAssetListFile(ArrayList<Asset> assets) throws SAXException, IOException, TransformerException {
 
 		Log.d("TAG", "update asset list");
 		try {
@@ -555,9 +572,32 @@ public class DuoleUtils {
 			XmlUtils.addNode(assets);
 
 		} catch (Exception e) {
-			new File(Constants.ItemList).delete();
-			FileUtils.copyFile(Constants.ItemList + ".bak", Constants.ItemList);
-			Log.d("TAG", "asset list xml error,use the bakcup to recovery the asset list.");
+			File file = new File(
+					Constants.ItemList);
+			file.delete();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = null;
+			FileInputStream iStream = null;
+			
+			try{
+				
+				File backup = new File(Constants.ItemList + ".bak");
+				dBuilder = dbf.newDocumentBuilder();
+				iStream = new FileInputStream(backup);
+				Document document = dBuilder.parse(iStream);
+				
+				FileUtils.copyFile(backup.getAbsolutePath(), Constants.ItemList);
+				Log.d("TAG", "asset list xml error,use the bakcup to recovery the asset list.");
+			}catch(Exception ex){
+				
+				Log.e("TAG", "xml backup is broken");
+				
+				XmlUtils.initFile(iStream, dBuilder, file);
+				
+				XmlUtils.addNode(assets);
+
+			}
+			
 		}
 
 		return true;
@@ -650,7 +690,11 @@ public class DuoleUtils {
 									ver);
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile,Constants.XML_UPDATE, Constants.TRUE);
 		    				XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME,updateHour);
+		    				
 		    				Constants.clientApkDownloaded = true;
+		    				
+//		    				AlarmManager am = (AlarmManager) Duole.appref.getSystemService(Context.ALARM_SERVICE);
+//		    				am.set(AlarmManager.RTC, getUpdateMills(), PendingIntent.getBroadcast(Duole.appref, 0, new Intent(Constants.EVENT_INSTALL_UPDATE), 0));
 		    			}
 		    		}else{
 		    			if(!ver.equals(DuoleUtils.getPackageVersion(client))){
@@ -670,6 +714,32 @@ public class DuoleUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+    
+    public static long getUpdateMills(){
+    	
+		String uptime = XmlUtils.readNodeValue(
+				Constants.SystemConfigFile,
+				Constants.XML_UPDATE_TIME);
+		
+		Date date = new Date(java.lang.System.currentTimeMillis());
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm ss");
+		
+		String time = sdf.format(date);
+		
+		String update = time.substring(0,11) + uptime + " 00";
+		
+		Date dateU = null;
+		try {
+			dateU = sdf.parse(update);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return dateU.getTime();
+	
     }
     
     /**
@@ -740,6 +810,7 @@ public class DuoleUtils {
         			
         		}
     		}else{
+    			if(DuoleNetUtils.isNetworkAvailable(Duole.appref) && path.contains("youku"))
     			temp.add(asset);
     		}
     		
@@ -937,6 +1008,61 @@ public class DuoleUtils {
 		
 		return output;
 	}
+	
+	/**
+	 * Execute a command as root.
+	 * @param command
+	 * @return
+	 */
+	public static boolean execAsRoot(String command) {
+		Process process = null;
+		DataOutputStream os = null;
+		try {
+			process = Runtime.getRuntime().exec("su");
+			os = new DataOutputStream(process.getOutputStream());
+			os.writeBytes(command + "\n");
+			os.writeBytes("exit\n");
+			os.flush();
+			process.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}finally {
+			try {
+				if (os != null) {
+					os.close();
+				}
+				process.destroy();
+			} catch (Exception e) {
+				// nothing
+			}
+		}
+		return true;
+	}
+	
+	public static String checkAssetType(Asset item){
+		
+		String url = item.getUrl();
+		
+		if(item.getType().equals(Constants.RES_CONFIG)){
+			return Constants.RES_CONFIG;
+		}else if(url.endsWith(".mp3")){
+			return Constants.RES_AUDIO;
+		}else if(url.endsWith(".apk")){
+			return Constants.RES_APK;
+		}else if(url.endsWith(".swf") || url.endsWith(".flv")){
+			return Constants.RES_GAME;
+		}else if(url.endsWith(".zip")){
+			return Constants.RES_FRONT;
+		}else if(url.endsWith(".zip")){
+			return Constants.RES_FRONT;
+		}else if(url.endsWith(".mp4") || url.endsWith(".avi")){
+			return Constants.RES_VIDEO;
+		}else {
+			return "";
+		}
+		
+	}
 }
 
 /**
@@ -952,6 +1078,7 @@ class installThread extends Thread{
 	}
 	public void run() {
 		DuoleUtils.installApkFromFile(installFile);
+		Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 	}
 	
 }

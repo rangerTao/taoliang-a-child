@@ -20,8 +20,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 			Intent LoadurlIntent = new Intent(context, Duole.class);
 			LoadurlIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			context.startActivity(LoadurlIntent);
-			
-			DuoleUtils.instalUpdateApk(context);
 		}
 	}
 
