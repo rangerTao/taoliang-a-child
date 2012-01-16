@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +18,15 @@ import com.duole.Duole;
 import com.duole.R;
 import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
+import com.duole.utils.FileUtils;
 
 public class AssetItemAdapter extends BaseAdapter {
 
 	private ArrayList<Asset> mList;
 	private Context mContext;
+	
+	private Bitmap musicBmp;
+	private Bitmap keBmp;
 
 	public AssetItemAdapter(Context context, List<Asset> list, int page) {
 		mContext = context;
@@ -33,6 +38,9 @@ public class AssetItemAdapter extends BaseAdapter {
 			mList.add(list.get(i));
 			i++;
 		}
+		
+		keBmp = FileUtils.toRoundCorner(Constants.bmpKe, 7);
+		musicBmp = FileUtils.toRoundCorner(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke_music), 7);
 	}
 	
 	public AssetItemAdapter(ArrayList<Asset> list){
@@ -100,9 +108,9 @@ public class AssetItemAdapter extends BaseAdapter {
 		}
 		
 		if(asset.getType().toLowerCase().equals(Constants.RES_AUDIO)){
-			assItem.ivKe.setImageResource(R.drawable.ke_music);
+			assItem.ivKe.setImageBitmap(musicBmp);
 		}else{
-			assItem.ivKe.setImageBitmap(Constants.bmpKe);
+			assItem.ivKe.setImageBitmap(keBmp);
 		}
 		
 		

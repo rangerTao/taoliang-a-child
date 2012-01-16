@@ -29,7 +29,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		if (intent.getAction().equals(Constants.Refresh_Start) && Constants.SCREEN_ON) {
+		if (intent.getAction().equals(Constants.Refresh_Start)) {
 			
 			Date date = new Date(System.currentTimeMillis());
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy MM dd HH:mm ss");
@@ -110,8 +110,10 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				Constants.SLEEP_TIME = false;
 			}
 			
-			if (!Constants.DOWNLOAD_RUNNING) {
-				new ItemListTask().execute();
+			if (Constants.dfu != null && !Constants.dfu.isAlive()) {
+				if(Constants.SCREEN_ON){
+					new ItemListTask().execute();
+				}
 			}else{
 				Log.v("TAG", "download is running" );
 			}
@@ -121,6 +123,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 
 				@Override
 				public void run() {
+					
 					DuoleNetUtils.uploadGamePeriodLength();
 					super.run();
 				}
@@ -131,6 +134,10 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 	}
 	
 	public boolean checkSleepTime(Date date,Date dateStart,Date dateEnd){
+		
+		if(Constants.sleepTimeDelayed){
+			return false;
+		}
 	
 		if(dateStart.before(dateEnd)){
 			if(date.after(dateStart) && date.before(dateEnd)){

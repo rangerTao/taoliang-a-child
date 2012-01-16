@@ -12,6 +12,9 @@ import com.duole.pojos.asset.Asset;
 
 public class Constants {
 
+	//Download items thread
+	public static DownloadFileUtils dfu = new DownloadFileUtils();
+	
 	//system flags
 	public static boolean musicPlayerIsRunning = false;
 	public static boolean clientApkDownloaded = false;
@@ -37,6 +40,8 @@ public class Constants {
 	public static final String TIPSTARTNAME = "restart.mp3";
 	
 	public static final String defaultPasswd = "duoleyuan";
+	
+	public static boolean sleepTimeDelayed = false;
 	
 	public static boolean newItemExists = false;
 	
@@ -141,6 +146,7 @@ public class Constants {
 	public static final String Refresh_Complete = "com.duole.refresh.Complete";
 	public static final String Event_AppStart = "com.duole.player.start";
 	public static final String Event_AppEnd = "com.duole.player.end";
+	public static final String EVENT_INSTALL_UPDATE = "com.duole.update.install";
 	
 	//Date formater
 	public static final SimpleDateFormat sdf_hour = new SimpleDateFormat("HH");

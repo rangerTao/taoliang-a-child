@@ -258,7 +258,7 @@ public class DuoleNetUtils {
         		JSONObject json = new JSONObject(result);
         		
         		String version = json.getString("ver");
-        		if(version.trim().equals(localVer))
+        		if(!version.trim().equals(""))
         			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "true");
         		else 
         			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
@@ -267,6 +267,45 @@ public class DuoleNetUtils {
         	}
     	}
     }
+    
+	public static void uploadLocalVersionForce() {
+
+		// upload local version
+		new Thread() {
+
+			@Override
+			public void run() {
+
+				String localVer = DuoleUtils.getVersion(Duole.appref);
+				String url = Constants.ClientUpdate + "?cver=" + localVer
+						+ "&cmcode=" + DuoleUtils.getAndroidId();
+
+				String loaded = XmlUtils.readNodeValue(
+						Constants.SystemConfigFile,
+						Constants.XML_CLIENTVERSIONUPLOAD);
+				String result = DuoleNetUtils.connect(url);
+
+				Log.v("TAG", "upload local version url : " + url);
+				try {
+					JSONObject json = new JSONObject(result);
+
+					String version = json.getString("ver");
+					if (!version.trim().equals(""))
+						XmlUtils.updateSingleNode(Constants.SystemConfigFile,
+								Constants.XML_CLIENTVERSIONUPLOAD, "true");
+					else
+						XmlUtils.updateSingleNode(Constants.SystemConfigFile,
+								Constants.XML_CLIENTVERSIONUPLOAD, "false");
+				} catch (Exception e) {
+					XmlUtils.updateSingleNode(Constants.SystemConfigFile,
+							Constants.XML_CLIENTVERSIONUPLOAD, "false");
+				}
+				super.run();
+			}
+
+		}.start();
+
+	}
     
 	public static void uploadGamePeriodLength() {
 		ArrayList<String[]> records = new ArrayList<String[]>();

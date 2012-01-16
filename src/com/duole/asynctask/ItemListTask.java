@@ -58,7 +58,8 @@ public class ItemListTask extends AsyncTask {
 		}
 		
 		//Whether download thread is running.
-		if(!Constants.DOWNLOAD_RUNNING){
+//		if(!Constants.DOWNLOAD_RUNNING){
+		if(Constants.dfu != null || !Constants.dfu.isAlive()){
 			//Set the download thread as running.
 			Constants.DOWNLOAD_RUNNING = true;
 			
@@ -134,20 +135,13 @@ public class ItemListTask extends AsyncTask {
 			new DeleteAssetFilesThread(alAssetDeleteList).start();
 		}
 
-		//there are assets need to download.
-		if (DownloadFileUtils.downloadAll()) {
-			if(Constants.AssetList.size() != Constants.alAsset.size()){
-				Constants.newItemExists = true;
-			}
-			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
-		}
-		
 		//if there is noting wrong with the asset list.
 		if(gettedSourceList){
-			//Update the assetlist.
-			DuoleUtils.updateAssetListFile(Constants.alAsset);
 			
 			try {
+				//Update the assetlist.
+				DuoleUtils.updateAssetListFile(Constants.alAsset);
+				
 				Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir
 								+ "itemlist.xml");
 			} catch (Exception e) {
@@ -155,7 +149,22 @@ public class ItemListTask extends AsyncTask {
 			}
 		}
 		
-		Constants.DOWNLOAD_RUNNING = false;
+		Log.d("TAG", "Constants.dfu is running   " + Constants.dfu.isAlive());
+		if(!Constants.dfu.isAlive()){
+			Log.d("TAG", "start download thread");
+			Constants.dfu = new DownloadFileUtils();
+			Constants.dfu.start();
+		}
+		
+//		//there are assets need to download.
+//		if (DownloadFileUtils.downloadAll()) {
+//			if(Constants.AssetList.size() != Constants.alAsset.size()){
+//				Constants.newItemExists = true;
+//			}
+//			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
+//		}
+//		
+//		Constants.DOWNLOAD_RUNNING = false;
 		return true;
 	}
 

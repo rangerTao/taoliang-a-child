@@ -157,7 +157,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		
 		Duole.appref.mScrollLayout.refresh();
 		
-		Constants.DOWNLOAD_RUNNING = false;
+//		Constants.DOWNLOAD_RUNNING = false;
 		
 		temp = null;
 	
