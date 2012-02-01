@@ -84,7 +84,6 @@ public class Duole extends BaseActivity {
 	
 	PageDiv pageDiv;
 
-	private static final String TAG = "TAG";
 	public ScrollLayout mScrollLayout;
 	private static Context mContext;
 	public static BackgroundRefreshService mBoundService;
@@ -138,9 +137,9 @@ public class Duole extends BaseActivity {
 		appref = this;
 		try {
 
-			initContents();
-			
 			enableWifiState();
+			
+			initContents();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -875,6 +874,26 @@ public class Duole extends BaseActivity {
 		}
 		super.onResume();
 	}
+	
+
+//	@Override
+//	public void onAttachedToWindow() {
+//		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+//		super.onAttachedToWindow();
+//	}
+//	
+//	@Override
+//	public boolean onKeyDown(int keyCode, KeyEvent event) {
+//
+//		switch (keyCode) {
+//		case KeyEvent.KEYCODE_HOME:
+//			
+//			mScrollLayout.snapToScreen(0);
+//			
+//			break;
+//		}
+//		return true;
+//	}
 	
 	/**
 	 * The class of divider.

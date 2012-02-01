@@ -88,7 +88,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	AlertDialog adPasswd;
 
-	PopupWindow volumePopup;
+	TextView tvTip;
 	AudioManager am;
 
 	@Override
@@ -146,30 +146,11 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 	}
 
 	private void initDragListener() {
-		TextView tvTip = new TextView(this);
-		tvTip.setText(R.string.drag_change_volume);
+		
+		tvTip = (TextView) findViewById(R.id.volumeTip);
 		tvTip.setTextColor(Color.BLACK);
 		tvTip.setTextSize(18f);
-		volumePopup = new PopupWindow(tvTip, LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
-		mHandler.postDelayed(new Runnable() {
-
-			public void run() {
-
-				try {
-					if (!volumePopup.isShowing()) {
-						try{
-							volumePopup.showAsDropDown(btnPlay);
-						}catch (Exception e) {
-							Log.e("TAG", e.getMessage());
-						}
-					}
-
-				} catch (Exception e) {
-				}
-
-			}
-		}, 1000);
+		
 
 		dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -185,7 +166,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			int maxV = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 			int perDegree = dm.widthPixels / maxV;
 			int tempX = 0;
-
+			
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
 				switch (event.getAction()) {
@@ -195,9 +176,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 					lastY = (int) event.getRawY();
 					disX = lastX;
 					isClick = false;
-					if (volumePopup != null) {
-						volumePopup.dismiss();
-					}
+					
 					break;
 				case MotionEvent.ACTION_MOVE:
 					int dx = (int) event.getRawX() - lastX;
@@ -251,6 +230,8 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 						isClick = true;
 					}
 					Log.d("TAG", "action up");
+					
+					tvTip.setVisibility(View.INVISIBLE);
 					break;
 
 				default:
@@ -388,9 +369,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 		isExitDialogOn = true;
 
-		if (volumePopup != null) {
-			volumePopup.dismiss();
-		}
+		tvTip.setVisibility(View.INVISIBLE);
 
 		etPasswd = new EditText(appref);
 		etPasswd.setSingleLine(true);

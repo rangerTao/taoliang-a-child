@@ -25,7 +25,13 @@ public class JsonUtils {
 	public static void parserJson(ArrayList<Asset> alAsset ,JSONObject jsonObject) throws MalformedURLException, JSONException{
 		File client;
 		//Get the verison of client.
-		String version = jsonObject.getString("ver");
+		String version = "";
+		try{
+			version = jsonObject.getString("ver");
+		}catch (Exception e) {
+			Log.e("TAG", "no new verison");
+		}
+		
 		
 		if(!version.equals("null") && !version.equals("")){
 			//Version is exists.

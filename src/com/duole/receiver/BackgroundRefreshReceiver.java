@@ -110,14 +110,14 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				Constants.SLEEP_TIME = false;
 			}
 			
-			if (Constants.dfu != null && !Constants.dfu.isAlive()) {
-				if(Constants.SCREEN_ON){
-					new ItemListTask().execute();
-				}
-			}else{
-				Log.v("TAG", "download is running" );
+//			if (Constants.dfu != null && !Constants.dfu.isAlive()) {
+			if (Constants.SCREEN_ON) {
+				new ItemListTask().execute();
 			}
-			
+//			}else{
+//				Log.v("TAG", "download is running" );
+//			}
+//			
 			//upload game time
 			new Thread(){
 

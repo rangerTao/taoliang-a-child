@@ -427,12 +427,17 @@ public class DuoleUtils {
 		ArrayList<Asset> alReturn = new ArrayList<Asset>();
 
 		if (source != null) {
-			for (int i = 0; i < source.size(); i++) {
-				Asset referAsset = source.get(i);
-				if (!refer.containsKey(referAsset.getId())) {
-					alReturn.add(referAsset);
+			if(source.size() == 0){
+				alReturn.addAll(source);
+			}else{
+				for (int i = 0; i < source.size(); i++) {
+					Asset referAsset = source.get(i);
+					if (!refer.containsKey(referAsset.getId())) {
+						alReturn.add(referAsset);
+					}
 				}
 			}
+
 		}
 
 		return alReturn;
@@ -451,6 +456,10 @@ public class DuoleUtils {
 //			Log.e("TAG", "refer is null,download the new item.");
 //			return true;
 //		}
+		
+		if(asset == null || refer == null){
+			return false;
+		}
 		
 		// If id is different.true.
 		if (!asset.getId().equals(refer.getId())) {
@@ -693,6 +702,8 @@ public class DuoleUtils {
 		    				
 		    				Constants.clientApkDownloaded = true;
 		    				
+		    				DuoleUtils.instalUpdateApk(Duole.appref);
+		    				
 //		    				AlarmManager am = (AlarmManager) Duole.appref.getSystemService(Context.ALARM_SERVICE);
 //		    				am.set(AlarmManager.RTC, getUpdateMills(), PendingIntent.getBroadcast(Duole.appref, 0, new Intent(Constants.EVENT_INSTALL_UPDATE), 0));
 		    			}
@@ -749,8 +760,17 @@ public class DuoleUtils {
     	
     	PackageManager pm = Duole.appref.getPackageManager();
 
-		PackageInfo info;
-		info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+		PackageInfo info = null;
+		try{
+			info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+		}catch (Exception e) {
+			if(file.exists()){
+				Log.d("TAG", "update package error. Delete");
+				file.delete();
+			}
+			
+		}
+		
 		if(info != null){
 			return info.versionName;
 		}else{
@@ -907,8 +927,8 @@ public class DuoleUtils {
 			}
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 		return false;
 	}
@@ -931,7 +951,6 @@ public class DuoleUtils {
 				}catch(Exception e){
 					e.printStackTrace();
 				}
-				
 				
 				return true;
 			}else{
@@ -1034,7 +1053,6 @@ public class DuoleUtils {
 				}
 				process.destroy();
 			} catch (Exception e) {
-				// nothing
 			}
 		}
 		return true;
@@ -1056,7 +1074,9 @@ public class DuoleUtils {
 			return Constants.RES_FRONT;
 		}else if(url.endsWith(".zip")){
 			return Constants.RES_FRONT;
-		}else if(url.endsWith(".mp4") || url.endsWith(".avi")){
+		}else if(url.endsWith(".mp4") || url.endsWith(".avi") 
+				|| url.endsWith(".mkv") || url.endsWith(".rmvb") 
+				|| url.endsWith(".rm")){
 			return Constants.RES_VIDEO;
 		}else {
 			return "";

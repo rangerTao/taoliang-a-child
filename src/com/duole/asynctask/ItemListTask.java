@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
 import com.duole.thread.DeleteAssetFilesThread;
+import com.duole.thread.DownloadThreadPool;
 import com.duole.utils.Constants;
 import com.duole.utils.DownloadFileUtils;
 import com.duole.utils.DuoleNetUtils;
@@ -59,7 +60,8 @@ public class ItemListTask extends AsyncTask {
 		
 		//Whether download thread is running.
 //		if(!Constants.DOWNLOAD_RUNNING){
-		if(Constants.dfu != null || !Constants.dfu.isAlive()){
+		if(Constants.dfu != null && !Constants.dfu.isAlive()){
+			
 			//Set the download thread as running.
 			Constants.DOWNLOAD_RUNNING = true;
 			
@@ -74,7 +76,7 @@ public class ItemListTask extends AsyncTask {
 				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			}
 		}else{
-			Log.v("TAG", "download task not finished");
+			Log.v("TAG", "a download thread not finished");
 			return false;
 		}
 		
@@ -156,15 +158,6 @@ public class ItemListTask extends AsyncTask {
 			Constants.dfu.start();
 		}
 		
-//		//there are assets need to download.
-//		if (DownloadFileUtils.downloadAll()) {
-//			if(Constants.AssetList.size() != Constants.alAsset.size()){
-//				Constants.newItemExists = true;
-//			}
-//			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
-//		}
-//		
-//		Constants.DOWNLOAD_RUNNING = false;
 		return true;
 	}
 
