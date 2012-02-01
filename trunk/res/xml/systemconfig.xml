@@ -29,7 +29,7 @@
 	<PreferenceCategory android:title="@string/security_title">
 	    <Preference android:title="@string/security_changePasswd"
 			android:key="preSecurityChangePasswd"></Preference>
-		<Preference android:key="preCheckUpdate" android:title="@string/check_update" android:enabled="false"></Preference>
+		<Preference android:key="preCheckUpdate" android:title="@string/check_update" android:enabled="true"></Preference>
 	</PreferenceCategory>
 
 

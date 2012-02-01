@@ -1,6 +1,7 @@
 package com.duole.service;
 
 import com.duole.Duole;
+import com.duole.asynctask.ItemListTask;
 import com.duole.utils.Constants;
 
 import android.app.KeyguardManager;
@@ -41,8 +42,6 @@ public class UnLockScreenService extends Service {
 			public void onReceive(Context context, Intent intent) {
 				Log.v("TAG", "Screen off");
 				Constants.SCREEN_ON = false;
-				
-//				Duole.appref.unBindAutoRefreshService();
 			}
 		};
 
@@ -55,8 +54,6 @@ public class UnLockScreenService extends Service {
 
 				Constants.SCREEN_ON = true;
 				Constants.DOWNLOAD_RUNNING = false;
-				
-//				Duole.appref.bindAutoRefreshService();
 
 				KeyguardManager keyguardManager = (KeyguardManager) Duole.appref
 						.getSystemService(Context.KEYGUARD_SERVICE);

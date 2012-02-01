@@ -12,6 +12,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -31,8 +32,12 @@ public class DownloadFileUtils extends Thread {
 
 	static Asset asset;
 
+	public long threadStartMills = 0;
+	private static boolean running = true;
 	@Override
 	public void run() {
+		
+		threadStartMills = java.lang.System.currentTimeMillis();
 		
 		if(downloadAll()){
 			if(Constants.AssetList.size() != Constants.alAsset.size()){
@@ -42,6 +47,10 @@ public class DownloadFileUtils extends Thread {
 		}
 		
 		super.run();
+	}
+	
+	public void disturb(){
+		running = false;
 	}
 
 	public static boolean downloadAll() {
@@ -53,8 +62,11 @@ public class DownloadFileUtils extends Thread {
 			if (listsize > 0) {
 				Log.d("TAG","download all listsize   " + listsize);
 				for (int i = 0; i < listsize; i++) {
-					Log.d("TAG","download all index   " + i);
-					download(i);
+					if(running){
+						Log.d("TAG","download all index   " + i);
+						download(i);
+					}
+					
 				}
 			}
 		}catch(Exception e){
@@ -72,6 +84,10 @@ public class DownloadFileUtils extends Thread {
 			asset = Constants.DownLoadTaskList.get(index);
 			
 			String type = asset.getType().toLowerCase();
+			
+			if(type.trim().equals("")){
+				asset.setType(DuoleUtils.checkAssetType(asset));
+			}
 			
 			String url = asset.getUrl().toLowerCase();
 			//Download thumbnail.
@@ -98,7 +114,7 @@ public class DownloadFileUtils extends Thread {
 					DuoleUtils.downloadVideo(asset, asset.getUrl());
 				}
 			}
-			if(type.equals(Constants.RES_APK)){
+			if(type.equals(Constants.RES_APK) || url.endsWith("apk")){
 //				if (!asset.getUrl().startsWith("http") || url.contains(Constants.DuoleSite)) {
 					DuoleUtils.downloadApp(asset, asset.getUrl());
 //				}
@@ -129,6 +145,7 @@ public class DownloadFileUtils extends Thread {
 		try{
 			// Open a connection.
 			URLConnection conn = url.openConnection();
+			conn.setConnectTimeout(10 * 1000);
 			// get the size of file.
 			int fileSize = conn.getContentLength();
 
@@ -173,6 +190,7 @@ public class DownloadFileUtils extends Thread {
 			
 			conn.setAllowUserInteraction(true); 
 			conn.setRequestProperty("RANGE","bytes=" + localSize + "-");
+			conn.setConnectTimeout(10 * 1000);
 			
 			Log.v("TAG", cacheFile.getName() + localSize);
 			// get the size of file.

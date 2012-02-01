@@ -9,11 +9,13 @@ import android.graphics.Bitmap;
 import android.view.View;
 
 import com.duole.pojos.asset.Asset;
+import com.duole.thread.ThreadQueue;
 
 public class Constants {
 
 	//Download items thread
 	public static DownloadFileUtils dfu = new DownloadFileUtils();
+	public static ThreadQueue tq = new ThreadQueue();
 	
 	//system flags
 	public static boolean musicPlayerIsRunning = false;

@@ -11,12 +11,11 @@
 			android:layout_height="133px" />
 
 	</AbsoluteLayout>
-	<com.duole.widget.AutoScrollTextView
+	<TextView
 		android:id="@+id/tvAppName" android:layout_width="fill_parent"
 		android:gravity="center_horizontal" android:layout_alignLeft="@+id/alIcon"
 		android:layout_alignRight="@+id/alIcon" android:layout_below="@+id/alIcon"
 		android:layout_height="wrap_content" android:textColor="#000000"
-		android:shadowColor="#ffFFFFFF" android:ellipsize="marquee"
-		android:marqueeRepeatLimit="1" android:shadowRadius="1"
+		android:shadowColor="#ffFFFFFF" android:shadowRadius="1"
 		android:shadowDx="1" android:singleLine="true" />
 </RelativeLayout>

@@ -200,6 +200,7 @@ public class FileUtils {
 					File[] dirFiles = temp.listFiles();
 					for (File inDir : dirFiles) {
 						if (!usefulFile.containsKey(inDir.getName())) {
+							FileUtils.emptyFolder(inDir);
 							inDir.delete();
 							Log.d("TAG", "Useless file :" + inDir.getAbsolutePath());
 						}
@@ -300,6 +301,25 @@ public class FileUtils {
 	public static String getPackagenameFromAPK(Context context,Asset asset){
 		PackageManager pm = context.getPackageManager();
 		File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+
+		PackageInfo info;
+		info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+
+		if(info != null){
+			return info.packageName;
+		}else{
+			return "";
+		}
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 * @param asset
+	 * @return
+	 */
+	public static String getPackagenameFromFile(Context context,File file){
+		PackageManager pm = context.getPackageManager();
 
 		PackageInfo info;
 		info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);

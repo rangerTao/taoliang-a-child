@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
 
 /**
@@ -68,16 +69,24 @@ public class DeleteAssetFilesThread extends Thread {
 			// if is a asset of apk.
 			if (ass.getType().equals(Constants.RES_APK)) {
 				file = new File(Constants.CacheDir + Constants.RES_APK + ass.getUrl().substring(ass.getUrl().lastIndexOf("/")));
-				if (file.exists()) {
-					file.delete();
-				}
 				try {
+					String strPackage = "";
+					if(ass.getPackag() == null || ass.getPackag().trim().equals("")){
+						if(file.exists()){
+							strPackage = FileUtils.getPackagenameFromFile(Duole.appref, file);
+						}
+					}else{
+						strPackage = ass.getPackag();
+					}
 					Process p = Runtime.getRuntime().exec("pm uninstall " + ass.getPackag());
 					p.waitFor();
 					int result = p.exitValue();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
+				if (file.exists()) {
+					file.delete();
 				}
 			}
 
