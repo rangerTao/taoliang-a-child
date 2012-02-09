@@ -32,6 +32,7 @@ public class UnLockScreenService extends Service {
 	public void onStart(Intent intent, int startId) {
 
 		acquireWakeLock();
+		
 		IntentFilter intentFilter = new IntentFilter(
 				"android.intent.action.SCREEN_ON");
 		IntentFilter intentFilterOff = new IntentFilter(

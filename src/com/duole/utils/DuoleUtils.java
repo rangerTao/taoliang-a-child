@@ -503,6 +503,7 @@ public class DuoleUtils {
 					asset.getUrl().lastIndexOf("/")));
 			
 			if(asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")){
+				Constants.newItemExists = true;
 				return false;
 			}
 			if (!file.exists()) {
@@ -541,6 +542,7 @@ public class DuoleUtils {
 			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
 			if(asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")){
+				Constants.newItemExists = true;
 				return false;
 			}
 			

@@ -185,7 +185,6 @@ public class ItemListTask extends AsyncTask {
 			if (error == null){
 				try{
 					JsonUtils.parserJson(Constants.alAsset, jsonObject);
-					
 				}catch(Exception e){
 					Constants.DOWNLOAD_RUNNING = false;
 					e.printStackTrace();
