@@ -58,8 +58,10 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				boolean isSleepTime = checkSleepTime(date,dateStart,dateEnd);
 				
 				if (isSleepTime) {
+					
 					Constants.SLEEP_TIME = true;
 					
+					Constants.ENTIME_OUT = false;
 					//swipe the cache dir.
 					FileUtils.clearUselessResource();
 					try{
@@ -77,7 +79,7 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 							Intent intent1 = new Intent(Duole.appref,
 									MusicPlayerActivity.class);
 							intent1.putExtra("index", "1");
-
+							
 							Duole.appref.startActivity(intent1);
 							Constants.musicPlayerIsRunning = true;
 						}
@@ -110,14 +112,10 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 				Constants.SLEEP_TIME = false;
 			}
 			
-//			if (Constants.dfu != null && !Constants.dfu.isAlive()) {
 			if (Constants.SCREEN_ON) {
 				new ItemListTask().execute();
 			}
-//			}else{
-//				Log.v("TAG", "download is running" );
-//			}
-//			
+
 			//upload game time
 			new Thread(){
 

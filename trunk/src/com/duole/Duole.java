@@ -181,6 +181,7 @@ public class Duole extends BaseActivity {
 		if(!wm.isWifiEnabled()){
 			wm.setWifiEnabled(true);
 		}
+		
 	}
 	
 	/**
@@ -315,6 +316,7 @@ public class Duole extends BaseActivity {
 	 * Init count down timers.
 	 */
 	public void initCountDownTimer() {
+		
 		long currentTimeMillis = System.currentTimeMillis();
 		String enstart = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
 		long current = Long.parseLong(enstart.equals("") ? currentTimeMillis+"" : enstart);
@@ -631,6 +633,7 @@ public class Duole extends BaseActivity {
 				intent.putExtra("index", index + "");
 
 			}
+			
 			// Launch a application.
 			if (url.endsWith(Constants.RES_APK)) {
 

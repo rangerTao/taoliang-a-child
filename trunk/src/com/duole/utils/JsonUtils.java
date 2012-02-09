@@ -179,6 +179,7 @@ public class JsonUtils {
 		Constants.sleepstart = jsonObject.getString("sleepstart");
 		//when sleep time is out.
 		Constants.sleepend = jsonObject.getString("sleepend");
+		
 		//the url of  tip sound.
 		Constants.restart = jsonObject.getString("tipsd");
 		

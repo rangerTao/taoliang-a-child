@@ -43,8 +43,8 @@ public class DownloadFileUtils extends Thread {
 			if(Constants.AssetList.size() != Constants.alAsset.size()){
 				Constants.newItemExists = true;
 			}
-			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		}
+		Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		
 		super.run();
 	}
@@ -64,13 +64,19 @@ public class DownloadFileUtils extends Thread {
 				for (int i = 0; i < listsize; i++) {
 					if(running){
 						Log.d("TAG","download all index   " + i);
-						download(i);
+						if(DuoleNetUtils.isNetworkAvailable(Duole.appref)){
+							download(i);
+						}else{
+							Log.e("TAG", "No useful network");
+						}
+						
 					}
 					
 				}
 			}
 		}catch(Exception e){
 			Log.v("TAG", e.getMessage());
+			return false;
 		}
 		Log.d("TAG", "download finish");
 		return true;
@@ -146,6 +152,7 @@ public class DownloadFileUtils extends Thread {
 			// Open a connection.
 			URLConnection conn = url.openConnection();
 			conn.setConnectTimeout(10 * 1000);
+			conn.setReadTimeout(10 * 1000);
 			// get the size of file.
 			int fileSize = conn.getContentLength();
 
@@ -191,6 +198,7 @@ public class DownloadFileUtils extends Thread {
 			conn.setAllowUserInteraction(true); 
 			conn.setRequestProperty("RANGE","bytes=" + localSize + "-");
 			conn.setConnectTimeout(10 * 1000);
+			conn.setReadTimeout(10 * 1000);
 			
 			Log.v("TAG", cacheFile.getName() + localSize);
 			// get the size of file.

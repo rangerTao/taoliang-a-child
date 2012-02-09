@@ -1,8 +1,12 @@
 package com.duole.player;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.TransformerException;
 
 import android.R.integer;
 import android.app.AlertDialog;
@@ -20,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -27,6 +32,7 @@ import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -85,6 +91,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	EditText etPasswd;
 	TimePicker tPicker;
+	TextView tvMinute;
 
 	AlertDialog adPasswd;
 
@@ -115,7 +122,9 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 		gallery.setCallbackDuringFling(false);
 
 		gallery.setOnItemClickListener(this);
+		
 		mp = new MediaPlayer();
+		mp.setOnErrorListener(mpError);
 
 		index = Integer.parseInt(intent.getStringExtra("index")) - 1;
 		type = intent.getStringExtra("type");
@@ -300,7 +309,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 	private void registerReceiver() {
 		IntentFilter intentFilter = new IntentFilter("com.duole.restime.out");
 		registerReceiver(timeOutReceiver, intentFilter);
-
 	}
 
 	public void setBackground() {
@@ -407,8 +415,34 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 				tPicker.setCurrentHour(0);
 				tPicker.setCurrentMinute(30);
 				tPicker.setIs24HourView(true);
+				
+				View minutePicker = LayoutInflater.from(appref).inflate(R.layout.sleeptimexit, null);
+				tvMinute = (TextView) minutePicker.findViewById(R.id.tvMinute);
+				Button btnAdd = (Button) minutePicker.findViewById(R.id.btnMinuteAdd);
+				Button btnDe = (Button) minutePicker.findViewById(R.id.btnMinuteDe);
+				
+				btnAdd.setOnClickListener(new OnClickListener() {
+					
+					public void onClick(View v) {
+						int min = Integer.parseInt(tvMinute.getText().toString());
+						if(min < 56){
+							tvMinute.setText((min + 5) + "");
+						}
+					}
+				});
+				
+				btnDe.setOnClickListener(new OnClickListener() {
+					
+					public void onClick(View v) {
+						int min = Integer.parseInt(tvMinute.getText().toString());
+						if(min > 9){
+							tvMinute.setText((min - 5) +"");
+						}
+					}
+				});
+
 				new AlertDialog.Builder(appref)
-						.setView(tPicker)
+						.setView(minutePicker)
 						.setTitle(R.string.sleep_delay_title)
 						.setPositiveButton(R.string.btnPositive,
 								delayClickListener)
@@ -437,8 +471,11 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 	DialogInterface.OnClickListener delayClickListener = new DialogInterface.OnClickListener() {
 
 		public void onClick(DialogInterface dialog, int which) {
-			long mills = tPicker.getCurrentHour() * 3600 * 1000
-					+ tPicker.getCurrentMinute() * 60 * 1000;
+			int min = Integer.parseInt(tvMinute.getText().toString());
+			long mills = min * 60 * 1000;
+			
+			Log.d("TAG", mills + " delay");
+			
 			mHandler.postDelayed(new Runnable() {
 
 				public void run() {
@@ -476,25 +513,11 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			url = Constants.CacheDir + Constants.RES_AUDIO + filename;
 		}
 
-//		RelativeLayout llMusicPlayer = (RelativeLayout) findViewById(R.id.llMusicPlayer);
-//
-//		if (!Constants.bgRestUrl.equals("")) {
-//			File file = new File(Constants.CacheDir
-//					+ Constants.bgRestUrl.substring(Constants.bgRestUrl
-//							.lastIndexOf("/")));
-//			if (file.exists()) {
-//				llMusicPlayer.setBackgroundDrawable(Drawable
-//						.createFromPath(file.getAbsolutePath()));
-//			} else {
-//				llMusicPlayer.setBackgroundResource(R.drawable.musicbg);
-//			}
-//		} else {
-//			llMusicPlayer.setBackgroundResource(R.drawable.musicbg);
-//		}
-
+		Log.d("TAG","set data source");
 		try {
-
-			mp.setDataSource(this, Uri.fromFile(new File(url)));
+//			mp.setDataSource(this, Uri.fromFile(new File(url)));
+			
+			mp.setDataSource(url);
 			mp.prepare();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -524,7 +547,9 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	@Override
 	protected void onDestroy() {
-		mp.stop();
+		if(mp.isPlaying()){
+			mp.stop();
+		}
 		unregisterReceiver(timeOutReceiver);
 		super.onDestroy();
 	}
@@ -563,9 +588,14 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 		this.mHandler.post(new Runnable() {
 
 			public void run() {
-				mp.stop();
-				mp.release();
+				if(mp != null && mp.isPlaying()){
+					mp.stop();
+					mp.release();
+				}
+
 				mp = new MediaPlayer();
+				
+				mp.setOnErrorListener(mpError);
 
 				setMusicData(index);
 
@@ -575,6 +605,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			}
 
 		});
+
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {
@@ -646,15 +677,12 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	@Override
 	protected void onResume() {
-		KeyguardManager km = (KeyguardManager) Duole.appref
-				.getSystemService(Context.KEYGUARD_SERVICE);
-		KeyguardLock kl = km.newKeyguardLock("com.duole");
-		kl.reenableKeyguard();
 		super.onResume();
 	}
 
 	@Override
 	protected void onStop() {
+		
 		if (Constants.ENTIME_OUT) {
 			Duole.appref.startMusicPlay();
 		}
@@ -673,5 +701,14 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 	public boolean IsTopOfStack() {
 		return isTopOfStack;
 	}
-
+	
+	OnErrorListener mpError = new OnErrorListener() {
+		
+		public boolean onError(MediaPlayer mp, int what, int extra) {
+			Log.e("TAG", "mp error.What : " + what);
+//			mp.release();
+			mp.reset();
+			return false;
+		}
+	};
 }

@@ -421,7 +421,11 @@ public class XmlUtils {
 
 				result[i] = sbresult.toString();
 			}
-
+			
+			//bgurl bgRestUrl  entime  restime sleepstart sleepend  ke tipstart
+			String[] names = {"bgurl", "bgRestUrl", "entime", "restime", "sleepstart", "sleepend", "ke", "tipstart"};
+			removeNode(document, names);
+			
 			TransformerFactory transformerFactory = TransformerFactory
 					.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
@@ -434,8 +438,24 @@ public class XmlUtils {
 		} catch (Exception e) {
 			Log.e("TAG", e.getMessage());
 			initFile(iStream, dBuilder, file);
-//			throw new Exception(e.getMessage());			
 		}
+	}
+	
+	public static void removeNode(Document document , String[] name){
+		
+		NodeList nl;
+		
+		for( int j = 0 ; j < name.length ; j ++){
+			//bgurl bgRestUrl  entime  restime sleepstart sleepend  ke tipstart
+			nl = document.getElementsByTagName(name[j]);
+			
+			for (int i = 0; i < nl.getLength(); i++) {
+				Node node = nl.item(i);
+				node.getParentNode().removeChild(node);
+			}
+		}
+		
+		
 	}
 
 	public static void addNode(ArrayList<Asset> assetList) throws IOException {
@@ -616,7 +636,6 @@ public class XmlUtils {
 			}else{
 				createNode(document,"bgurl",Constants.bgurl);
 			}
-			
 		}
 
 		//Bg of rest
@@ -654,6 +673,7 @@ public class XmlUtils {
 			nl = document.getElementsByTagName("sleepstart");
 			if(nl.getLength() > 0){
 				nl.item(0).getFirstChild().setNodeValue(Constants.sleepstart);
+				
 			}else{
 				createNode(document,"sleepstart",Constants.sleepstart);
 			}
