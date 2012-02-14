@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,8 +15,8 @@ import android.widget.Toast;
 
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
+import com.duole.service.BackgroundRefreshService;
 import com.duole.thread.DeleteAssetFilesThread;
-import com.duole.thread.DownloadThreadPool;
 import com.duole.utils.Constants;
 import com.duole.utils.DownloadFileUtils;
 import com.duole.utils.DuoleNetUtils;
@@ -49,7 +50,7 @@ public class ItemListTask extends AsyncTask {
 	 */
 	public boolean treatData() {
 		HashMap<String, Asset> hmSource = new HashMap<String, Asset>();
-		ArrayList<Asset> alAssetDeleteList = new ArrayList<Asset>();
+		Constants.alAssetDeleteList = new ArrayList<Asset>();
 		boolean gettedSourceList = false;
 		
 		//Whether sdcard exists.
@@ -60,7 +61,7 @@ public class ItemListTask extends AsyncTask {
 		
 		//Whether download thread is running.
 //		if(!Constants.DOWNLOAD_RUNNING){
-		if(Constants.dfu != null && !Constants.dfu.isAlive()){
+//		if(Constants.dfu != null && !Constants.dfu.isAlive()){
 			
 			//Set the download thread as running.
 			Constants.DOWNLOAD_RUNNING = true;
@@ -75,10 +76,10 @@ public class ItemListTask extends AsyncTask {
 			if(!gettedSourceList){
 				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			}
-		}else{
-			Log.v("TAG", "a download thread not finished");
-			return false;
-		}
+//		}else{
+//			Log.v("TAG", "a download thread not finished");
+//			return false;
+//		}
 		
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
@@ -91,7 +92,7 @@ public class ItemListTask extends AsyncTask {
 			}
 			
 			//The assets to be deleted.
-			alAssetDeleteList = DuoleUtils.getAssetDeleteList(
+			Constants.alAssetDeleteList = DuoleUtils.getAssetDeleteList(
 					hmSource, Constants.AssetList);
 			
 			Constants.DownLoadTaskList = new ArrayList<Asset>();
@@ -130,11 +131,11 @@ public class ItemListTask extends AsyncTask {
 		}
 
 		Log.v("TAG", Constants.DownLoadTaskList.size() + " downloads");
-		Log.v("TAG", alAssetDeleteList.size()  + " deletes");
+		Log.v("TAG", Constants.alAssetDeleteList.size()  + " deletes");
 		
 		//there are assets need to delete.
-		if (alAssetDeleteList.size() > 0) {
-			new DeleteAssetFilesThread(alAssetDeleteList).start();
+		if (Constants.alAssetDeleteList.size() > 0) {
+			new DeleteAssetFilesThread(Constants.alAssetDeleteList).start();
 		}
 
 		//if there is noting wrong with the asset list.
@@ -151,16 +152,46 @@ public class ItemListTask extends AsyncTask {
 			}
 		}
 		
-		Log.d("TAG", "Constants.dfu is running   " + Constants.dfu.isAlive());
-		if(!Constants.dfu.isAlive()){
-			Log.d("TAG", "start download thread");
-			Constants.dfu = new DownloadFileUtils();
-			Constants.dfu.start();
-		}
+		initDownloadQueue();
 		
 		return true;
 	}
+	
+	private void initDownloadQueue(){
 
+		int i = 0;
+		for(Asset asset : Constants.DownLoadTaskList){
+			
+			if(!Constants.queueMap.containsKey(asset.getUrl())){
+				i ++;
+				Constants.queueMap.put(asset.getUrl(), asset);
+				Constants.dtq.push_back(asset);
+			}
+		}
+		
+		Log.d("TAG", String.format("%d task has been add to the queue.", i));
+		
+		i = 0;
+		for(Asset asset : Constants.alAssetDeleteList){
+			
+			if(Constants.queueMap.containsKey(asset.getUrl())){
+				i ++ ;
+				Constants.queueMap.remove(asset.getUrl());
+				Constants.dtq.remove(asset);
+			}
+		}
+		
+		Log.d("TAG", String.format("%d task has been removed from the queue.", i));
+		
+		try{
+			Duole.appref.bindService(new Intent(Duole.appref,
+					BackgroundRefreshService.class), Duole.appref.mConnection,
+					Context.BIND_AUTO_CREATE);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Get resource list from server.
 	 */
@@ -179,7 +210,6 @@ public class ItemListTask extends AsyncTask {
 			try {
 				error = jsonObject.getString("errstr");
 			} catch (Exception e) {
-				Log.e("TAG", "No error!");
 			}
 
 			if (error == null){

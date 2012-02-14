@@ -25,6 +25,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -80,11 +81,12 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	int homeCount = 0;
 
-	ProgressBar pbCountDown;
+	static ProgressBar pbCountDown;
 	DisplayMetrics dm;
 
 	public boolean clicked = false;
-	public boolean isTopOfStack = false;
+	public static boolean isTopOfStack = false;
+	public static boolean forceClose = false;
 	boolean isExitDialogOn = false;
 
 	Button btnPlay;
@@ -104,6 +106,8 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 		this.SetFullScreen();
 		setContentView(R.layout.musicplayer);
 		appref = this;
+		
+		topOfStack();
 
 		btnPlay = (Button) findViewById(R.id.btnPlay);
 
@@ -123,12 +127,9 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 		gallery.setOnItemClickListener(this);
 		
-		mp = new MediaPlayer();
-		mp.setOnErrorListener(mpError);
-
 		index = Integer.parseInt(intent.getStringExtra("index")) - 1;
 		type = intent.getStringExtra("type");
-
+		
 		gallery.setSelection(index);
 
 		if (Constants.MusicList.size() > 0) {
@@ -137,7 +138,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 		btnPlay.setOnClickListener(this);
 
-		mp.setOnCompletionListener(this);
+//		mp.setOnCompletionListener(this);
 
 		registerReceiver();
 
@@ -293,8 +294,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 		pbCountDown.setMax(Duole.appref.restCountDown.getTotalTime());
 
-		if (type != null && type.equals("rest")
-				&& !Duole.appref.restCountDown.isRunning()) {
+		if (type != null && type.equals("rest")) {
 
 			pbCountDown.setVisibility(View.VISIBLE);
 
@@ -333,7 +333,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			} else {
 				llMain.setBackgroundResource(R.drawable.musicbg);
 				try {
-					DuoleUtils.downloadSingleFile(new URL(Constants.Duole
+					DuoleUtils.downloadPicSingle(new URL(Constants.Duole
 							+ Constants.bgRestUrl), bg);
 					llMain.setBackgroundDrawable(Drawable.createFromPath(bg
 							.getAbsolutePath()));
@@ -514,14 +514,25 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 		}
 
 		Log.d("TAG","set data source");
-		try {
-//			mp.setDataSource(this, Uri.fromFile(new File(url)));
+		mHandler.post(new Runnable() {
 			
-			mp.setDataSource(url);
-			mp.prepare();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			public void run() {
+				try {
+//					mp.setDataSource(this, Uri.fromFile(new File(url)));
+					
+					mp = new MediaPlayer();
+					mp.setOnErrorListener(mpError);
+					
+					mp.setDataSource(url);
+					mp.prepare();
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		
 	}
 
 	@Override
@@ -547,9 +558,11 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	@Override
 	protected void onDestroy() {
-		if(mp.isPlaying()){
+		
+		if(mp != null && mp.isPlaying()){
 			mp.stop();
 		}
+		
 		unregisterReceiver(timeOutReceiver);
 		super.onDestroy();
 	}
@@ -616,8 +629,10 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			if (!Constants.SLEEP_TIME) {
-				appref.finish();
+				forceClose = true;
 				Constants.ENTIME_OUT = false;
+				appref.finish();
+				
 			}
 		}
 
@@ -640,14 +655,22 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	private void playMusic() {
 		btnPlay.setBackgroundResource(R.drawable.pause);
-		mp.start();
-		try {
+		
+		try{
+			
+			mHandler.post(new Runnable() {
+				
+				public void run() {
+					mp.start();
+				}
+			});
+			
 			if (mp2 != null) {
 				mp2.release();
 			}
-		} catch (Exception e) {
+		}catch (Exception e) {
+			// TODO: handle exception
 		}
-
 	}
 
 	private void pauseMusic() {
@@ -666,27 +689,34 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	@Override
 	protected void onPause() {
+		Log.e("TAG", "music player on pause");
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
 		if (pm.isScreenOn()) {
 			Constants.musicPlayerIsRunning = false;
 		}
-
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
+		topOfStack();
 		super.onResume();
 	}
 
 	@Override
 	protected void onStop() {
 		
-		if (Constants.ENTIME_OUT) {
-			Duole.appref.startMusicPlay();
-		}
+		notTopOfStack();
+		
+		if(!Constants.ENTIME_OUT && !isTopOfStack() && !forceClose){
 
+			Intent intent1 = new Intent(Duole.appref,
+					MusicPlayerActivity.class);
+			intent1.putExtra("index", "1");
+			Duole.appref.startActivity(intent1);
+		}
+		
 		super.onStop();
 	}
 
@@ -698,7 +728,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 		isTopOfStack = false;
 	}
 
-	public boolean IsTopOfStack() {
+	public static boolean isTopOfStack() {
 		return isTopOfStack;
 	}
 	
@@ -711,4 +741,10 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			return false;
 		}
 	};
+	
+	public static void hidePBAndStopCountDown(){
+		pbCountDown.setVisibility(View.GONE);
+		Duole.appref.restCountDown.stop();
+		Duole.appref.restCountDown.seek(0);
+	}
 }

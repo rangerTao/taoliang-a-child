@@ -64,23 +64,29 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					Constants.ENTIME_OUT = false;
 					//swipe the cache dir.
 					FileUtils.clearUselessResource();
+					
+					DuoleSysConfigUtils.disableWifi(context);
+					
 					try{
 						if (!Constants.musicPlayerIsRunning) {
-
-							DuoleSysConfigUtils.disableWifi(context);
-
-							// Take main task to front
-							Intent intentMain = new Intent(Duole.appref,
-									Duole.class);
-							Duole.appref.startActivity(intentMain);
-
-							Duole.appref.uploadGamePeriod();
-
-							Intent intent1 = new Intent(Duole.appref,
-									MusicPlayerActivity.class);
-							intent1.putExtra("index", "1");
 							
-							Duole.appref.startActivity(intent1);
+							if(!MusicPlayerActivity.isTopOfStack()){
+								
+								// Take main task to front
+								Intent intentMain = new Intent(Duole.appref,
+										Duole.class);
+								Duole.appref.startActivity(intentMain);
+
+								Duole.appref.uploadGamePeriod();
+
+								Intent intent1 = new Intent(Duole.appref,
+										MusicPlayerActivity.class);
+								intent1.putExtra("index", "1");
+								Duole.appref.startActivity(intent1);
+							}else{
+								MusicPlayerActivity.hidePBAndStopCountDown();
+							}
+							
 							Constants.musicPlayerIsRunning = true;
 						}
 

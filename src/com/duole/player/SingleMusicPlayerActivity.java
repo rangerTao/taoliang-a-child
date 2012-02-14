@@ -91,10 +91,9 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 				
 			} else {
 				try {
-					DuoleUtils.downloadSingleFile(new URL(Constants.Duole
+					DuoleUtils.downloadPicSingle(new URL(Constants.Duole
 							+ mpbg), bg);
 				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

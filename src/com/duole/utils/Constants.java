@@ -1,6 +1,5 @@
 package com.duole.utils;
 
-import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,13 +8,18 @@ import android.graphics.Bitmap;
 import android.view.View;
 
 import com.duole.pojos.asset.Asset;
-import com.duole.thread.ThreadQueue;
+import com.duole.thread.DownloadTaskQueue;
 
 public class Constants {
 
 	//Download items thread
 	public static DownloadFileUtils dfu = new DownloadFileUtils();
-	public static ThreadQueue tq = new ThreadQueue();
+	
+	public static ArrayList<Asset> alAssetDeleteList;
+	public static HashMap<String, Asset> queueMap = new HashMap<String, Asset>();
+	public static DownloadTaskQueue dtq = new DownloadTaskQueue();
+	
+	public static Asset assetSynchronized;
 	
 	//system flags
 	public static boolean musicPlayerIsRunning = false;
@@ -139,7 +143,7 @@ public class Constants {
 	
 	
 	//refresh frequences.
-	public static final int frequence = 120000;
+	public static final int frequence = 1 * 60 * 1000;
 	
 	public static final long countInterval = 1000;
 	

@@ -53,11 +53,13 @@ import com.duole.activity.PasswordActivity;
 import com.duole.asynctask.ItemListTask;
 import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
+import com.duole.player.MusicPlayerActivity;
 import com.duole.player.SingleMusicPlayerActivity;
 import com.duole.player.VideoPlayerActivity;
 import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
+import com.duole.service.AssetDownloadService;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
 import com.duole.utils.Constants;
@@ -120,7 +122,7 @@ public class Duole extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
-		systemSettings();
+//		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -128,7 +130,10 @@ public class Duole extends BaseActivity {
 		Constants.bmpKe = BitmapFactory.decodeResource(getResources(), R.drawable.ke);
 
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
+		Intent downService = new Intent(this,AssetDownloadService.class);
+		
 		startService(screenLock);
+		startService(downService);
 		
 		appref = this;
 		
@@ -180,6 +185,53 @@ public class Duole extends BaseActivity {
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		if(!wm.isWifiEnabled()){
 			wm.setWifiEnabled(true);
+		}
+		
+	}
+	
+	/**
+	 * Intitialize the content.
+	 * @throws Exception
+	 */
+	public void initContents()  throws Exception{
+		// Check whether tf card exists.
+		if (DuoleUtils.checkTFCard()) {
+			// init the cache folders.
+			if (DuoleUtils.checkCacheFiles()) {
+				// init the main view.
+				
+				//If a update is exists.install it.
+				DuoleUtils.instalUpdateApk(appref);
+				//Verify the installation of flash player.
+				verifyFlashPlayerInstallation();
+				//Init the view.
+				initViews();
+
+				//Set the background picture.
+				setBackground();
+				
+				//Init the count down timer of game and rest time.
+				initCountDownTimer();
+				
+				//Upload local version.
+				DuoleNetUtils.uploadLocalVersionForce();
+				
+			} else {
+				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
+			}
+
+			new ItemListTask().execute();
+
+		} else {
+			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
+			
+			IntentFilter intentFilter = new IntentFilter("android.intent.action.MEDIA_MOUNTED");
+			try{
+				registerReceiver(mountedReceiver, intentFilter);
+			}catch(Exception e ){
+				Log.v("TAG", e.getMessage());
+			}
+	
 		}
 		
 	}
@@ -244,53 +296,6 @@ public class Duole extends BaseActivity {
 			}
 			
 		}
-	}
-	
-	/**
-	 * Intitialize the content.
-	 * @throws Exception
-	 */
-	public void initContents()  throws Exception{
-		// Check whether tf card exists.
-		if (DuoleUtils.checkTFCard()) {
-			// init the cache folders.
-			if (DuoleUtils.checkCacheFiles()) {
-				// init the main view.
-				
-				//If a update is exists.install it.
-				DuoleUtils.instalUpdateApk(appref);
-				//Verify the installation of flash player.
-				verifyFlashPlayerInstallation();
-				//Init the view.
-				initViews();
-
-				//Set the background picture.
-				setBackground();
-				
-				//Init the count down timer of game and rest time.
-				initCountDownTimer();
-				
-				//Upload local version.
-				DuoleNetUtils.uploadLocalVersionForce();
-				
-			} else {
-				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
-			}
-
-			new ItemListTask().execute();
-
-		} else {
-			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
-			
-			IntentFilter intentFilter = new IntentFilter("android.intent.action.MEDIA_MOUNTED");
-			try{
-				registerReceiver(mountedReceiver, intentFilter);
-			}catch(Exception e ){
-				Log.v("TAG", e.getMessage());
-			}
-	
-		}
-		
 	}
 	
 	/**
@@ -837,6 +842,8 @@ public class Duole extends BaseActivity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		
 
 		super.onDestroy();
 	}
@@ -872,9 +879,11 @@ public class Duole extends BaseActivity {
 		}
         this.mScrollLayout.refresh();
         
-		if (Constants.ENTIME_OUT) {
+		if ((Constants.ENTIME_OUT && !Constants.musicPlayerIsRunning)) {
+			Log.e("TAG","start music player rest");
 			startMusicPlay();
 		}
+		
 		super.onResume();
 	}
 	

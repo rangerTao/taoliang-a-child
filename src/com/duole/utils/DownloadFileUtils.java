@@ -6,17 +6,8 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.RandomAccess;
 
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
-
-import android.app.ActivityManager.RunningAppProcessInfo;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.duole.Duole;
@@ -31,11 +22,15 @@ import com.duole.pojos.asset.Asset;
 public class DownloadFileUtils extends Thread {
 
 	static Asset asset;
+	
+	private boolean isPreFinished = true;
 
 	public long threadStartMills = 0;
-	private static boolean running = true;
+	public static boolean running = false;
 	@Override
 	public void run() {
+		
+		running = true;
 		
 		threadStartMills = java.lang.System.currentTimeMillis();
 		
@@ -46,36 +41,40 @@ public class DownloadFileUtils extends Thread {
 		}
 		Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 		
+		running = false;
 		super.run();
 	}
 	
 	public void disturb(){
 		running = false;
 	}
+	
+	public void downloadNext(){
+		isPreFinished = true;
+	}
 
 	public static boolean downloadAll() {
 
-		Log.d("TAG","download all");
-		int listsize = Constants.DownLoadTaskList.size();
 		// If there are several task in the list.
 		try{
-			if (listsize > 0) {
-				Log.d("TAG","download all listsize   " + listsize);
-				for (int i = 0; i < listsize; i++) {
-					if(running){
-						Log.d("TAG","download all index   " + i);
-						if(DuoleNetUtils.isNetworkAvailable(Duole.appref)){
-							download(i);
-						}else{
-							Log.e("TAG", "No useful network");
-						}
-						
-					}
+			
+			Asset downAsset = Constants.dtq.pop_front();
+			while(downAsset != null){
+				if(DuoleNetUtils.isNetworkAvailable(Duole.appref)){
 					
+					Log.d("TAG", downAsset.toString());
+					download(downAsset);
+					Constants.queueMap.remove(downAsset.getUrl());
+				}else{
+					Log.e("TAG", "No useful network");
 				}
+				
+				downAsset = Constants.dtq.pop_front();
+				
 			}
+			
 		}catch(Exception e){
-			Log.v("TAG", e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		Log.d("TAG", "download finish");
@@ -85,9 +84,8 @@ public class DownloadFileUtils extends Thread {
 	/**
 	 * Download resources from server.
 	 */
-	public static void download(int index) {
+	public static void download(Asset asset) {
 		try {
-			asset = Constants.DownLoadTaskList.get(index);
 			
 			String type = asset.getType().toLowerCase();
 			
@@ -232,6 +230,10 @@ public class DownloadFileUtils extends Thread {
 			return false;
 		}
 
+	}
+	
+	public void removeTaskFromMap(String asset){
+		Constants.queueMap.remove(asset);
 	}
 	
 }
