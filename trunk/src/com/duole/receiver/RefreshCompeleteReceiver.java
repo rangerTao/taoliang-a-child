@@ -52,16 +52,11 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 				});
 			}
 
-			Duole.appref.bindService(new Intent(Duole.appref,
-					BackgroundRefreshService.class), Duole.appref.mConnection,
-					Context.BIND_AUTO_CREATE);
 			Constants.newItemExists = false;
 			
 			//Clear the temp folder
 
 		}
-		
-		
 	}
 	
 	private synchronized void refreshView(){
@@ -103,36 +98,38 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		sl.removeAllViews();
 		
 		for (int i = 0; i < PageCount; i++) {
-			if(i > sl.getChildCount() - 1 ){
+			
+			if (i > sl.getChildCount() - 1) {
 				GridView appPage = new GridView(Duole.appref);
 				// get the "i" page data
 				AssetItemAdapter aia = new AssetItemAdapter(Duole.appref, temp,
 						i);
 				appPage.setAdapter(aia);
 
-				appPage.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
-				
+				appPage.setLayoutParams(new ViewGroup.LayoutParams(
+						LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
 				appPage.setNumColumns(Constants.COLUMNS);
-				
+
 				appPage.setPadding(40, 10, 40, 0);
-				
+
 				appPage.setVerticalSpacing(30);
-				
+
 				appPage.setColumnWidth(110);
 
 				appPage.setOnItemClickListener(Duole.appref.listener);
 				Duole.appref.mScrollLayout.addView(appPage);
 
-			}else{
+			} else {
+				
 				GridView appPage = (GridView) sl.getChildAt(i);
 				// get the "i" page data
-				AssetItemAdapter aia = new AssetItemAdapter(Duole.appref, temp,
-						i);
+				AssetItemAdapter aia = new AssetItemAdapter(Duole.appref, temp,	i);
+				
 				appPage.setAdapter(aia);
 
 			}
-			
-			
+
 		}
 		
 		int llChildCount = Duole.appref.llPageDivider.getChildCount();
@@ -156,8 +153,6 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		Duole.appref.setBackground();
 		
 		Duole.appref.mScrollLayout.refresh();
-		
-//		Constants.DOWNLOAD_RUNNING = false;
 		
 		temp = null;
 	

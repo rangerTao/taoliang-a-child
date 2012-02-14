@@ -200,9 +200,12 @@ public class FileUtils {
 					File[] dirFiles = temp.listFiles();
 					for (File inDir : dirFiles) {
 						if (!usefulFile.containsKey(inDir.getName())) {
-							FileUtils.emptyFolder(inDir);
-							inDir.delete();
-							Log.d("TAG", "Useless file :" + inDir.getAbsolutePath());
+							if(inDir != null){
+								FileUtils.emptyFolder(inDir);
+								inDir.delete();
+								Log.d("TAG", "Useless file :" + inDir.getAbsolutePath());
+							}
+							
 						}
 					}
 				}
@@ -303,7 +306,13 @@ public class FileUtils {
 		File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 		PackageInfo info;
-		info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+		try{
+			info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+		}catch (Exception e) {
+			e.printStackTrace();
+			file.delete();
+			return "";
+		}
 
 		if(info != null){
 			return info.packageName;

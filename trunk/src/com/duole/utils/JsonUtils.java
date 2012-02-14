@@ -124,7 +124,7 @@ public class JsonUtils {
 			file = new File(Constants.CacheDir
 					+bgurl.substring(bgurl
 							.lastIndexOf("/")));
-			DuoleUtils.downloadSingleFile(new URL(Constants.Duole + bgurl), file);
+			DuoleUtils.downloadPicSingle(new URL(Constants.Duole + bgurl), file);
 			Constants.bgurl = bgurl;
 			
 			Constants.newItemExists = true;
@@ -149,7 +149,7 @@ public class JsonUtils {
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
-			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
+			DuoleUtils.downloadPicSingle(new URL(Constants.Duole
 					+ bgurl), file);
 			Constants.bgRestUrl = bgurl;
 			
@@ -167,7 +167,7 @@ public class JsonUtils {
 				|| !Constants.restart.equals(jsonObject.getString("tipsd"))) {
 			Log.v("TAG", "new tip");
 			Constants.restart = jsonObject.getString("tipsd");
-			DuoleUtils.downloadSingleFile(new URL(Constants.Duole
+			DuoleUtils.downloadPicSingle(new URL(Constants.Duole
 					+ Constants.restart), file);
 		}
 		

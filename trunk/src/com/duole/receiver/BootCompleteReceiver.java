@@ -1,6 +1,7 @@
 package com.duole.receiver;
 
 import com.duole.Duole;
+import com.duole.service.UnLockScreenService;
 import com.duole.utils.DuoleUtils;
 
 import android.R.array;

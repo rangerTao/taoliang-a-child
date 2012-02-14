@@ -120,7 +120,7 @@ public class CheckUpdateActivity extends BaseActivity {
 					if(!path.equals("null") || !path.equals("")){
 						URL url = new URL(Constants.Duole + path);
 						File file = new File(Constants.CacheDir + "client.apk");
-						if(DuoleUtils.downloadSingleFile(url, file)){
+						if(DuoleUtils.downloadSingleFile(url, file,"false")){
 							Process p = Runtime.getRuntime().exec("pm install -r " + file.getAbsolutePath());
 //							Process p = Runtime.getRuntime().exec("pm install -r /sdcard/DuoleCache/Duole.apk");
 							p.waitFor();

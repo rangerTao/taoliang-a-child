@@ -15,7 +15,7 @@
 			android:layout_width="wrap_content" android:orientation="horizontal"
 			android:layout_centerHorizontal="true" android:gravity="center_vertical"
 			android:baselineAligned="false" />
-			
+		
 		<ProgressBar android:layout_width="fill_parent"
 		android:layout_height="5dip" android:id="@+id/pbEnTime"
 		style="?android:attr/progressBarStyleHorizontal"
