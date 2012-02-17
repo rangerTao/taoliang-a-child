@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/llMain"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	android:background="@drawable/bg86">
-	<RelativeLayout android:id="@+id/rlMain"
-		android:layout_width="fill_parent" android:layout_height="fill_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llMain"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg86" >
 
-		<com.duole.widget.ScrollLayout
-			xmlns:android="http://schemas.android.com/apk/res/android"
-			android:id="@+id/ScrollLayoutTest" android:layout_width="fill_parent"
-			android:layout_height="wrap_content"/>
-		
-		<LinearLayout android:id="@+id/llPageDividerTip"
-			android:layout_above="@+id/pbEnTime" android:layout_height="45dip"
-			android:layout_width="wrap_content" android:orientation="horizontal"
-			android:layout_centerHorizontal="true" android:gravity="center_vertical"
-			android:baselineAligned="false" />
-		
-		<ProgressBar android:layout_width="fill_parent"
-		android:layout_height="5dip" android:id="@+id/pbEnTime"
-		style="?android:attr/progressBarStyleHorizontal"
-		android:layout_alignParentBottom="true"
-		android:layout_centerHorizontal="true" />
-	</RelativeLayout>
-	
+    <RelativeLayout
+        android:id="@+id/rlMain"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <com.duole.widget.ScrollLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/ScrollLayoutTest"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvTrafficStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true" />
+
+        <LinearLayout
+            android:id="@+id/llPageDividerTip"
+            android:layout_width="wrap_content"
+            android:layout_height="45dip"
+            android:layout_above="@+id/pbEnTime"
+            android:layout_centerHorizontal="true"
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+
+        <ProgressBar
+            android:id="@+id/pbEnTime"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="5dip"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
 </LinearLayout>

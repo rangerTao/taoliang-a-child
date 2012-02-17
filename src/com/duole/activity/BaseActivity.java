@@ -1,43 +1,30 @@
 package com.duole.activity;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.R.integer;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.net.TrafficStats;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.duole.Duole;
 import com.duole.player.MusicPlayerActivity;
 import com.duole.utils.Constants;
-import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
-import com.duole.utils.XmlUtils;
 
 public class BaseActivity extends Activity {
 
@@ -46,10 +33,13 @@ public class BaseActivity extends Activity {
 	public long playStart = 0;
 	public String resourceId = "";
 	
-	private static ActivityManager gDefault;
+	public TextView tvTrafficStats;
+	long netTrafficPre = 0;
+	long netTrafficCur = 0;
 	
+	DecimalFormat df = new DecimalFormat("0.00");
 	public Handler mHandler = new Handler(){
-
+		
 		@Override
 		public void handleMessage(Message msg) {
 
@@ -57,6 +47,32 @@ public class BaseActivity extends Activity {
 			case Constants.REST_TIME:
 				startMusicPlay();
 				break;
+			case Constants.NET_TRAFFIC:
+				if(tvTrafficStats != null){
+					
+					
+					netTrafficCur = TrafficStats.getTotalRxBytes();
+					
+					if(netTrafficPre == 0){
+						tvTrafficStats.setText("0 KB/S");
+					}else{
+						long tr = netTrafficCur - netTrafficPre;
+						if(tr == 0)
+							tvTrafficStats.setVisibility(View.INVISIBLE);
+						else {
+							if(tr < Float.MAX_VALUE){
+
+								float value = ((float)tr / 1024) /5;
+								tvTrafficStats.setText( df.format(value) + " KB/S");
+								tvTrafficStats.setVisibility(View.VISIBLE);
+							}
+						}
+					}
+
+					netTrafficPre = netTrafficCur;
+					
+					sendMessageDelayed(obtainMessage(Constants.NET_TRAFFIC), 5000);
+				}
 			}
 			super.handleMessage(msg);
 		}

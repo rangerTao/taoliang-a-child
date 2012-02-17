@@ -107,9 +107,14 @@ public class JsonUtils {
 		File file = null;
 		//Background.
 		if(!Constants.bgurl.equals("")){
-			file = new File(Constants.CacheDir
-					+ Constants.bgurl.substring(Constants.bgurl
-							.lastIndexOf("/")));
+			try{
+				file = new File(Constants.CacheDir
+						+ Constants.bgurl.substring(Constants.bgurl
+								.lastIndexOf("/")));
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		}
 		
 		//file not exists or background has been changed.
@@ -132,9 +137,14 @@ public class JsonUtils {
 		
 		//Background of rest time.
 		if(!Constants.bgRestUrl.equals("")){
-			file = new File(Constants.CacheDir
-					+ Constants.bgRestUrl.substring(Constants.bgRestUrl
-							.lastIndexOf("/")));
+			try{
+				file = new File(Constants.CacheDir
+						+ Constants.bgRestUrl.substring(Constants.bgRestUrl
+								.lastIndexOf("/")));
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		}
 		
 		//file not exists or background has been changed.

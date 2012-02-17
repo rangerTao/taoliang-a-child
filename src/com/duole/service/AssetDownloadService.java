@@ -37,12 +37,13 @@ public class AssetDownloadService extends Service{
 					
 					Log.d("TAG", String.format("Download task list size is %d, service will sleep for 30 seconds.", Constants.dtq.size()));
 					try {
-						Thread.sleep( 30 * 1000);
+						Thread.sleep( 20 * 1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
+					Constants.newItemExists = true;
 					Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 				}
 			

@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -122,12 +123,14 @@ public class Duole extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
-//		systemSettings();
+		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
 		bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
 		Constants.bmpKe = BitmapFactory.decodeResource(getResources(), R.drawable.ke);
+		
+		tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
 
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
 		Intent downService = new Intent(this,AssetDownloadService.class);
@@ -215,6 +218,12 @@ public class Duole extends BaseActivity {
 				
 				//Upload local version.
 				DuoleNetUtils.uploadLocalVersionForce();
+				
+				//Start refreshing the network traffic status.
+				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
+				Message msgRefresh = new Message();
+				msgRefresh.what = Constants.NET_TRAFFIC;
+				mHandler.sendMessageDelayed(msgRefresh, 5000);
 				
 			} else {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
