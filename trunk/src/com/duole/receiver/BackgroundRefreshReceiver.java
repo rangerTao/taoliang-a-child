@@ -1,7 +1,6 @@
 package com.duole.receiver;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import com.duole.Duole;
@@ -14,9 +13,6 @@ import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
 import com.duole.utils.XmlUtils;
 
-import android.R.xml;
-import android.app.KeyguardManager;
-import android.app.KeyguardManager.KeyguardLock;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;

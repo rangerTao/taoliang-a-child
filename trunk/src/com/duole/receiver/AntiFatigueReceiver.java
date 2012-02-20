@@ -1,7 +1,6 @@
 package com.duole.receiver;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

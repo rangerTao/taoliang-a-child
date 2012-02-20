@@ -5,8 +5,6 @@ import java.io.File;
 import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
 import com.duole.utils.Constants;
-import com.duole.utils.DuoleNetUtils;
-import com.duole.utils.DuoleUtils;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +14,6 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 public class FlashPlayerActivity extends PlayerBaseActivity{
 
