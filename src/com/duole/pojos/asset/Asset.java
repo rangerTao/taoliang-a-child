@@ -2,8 +2,6 @@ package com.duole.pojos.asset;
 
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.duole.utils.Constants;
 
 public class Asset {

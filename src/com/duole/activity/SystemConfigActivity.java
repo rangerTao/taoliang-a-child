@@ -1,7 +1,6 @@
 package com.duole.activity;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,7 +30,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.os.StatFs;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;

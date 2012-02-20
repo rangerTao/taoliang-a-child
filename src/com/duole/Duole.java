@@ -54,7 +54,6 @@ import com.duole.activity.PasswordActivity;
 import com.duole.asynctask.ItemListTask;
 import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
-import com.duole.player.MusicPlayerActivity;
 import com.duole.player.SingleMusicPlayerActivity;
 import com.duole.player.VideoPlayerActivity;
 import com.duole.pojos.DuoleCountDownTimer;
@@ -123,7 +122,7 @@ public class Duole extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
-		systemSettings();
+//		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -133,10 +132,8 @@ public class Duole extends BaseActivity {
 		tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
 
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
-		Intent downService = new Intent(this,AssetDownloadService.class);
-		
 		startService(screenLock);
-		startService(downService);
+
 		
 		appref = this;
 		
@@ -219,6 +216,10 @@ public class Duole extends BaseActivity {
 				//Upload local version.
 				DuoleNetUtils.uploadLocalVersionForce();
 				
+				//Start the asset download service.s
+				Intent downService = new Intent(this,AssetDownloadService.class);
+				startService(downService);
+				
 				//Start refreshing the network traffic status.
 				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
 				Message msgRefresh = new Message();
@@ -277,7 +278,6 @@ public class Duole extends BaseActivity {
 				try {
 					InputStream is = am.open("flashplayer.apk");
 					
-					int bytesum = 0;
 					int byteread = 0;
 					if (is != null) {
 						file = new File("/sdcard/flashplayer.apk");
@@ -285,7 +285,6 @@ public class Duole extends BaseActivity {
 						FileOutputStream fs = new FileOutputStream(file);
 						byte[] buffer = new byte[512];
 						while ((byteread = is.read(buffer)) != -1) {
-							bytesum += byteread;
 							fs.write(buffer, 0, byteread);
 						}
 						is.close();

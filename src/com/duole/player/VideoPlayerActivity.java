@@ -1,7 +1,5 @@
 package com.duole.player;
 
-import java.net.URI;
-
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;

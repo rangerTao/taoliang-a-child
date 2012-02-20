@@ -1,8 +1,5 @@
 package com.duole.activity;
 
-import com.duole.utils.Constants;
-
-import android.content.Intent;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 

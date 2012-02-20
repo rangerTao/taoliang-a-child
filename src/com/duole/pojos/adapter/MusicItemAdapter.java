@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.duole.Duole;
 import com.duole.R;
-import com.duole.pojos.adapter.AssetItemAdapter.AssetItem;
 import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
 

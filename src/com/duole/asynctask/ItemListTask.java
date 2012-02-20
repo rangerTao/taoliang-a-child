@@ -18,7 +18,6 @@ import com.duole.pojos.asset.Asset;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.thread.DeleteAssetFilesThread;
 import com.duole.utils.Constants;
-import com.duole.utils.DownloadFileUtils;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.JsonUtils;
