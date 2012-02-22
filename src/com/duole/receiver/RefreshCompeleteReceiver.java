@@ -86,8 +86,13 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		}
 		
 		// the total pages
-		int PageCount = (int) Math.ceil(temp.size()
-				/ Constants.APP_PAGE_SIZE);
+		
+		int PageCount = 0;
+		if(temp != null){
+			PageCount = (int) Math.ceil(temp.size()
+					/ Constants.APP_PAGE_SIZE);
+		}
+		
 		
 		if(PageCount == 0 || (temp.size() % Constants.APP_PAGE_SIZE) > 0){
 			PageCount += 1;

@@ -60,10 +60,13 @@ public class BaseActivity extends Activity {
 						if(tr == 0)
 							tvTrafficStats.setVisibility(View.INVISIBLE);
 						else {
-							if(tr < Float.MAX_VALUE){
-
-								float value = ((float)tr / 1024) /5;
+							
+							float value = ((float)tr / 1024) /5;
+							if(value < Float.MAX_VALUE && value > 1){
 								tvTrafficStats.setText( df.format(value) + " KB/S");
+								tvTrafficStats.setVisibility(View.VISIBLE);
+							}else{
+								tvTrafficStats.setText( "0 KB/S");
 								tvTrafficStats.setVisibility(View.VISIBLE);
 							}
 						}
