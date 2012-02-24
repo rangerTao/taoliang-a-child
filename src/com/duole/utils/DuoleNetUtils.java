@@ -253,7 +253,6 @@ public class DuoleNetUtils {
     	if(loaded.equals("false") || loaded.equals("") ){
     		String result = DuoleNetUtils.connect(url);
         	
-        	Log.v("TAG", "upload local version url : "+ url);
         	try{
         		JSONObject json = new JSONObject(result);
         		
@@ -285,7 +284,6 @@ public class DuoleNetUtils {
 						Constants.XML_CLIENTVERSIONUPLOAD);
 				String result = DuoleNetUtils.connect(url);
 
-				Log.v("TAG", "upload local version url : " + url);
 				try {
 					JSONObject json = new JSONObject(result);
 

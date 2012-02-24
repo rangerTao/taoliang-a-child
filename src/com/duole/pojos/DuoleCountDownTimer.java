@@ -21,7 +21,19 @@ public abstract class DuoleCountDownTimer {
         synchronized (DuoleCountDownTimer.this) {  
             mRemainTime = ((100 - value) * mTotalTime) / 100;  
         }  
-    }  
+    }
+    
+    public final void seekMills(long mills){
+    	synchronized (DuoleCountDownTimer.this) {
+    		mRemainTime -=  mills;
+		}
+    }
+    
+    public final void seekToMills(long mills){
+    	synchronized (DuoleCountDownTimer.this) {
+			mRemainTime = mTotalTime - mills;
+		}
+    }
       
     public void setTotalTime(long total){
     
@@ -70,11 +82,11 @@ public abstract class DuoleCountDownTimer {
             synchronized (DuoleCountDownTimer.this) {  
                 if (msg.what == MSG_RUN) {  
                     mRemainTime = mRemainTime - mCountdownInterval;  
-                    if (mRemainTime <= 0) {  
+                    if (mRemainTime <= 0) {
                         onFinish();  
-                    } else if (mRemainTime < mCountdownInterval) {  
+                    } else if (mRemainTime < mCountdownInterval) {
                         sendMessageDelayed(obtainMessage(MSG_RUN), mRemainTime);  
-                    } else {  
+                    } else {
                         onTick(mRemainTime, new Long(100  
                                 * (mTotalTime - mRemainTime) / mTotalTime)  
                                 .intValue());  
@@ -118,8 +130,8 @@ public abstract class DuoleCountDownTimer {
     	return "00:" + sb.toString();
     }
     
-    public int getRemainMills(){
-    	return (int) (mRemainTime / 1000);
+    public long getRemainMills(){
+    	return mRemainTime;
     }
     
     public int getTotalTime(){

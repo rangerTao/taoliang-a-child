@@ -15,8 +15,11 @@ public class Constants {
 	//Download items thread
 	public static DownloadFileUtils dfu = new DownloadFileUtils();
 	
+	//The asset list used to delete.
 	public static ArrayList<Asset> alAssetDeleteList;
+	//the map of download task queue.
 	public static HashMap<String, Asset> queueMap = new HashMap<String, Asset>();
+	//the download task queue.
 	public static DownloadTaskQueue dtq = new DownloadTaskQueue();
 	
 	public static Asset assetSynchronized;
@@ -144,7 +147,7 @@ public class Constants {
 	
 	
 	//refresh frequences.
-	public static final int frequence = 1 * 60 * 1000;
+	public static final int frequence = 90000;  //1.5*60*1000
 	
 	public static final long countInterval = 1000;
 	

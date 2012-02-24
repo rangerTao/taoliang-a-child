@@ -11,10 +11,10 @@ import android.util.Log;
 
 public class FileOperator {
 	
-	private FileMultiThreadDownloadDBOpenHelper fileHelper;
+	private DuoleDBHelper fileHelper;
 	
 	public FileOperator(Context context){
-		fileHelper = FileMultiThreadDownloadDBOpenHelper.getInstance(context);
+		fileHelper = DuoleDBHelper.getInstance(context);
 	}
 	
 	/**

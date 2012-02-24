@@ -228,7 +228,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 					if (disX > 5) {
 						isClick = true;
 					}
-					Log.d("TAG", "action up");
 					
 					tvTip.setVisibility(View.INVISIBLE);
 					break;
@@ -273,21 +272,24 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 	 * Init the progress of progress bar.
 	 */
 	private void initProgressBar() {
-		Duole.appref.gameCountDown.pause();
+		
+		Duole.gameCountDown.pause();
 
 		pbCountDown = (ProgressBar) findViewById(R.id.pbRestTime);
 
 		pbCountDown.setBackgroundColor(Color.RED);
+		
+		pbCountDown.setProgress((int)(Duole.restCountDown.getTotalTime() - Duole.restCountDown.getRemainMills()));
 
-		Duole.appref.restCountDown.setPb(pbCountDown);
+		Duole.restCountDown.setPb(pbCountDown);
 
-		pbCountDown.setMax(Duole.appref.restCountDown.getTotalTime());
+		pbCountDown.setMax(Duole.restCountDown.getTotalTime());
 
 		if (type != null && type.equals("rest")) {
 
 			pbCountDown.setVisibility(View.VISIBLE);
 
-			Duole.appref.restCountDown.resume();
+			Duole.restCountDown.resume();
 
 			playTipSound();
 
@@ -463,8 +465,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			int min = Integer.parseInt(tvMinute.getText().toString());
 			long mills = min * 60 * 1000;
 			
-			Log.d("TAG", mills + " delay");
-			
 			mHandler.postDelayed(new Runnable() {
 
 				public void run() {
@@ -502,13 +502,10 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			url = Constants.CacheDir + Constants.RES_AUDIO + filename;
 		}
 
-		Log.d("TAG","set data source");
 		mHandler.post(new Runnable() {
 			
 			public void run() {
 				try {
-//					mp.setDataSource(this, Uri.fromFile(new File(url)));
-					
 					mp = new MediaPlayer();
 					mp.setOnErrorListener(mpError);
 					
@@ -678,7 +675,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	@Override
 	protected void onPause() {
-		Log.e("TAG", "music player on pause");
+		
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
 		if (pm.isScreenOn()) {
@@ -724,8 +721,6 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 	OnErrorListener mpError = new OnErrorListener() {
 		
 		public boolean onError(MediaPlayer mp, int what, int extra) {
-			Log.e("TAG", "mp error.What : " + what);
-//			mp.release();
 			mp.reset();
 			return false;
 		}

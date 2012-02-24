@@ -19,15 +19,15 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 		if(intent.getAction().equals(Constants.Event_AppStart)){
 			antiFatigueConfiguration();
 			
-			if(Duole.appref.gameCountDown != null){
-				Duole.appref.gameCountDown.resume();
+			if(Duole.gameCountDown != null){
+				Duole.gameCountDown.resume();
 			}else{
 				Duole.appref.initCountDownTimer();
-				Duole.appref.gameCountDown.resume();
+				Duole.gameCountDown.resume();
 			}
 		}
 		if(intent.getAction().equals(Constants.Event_AppEnd)){
-			Duole.appref.gameCountDown.pause();
+			Duole.gameCountDown.pause();
 		}
 		
 	}
@@ -49,9 +49,9 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			
 			long time1 = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
-			Duole.appref.gameCountDown.setTotalTime(time1);
+			Duole.gameCountDown.setTotalTime(time1);
 			long time2 = Integer.parseInt(Constants.restime == "" ? "120" : Constants.restime) * 60 * 1000;
-			Duole.appref.restCountDown.setTotalTime(time2);
+			Duole.restCountDown.setTotalTime(time2);
 			
 			Constants.timePool = time1 + time2;
 			

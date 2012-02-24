@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -47,7 +46,6 @@ public class PasswordActivity extends BaseActivity implements OnEditorActionList
 		String type = intent.getStringExtra("type");
 
 		passwd = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_PASSWORD);
-		Log.v("TAG", passwd);
 		if(passwd.equals("")){
 			passwd = Constants.defaultPasswd;
 		}
@@ -246,7 +244,7 @@ public class PasswordActivity extends BaseActivity implements OnEditorActionList
 
 	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		InputMethodManager imm = (InputMethodManager) appref.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(appref.getCurrentFocus().getWindowToken(), imm.HIDE_NOT_ALWAYS);
+		imm.hideSoftInputFromWindow(appref.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 		return true;
 	}
 	

@@ -53,18 +53,20 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			}
 
 			Constants.newItemExists = false;
-			
-			//Clear the temp folder
 
 		}
 	}
 	
-	private synchronized void refreshView(){
+	/**
+	 * if there is anything changed,refresh the view.
+	 */
+	private synchronized boolean refreshView(){
 		
-		Log.d("TAG", "refresh view started");
-		
+		//Set the thread as single task.
 		Constants.viewrefreshenable = false;
+		
 		ArrayList<Asset> temp = null;
+		
 		// get all apps
 		try {
 			if(Constants.alAsset.size() < 1){
@@ -83,6 +85,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
 		
 		// the total pages
@@ -163,7 +166,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 	
 		Constants.viewrefreshenable = true;
 		
-		Log.d("TAG", "refresh view finished.");
+		return true;
 		
 	}
 	

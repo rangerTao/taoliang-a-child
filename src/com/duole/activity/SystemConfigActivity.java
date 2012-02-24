@@ -148,7 +148,6 @@ public class SystemConfigActivity extends PreferenceActivity {
 			StatFs statfs = new StatFs(sdcard.getAbsolutePath());
 			
 			long totalSize = countUp(statfs.getBlockCount(),statfs.getBlockSize());
-			Log.v("TAG", totalSize + "totalSize");
 			long usedSize = totalSize
 					- countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
 			if (totalSize > 1024) {
@@ -244,8 +243,6 @@ public class SystemConfigActivity extends PreferenceActivity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
-			Log.v("TAG", intent.getAction());
-			
 			if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent.getAction())) {
                 handleStateChanged(WifiInfo.getDetailedStateOf((SupplicantState)
                         intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE)));
@@ -290,7 +287,6 @@ public class SystemConfigActivity extends PreferenceActivity {
         if (state != null && preWifi.isChecked()) {
             WifiInfo info = wifiManager.getConnectionInfo();
             if (info != null) {
-            	Log.v("TAG",state.name() + "     " + state.ordinal());
             	preWifi.setSummary(Summary.get(appref, info.getSSID(), state));
             }
         }
@@ -455,7 +451,6 @@ public class SystemConfigActivity extends PreferenceActivity {
 						
 						WifiInfo wifiinfo = wifiManager.getConnectionInfo();
 						
-						Log.v("TAG", wifiinfo.getNetworkId() + "");
 						if(wifiinfo.getNetworkId() == -1){
 							wifiManager.removeNetwork(temp.networkId);
 							isConfiged = false;
@@ -543,7 +538,6 @@ public class SystemConfigActivity extends PreferenceActivity {
 												int res = wifiManager
 														.addNetwork(wc);
 
-												Log.v("TAG", "network id" + res);
 												if (res == -1) {
 													Toast.makeText(
 															appref,

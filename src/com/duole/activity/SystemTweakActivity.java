@@ -101,8 +101,6 @@ public class SystemTweakActivity extends BaseActivity implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
-			Log.v("TAG", intent.getAction());
-			
 			detectWifiStatus(wifiManager,wifiStatus);
 
 		}

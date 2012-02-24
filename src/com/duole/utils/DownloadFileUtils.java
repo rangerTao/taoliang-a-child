@@ -90,8 +90,12 @@ public class DownloadFileUtils extends Thread {
 			String type = asset.getType().toLowerCase();
 			
 			if(type.trim().equals("")){
-				asset.setType(DuoleUtils.checkAssetType(asset));
+//				asset.setType(DuoleUtils.checkAssetType(asset));
+//				type = asset.getType().toLowerCase();
+				type = DuoleUtils.checkAssetType(asset);
 			}
+			
+			Log.d("TAG", "asset type " + type);
 			
 			String url = asset.getUrl().toLowerCase();
 			//Download thumbnail.

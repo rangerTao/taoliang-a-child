@@ -181,10 +181,17 @@ public class JsonUtils {
 					+ Constants.restart), file);
 		}
 		
+		String en = Constants.entime;
+		String rest = Constants.restime;
+		
 		//The period of entermaintent.
 		Constants.entime = jsonObject.getString("entime");
 		//The period of rest.
 		Constants.restime = jsonObject.getString("restime");
+		
+		//If necessary.Reset the game count down.
+		AntiFatigureUtils.resetCountdownTimer(en, rest);
+		
 		//when sleep time is on.
 		Constants.sleepstart = jsonObject.getString("sleepstart");
 		//when sleep time is out.

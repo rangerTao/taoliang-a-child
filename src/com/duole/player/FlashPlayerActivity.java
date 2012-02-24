@@ -38,7 +38,6 @@ public class FlashPlayerActivity extends PlayerBaseActivity{
 //				finish();
 //			}
 			url = filename;
-			Log.d("TAG", "on line video url : " + url);
 			if (url.contains("youku.com")) {
 				String id = filename.substring(filename.indexOf("sid/") + 4,
 						filename.indexOf("/v.swf"));
