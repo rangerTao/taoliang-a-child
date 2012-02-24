@@ -56,8 +56,15 @@ import com.duole.pojos.asset.Asset;
 import com.duole.service.download.FileMultiThreadDownloader;
 import com.duole.service.download.OnDownloadCompleteListener;
 import com.duole.service.download.OnDownloadErrorListener;
+import com.duole.service.download.dao.MusicListDao;
 
 public class DuoleUtils {
+	
+	public static MusicListDao mld;
+	
+	static{
+		mld = new MusicListDao(Duole.appref);
+	}
 
 	/**
 	 * To check whether cache folders exists.
@@ -607,7 +614,12 @@ public class DuoleUtils {
 			return true;
 		}
 		
-		if(asset.getType().equals(Constants.RES_FRONT)){
+		String type = asset.getType().trim().toLowerCase();
+		if(type.equals("")){
+			type = checkAssetType(asset);
+		}
+		
+		if(type.equals(Constants.RES_FRONT)){
 			File front = new File(Constants.CacheDir + "/front/" + asset.getId());
 			if(!front.exists()){
 				return true;
@@ -629,8 +641,8 @@ public class DuoleUtils {
 		}
 
 		//Source file does not exists.
-		if(asset.getType().equals(Constants.RES_APK)){
-			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
+		if(type.equals(Constants.RES_APK)){
+			file = new File(Constants.CacheDir + type + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
 			
 			if(asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")){
@@ -676,7 +688,7 @@ public class DuoleUtils {
 				}
 			}
 		}else if (!asset.getUrl().equals("")) {
-			file = new File(Constants.CacheDir + asset.getType() + asset.getUrl().substring(
+			file = new File(Constants.CacheDir + type + asset.getUrl().substring(
 					asset.getUrl().lastIndexOf("/")));
 			if(asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")){
 				Constants.newItemExists = true;
@@ -713,7 +725,6 @@ public class DuoleUtils {
 	 */
 	public static boolean updateAssetListFile(ArrayList<Asset> assets) throws SAXException, IOException, TransformerException {
 
-		Log.d("TAG", "update asset list");
 		try {
 			XmlUtils.deleteAllItemNodes();
 
@@ -735,10 +746,7 @@ public class DuoleUtils {
 				Document document = dBuilder.parse(iStream);
 				
 				FileUtils.copyFile(backup.getAbsolutePath(), Constants.ItemList);
-				Log.d("TAG", "asset list xml error,use the bakcup to recovery the asset list.");
 			}catch(Exception ex){
-				
-				Log.e("TAG", "xml backup is broken");
 				
 				XmlUtils.initFile(iStream, dBuilder, file);
 				
@@ -941,6 +949,9 @@ public class DuoleUtils {
     		Asset asset = assets.get(i);
     		
     		String type = asset.getType();
+    		if(type.trim().toLowerCase().equals("")){
+    			type = DuoleUtils.checkAssetType(asset);
+    		}
     		String path = asset.getUrl();
     		String isfront = asset.getIsFront();
     		
@@ -1047,7 +1058,11 @@ public class DuoleUtils {
 				Constants.MusicList.add(asset);
 			}
 		}
-
+		
+		Log.d("TAG", "getMusicList :   Size of music list " + Constants.MusicList.size() );
+		
+		mld = new MusicListDao(Duole.appref);
+		mld.save(Constants.MusicList);
 	}
 	
 	/**

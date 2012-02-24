@@ -75,10 +75,6 @@ public class ItemListTask extends AsyncTask {
 			if(!gettedSourceList){
 				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			}
-//		}else{
-//			Log.v("TAG", "a download thread not finished");
-//			return false;
-//		}
 		
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
@@ -129,9 +125,6 @@ public class ItemListTask extends AsyncTask {
 			}
 		}
 
-		Log.v("TAG", Constants.DownLoadTaskList.size() + " downloads");
-		Log.v("TAG", Constants.alAssetDeleteList.size()  + " deletes");
-		
 		//there are assets need to delete.
 		if (Constants.alAssetDeleteList.size() > 0) {
 			new DeleteAssetFilesThread(Constants.alAssetDeleteList).start();
@@ -201,7 +194,7 @@ public class ItemListTask extends AsyncTask {
 			Constants.alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
 			if(result.equals("")){
-				Log.d("TAG", "connection time out");
+				Log.e("TAG", "connection time out");
 				return false;
 			}
 			JSONObject jsonObject = new JSONObject(result);

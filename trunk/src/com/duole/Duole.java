@@ -165,7 +165,7 @@ public class Duole extends BaseActivity {
 		//Disable the screen lock.
 		Settings.Secure.putInt(getContentResolver(),Settings.Secure.LOCK_PATTERN_ENABLED, 0);
 		//disable usb debug
-		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 0);
+		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 1);
 		//Disable the auto rotation.
 		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 1);
 		//Disable the wifi available_notification.
@@ -193,6 +193,7 @@ public class Duole extends BaseActivity {
 	 * Intitialize the content.
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public void initContents()  throws Exception{
 		// Check whether tf card exists.
 		if (DuoleUtils.checkTFCard()) {
@@ -250,12 +251,19 @@ public class Duole extends BaseActivity {
 	 * Initialize the entermaintent progress bar.
 	 */
 	private void initEnTimeProgressBar(){
+		
 		pbEnTime = (ProgressBar)findViewById(R.id.pbEnTime);
 		
-		pbEnTime.setMax(appref.gameCountDown.getTotalTime());
+		pbEnTime.setMax(gameCountDown.getTotalTime());
 		pbEnTime.setBackgroundColor(Color.RED);
+		pbEnTime.setProgress((int)(gameCountDown.getTotalTime() - gameCountDown.getRemainMills()));
 		
 		gameCountDown.setPb(pbEnTime);
+		
+		if(pbEnTime.getProgress() > 0){
+			gameCountDown.resume();
+		}
+		
 	}
 	
 	public void verifyFlashPlayerInstallation(){
@@ -336,14 +344,16 @@ public class Duole extends BaseActivity {
 
 		long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
 		long restime = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
+		long enSeek = 0;
+		long restSeek = 0;
 		
 		long poor = System.currentTimeMillis() - current;
 		
-		String pool = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_TIMEPOOL);
+		long pool = entime + restime;
 		
 		long total = 0;
 		try{
-			total = Integer.parseInt(pool);
+			total = pool;
 		}catch (Exception e) {
 			total = entime + restime;
 		}
@@ -353,15 +363,16 @@ public class Duole extends BaseActivity {
 		
 		now = Math.abs(now);
 		
+		Log.d("TAG", now + "  now");
+		
 		if(poor < total){
 			if(poor > 0 && poor < entime){
-				entime -= poor;
+				enSeek = poor;
 			}else if(poor > 0 && poor < total){
-				restime = total - poor;
+				restSeek = poor - entime;
 				Constants.ENTIME_OUT = true;
 			}
 			
-			Log.d("TAG", entime + " entime , " + restime + " rest time");
 		}
 		
 		Log.v("TAG","entiem " + entime);
@@ -388,6 +399,7 @@ public class Duole extends BaseActivity {
 				if(restCountDown != null){
 					time = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
 					restCountDown.setTotalTime(time);
+					restCountDown.seek(0);
 				}
 				if (!Constants.SLEEP_TIME) {
 					appref.startMusicPlay();
@@ -421,6 +433,9 @@ public class Duole extends BaseActivity {
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
 		};
+		
+		gameCountDown.seekMills(enSeek);
+		restCountDown.seekMills(restSeek);
 		
 		initEnTimeProgressBar();
 	}
@@ -600,7 +615,7 @@ public class Duole extends BaseActivity {
 					MODE_WORLD_READABLE);
 			Editor editor = sp.edit();
 			editor.putString("antiFatigue", getString(R.string.entime) + " : "
-					+ Duole.appref.gameCountDown.getRemainTime() + ";"
+					+ Duole.gameCountDown.getRemainTime() + ";"
 					+ getString(R.string.sleepstart) + " : "
 					+ Constants.sleepstart + ":00" + "     "
 					+ getString(R.string.sleepend) + " : " + Constants.sleepend
@@ -643,7 +658,10 @@ public class Duole extends BaseActivity {
 				intent = new Intent(appref, SingleMusicPlayerActivity.class);
 				int index = Constants.MusicList.indexOf(assItem);
 
-				intent.putExtra("index", index + "");
+//				intent.putExtra("index", index + "");
+				intent.putExtra("thumb", assItem.getThumbnail());
+				intent.putExtra("mp3", assItem.getUrl());
+				intent.putExtra("bg", assItem.getBg());
 
 			}
 			
@@ -834,7 +852,7 @@ public class Duole extends BaseActivity {
 	 * Bind a auto refresh service.
 	 */
 	public void bindAutoRefreshService(){
-		Duole.appref.bindService(getIntent(), appref.mConnection,
+		Duole.appref.bindService(getIntent(), mConnection,
 				Context.BIND_AUTO_CREATE);
 	}
 

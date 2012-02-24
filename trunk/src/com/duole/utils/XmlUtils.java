@@ -158,7 +158,6 @@ public class XmlUtils {
 	public static ArrayList<Asset> readFile(String filePath,
 			DocumentBuilder dBuilder,boolean update) throws SAXException, IOException, XmlPullParserException, TransformerException, ParserConfigurationException {
 
-		Log.d("TAG", "get asset list from: " + filePath);
 		ArrayList<Asset> result = new ArrayList<Asset>();
 		
 		FileInputStream iStream = new FileInputStream(new File(
@@ -302,7 +301,6 @@ public class XmlUtils {
 			}
 		}
 		if(update){
-			Log.d("TAG", "Update the backup xml file");
 			new File(filePath + ".bak").delete();
 			FileUtils.copyFile(filePath, filePath + ".bak");
 		}
@@ -438,6 +436,7 @@ public class XmlUtils {
 		} catch (Exception e) {
 			Log.e("TAG", e.getMessage());
 			initFile(iStream, dBuilder, file);
+			throw e;
 		}
 	}
 	

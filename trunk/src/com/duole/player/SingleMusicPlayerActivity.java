@@ -12,6 +12,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings.SettingNotFoundException;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,9 +46,13 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		
 		Intent intent = getIntent();
 		
-		int index = Integer.parseInt(intent.getStringExtra("index"));
+//		int index = Integer.parseInt(intent.getStringExtra("index"));
+		String thumb = intent.getStringExtra("thumb");
+		String path = intent.getStringExtra("mp3");
+		String bg = intent.getStringExtra("bg");
 		
-		setBackground(index);
+		setBackground(thumb,bg);
+		
 		try {
 			screen_off_timeout = android.provider.Settings.System.getInt(getContentResolver(), android.provider.Settings.System.SCREEN_OFF_TIMEOUT);
 		} catch (SettingNotFoundException e) {
@@ -58,11 +63,11 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		
 		mp = new MediaPlayer();
 		
-		setMusicData(index);
+		setMusicData(path);
 	}
 	
 	
-	public void setBackground(int index) {
+	public void setBackground(String path,String bgPath) {
 
 		llMain = findViewById(R.id.llMusicPlayer);
 		rl = findViewById(R.id.relativeLayout1);
@@ -70,14 +75,17 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		
 		tvMusicTitle = (TextView)findViewById(R.id.tvMusicTitle);
 		tvMusicTitle.setVisibility(View.INVISIBLE);
-		Asset asset = Constants.MusicList.get(index);
 		
-		String mpbg = asset.getBg();
+//		Log.d("TAG", "setBackground :   Size of music list " + Constants.MusicList.size() + "\n" + "  the index is " + index);
 		
-		if( mpbg != null && !mpbg.trim().equals("")){
+//		Asset asset = Constants.MusicList.get(index);
+		
+//		String mpbg = asset.getBg();
+		
+		if( bgPath != null && !bgPath.trim().equals("")){
 
 			File bg = new File(Constants.CacheDir
-					+ Constants.RES_THUMB + mpbg.substring(mpbg
+					+ Constants.RES_THUMB + bgPath.substring(bgPath
 							.lastIndexOf("/")));
 			
 			if (bg.exists()) {
@@ -91,7 +99,7 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 			} else {
 				try {
 					DuoleUtils.downloadPicSingle(new URL(Constants.Duole
-							+ mpbg), bg);
+							+ bgPath), bg);
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
@@ -100,10 +108,10 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		}
 		
 		
-		String ivUrl = asset.getThumbnail();
-		String ivThumb = Constants.CacheDir + Constants.RES_THUMB + ivUrl.substring(ivUrl.lastIndexOf("/"));
+//		String ivUrl = asset.getThumbnail();
+		String ivThumb = Constants.CacheDir + Constants.RES_THUMB + path.substring(path.lastIndexOf("/"));
 		ivMusicThumb.setImageDrawable(Drawable.createFromPath(ivThumb));
-		tvMusicTitle.setText(asset.getName());
+//		tvMusicTitle.setText(asset.getName());
 		
 		if (!Constants.bgRestUrl.equals("")) {}
 		
@@ -170,9 +178,9 @@ public class SingleMusicPlayerActivity extends PlayerBaseActivity{
 		
 	}
 	
-	public void setMusicData(int index) {
+	public void setMusicData(String path) {
 		
-		String filename = Constants.MusicList.get(index).getUrl();
+		String filename = path;
 
 		if (filename.startsWith("http:")) {
 		} else {

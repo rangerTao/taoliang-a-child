@@ -32,6 +32,7 @@ public class CheckUpdateActivity extends BaseActivity {
 	ProgressBar pbUpdate;
 	RelativeLayout rlContent;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -50,6 +51,7 @@ public class CheckUpdateActivity extends BaseActivity {
 		ut.execute();
 	}
 
+	@SuppressWarnings("rawtypes")
 	class UpdateTask extends AsyncTask {
 
 		@Override
@@ -124,7 +126,7 @@ public class CheckUpdateActivity extends BaseActivity {
 							Process p = Runtime.getRuntime().exec("pm install -r " + file.getAbsolutePath());
 //							Process p = Runtime.getRuntime().exec("pm install -r /sdcard/DuoleCache/Duole.apk");
 							p.waitFor();
-							int result = p.exitValue();
+							p.exitValue();
 						}else{
 							Toast.makeText(appref, R.string.download_error, 2000);
 						}

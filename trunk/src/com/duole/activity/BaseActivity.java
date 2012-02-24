@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -118,7 +117,6 @@ public class BaseActivity extends Activity {
 	
 	public boolean forceStopActivity(){
 		
-		Log.d("TAG", "force to stop a activity :  name " + pkgName);
 		if(pkgName != null && !pkgName.equals("")){
 			ActivityManager am = (ActivityManager)getSystemService(
 	                Context.ACTIVITY_SERVICE);
@@ -150,7 +148,6 @@ public class BaseActivity extends Activity {
 			var[1] = min + "";
 			var[2] = sdf.format(new Date(Constants.gameStartMillis));
 			
-			Log.v("TAG", "times "+ var[0] + "  " + var[1] + "    " + var[2]);
 			Date date = new Date(System.currentTimeMillis());
 			SimpleDateFormat sdfFileName = new SimpleDateFormat("yyyy-MM-dd");
 			String currentday = sdfFileName.format(date);
