@@ -1,6 +1,7 @@
 package com.duole.provider;
 
 import com.duole.Duole;
+import com.duole.service.download.dao.ConfigDao;
 import com.duole.service.download.dao.MusicListDao;
 
 import android.R.integer;
@@ -16,9 +17,11 @@ public class DuoleProvider extends ContentProvider {
 	private static final UriMatcher sURLMatcher =new UriMatcher(UriMatcher.NO_MATCH);
 	
 	private static final int MUSIC_ALL = 1;
+	private static final int CONFIG = 2;
 	
 	static {
 		sURLMatcher.addURI("com.duole.provider", "music", MUSIC_ALL);
+		sURLMatcher.addURI("com.duole.provider", "config", CONFIG);
 		}
 	
 	@Override
@@ -33,6 +36,19 @@ public class DuoleProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
+		
+		int match = sURLMatcher.match(uri);
+		
+		switch (match) {
+		case CONFIG:
+			ConfigDao cd = new ConfigDao(Duole.appref);
+			cd.save(values);
+			break;
+
+		default:
+			break;
+		}
+		
 		return null;
 	}
 
@@ -47,17 +63,21 @@ public class DuoleProvider extends ContentProvider {
 		
 		Cursor cursor = null;
 		
-		
-		MusicListDao mld = new MusicListDao(Duole.appref);
-		
 		int match = sURLMatcher.match(uri);
 		
 		switch (match) {
+		
 		case MUSIC_ALL:
+			MusicListDao mld = new MusicListDao(Duole.appref);
 			cursor = mld.query();
 			break;
-
+		case CONFIG:
+			ConfigDao cd = new ConfigDao(Duole.appref);
+			cursor = cd.queryAll();
+			break;
+			
 		}
+		
 		return cursor;
 	}
 

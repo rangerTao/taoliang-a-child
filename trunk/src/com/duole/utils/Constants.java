@@ -37,6 +37,7 @@ public class Constants {
 	public static final String PKG_PRIORITY = "com.duole.priorityres";
 	
 	public static final String Duole = "http://wvw.duoleyuan.com";
+	public static final String siteName = "duoleyuan";
 	public static final String UploadGamePeriod = Duole + "/e/member/fava/childuseup.php";
 	public static final String ClientUpdate = Duole + "/e/member/child/ancJver.php";
 	public static final String resourceUrl = Duole  + "/e/member/child/ancJn.php?cc=";
@@ -174,6 +175,7 @@ public class Constants {
 	public static final String Pre_Pc_UserInfo = "pcUserInfo";
 	public static final String Pre_Register = "preRegister";
 	public static final String Pre_CheckUpdate = "preCheckUpdate";
+	public static final String Pre_ClearLocal = "preClearLocal";
 	public static final String Pre_Storage = "preStorage";
 	public static final String Pre_Wifi = "preWIFI";
 	public static final String Pre_Screen_network = "preScreenNetwork";

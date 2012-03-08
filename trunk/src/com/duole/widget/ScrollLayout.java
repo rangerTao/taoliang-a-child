@@ -42,6 +42,7 @@ public class ScrollLayout extends ViewGroup {
 	
 	public ScrollLayout(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
+		
 		// TODO Auto-generated constructor stub
 	}
 

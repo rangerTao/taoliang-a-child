@@ -250,21 +250,25 @@ public class DuoleNetUtils {
     	String url = Constants.ClientUpdate + "?cver=" + localVer + "&cmcode=" + DuoleUtils.getAndroidId();
 		
     	String loaded =XmlUtils.readNodeValue( Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD);
-    	if(loaded.equals("false") || loaded.equals("") ){
-    		String result = DuoleNetUtils.connect(url);
-        	
-        	try{
-        		JSONObject json = new JSONObject(result);
-        		
-        		String version = json.getString("ver");
-        		if(!version.trim().equals(""))
-        			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "true");
-        		else 
-        			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
-        	}catch(Exception e){
-        		XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
-        	}
-    	}
+    	
+    	String result = DuoleNetUtils.connect(url);
+    	
+    	
+    	/*---------------2012 03 05 ------------------*/
+//    	if(loaded.equals("false") || loaded.equals("") ){
+//        	try{
+//        		JSONObject json = new JSONObject(result);
+//        		
+//        		String version = json.getString("ver");
+//        		if(!version.trim().equals(""))
+//        			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "true");
+//        		else 
+//        			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
+//        	}catch(Exception e){
+//        		XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, "false");
+//        	}
+//    	}
+    	/*---------------2012 03 05 ------------------*/
     }
     
 	public static void uploadLocalVersionForce() {

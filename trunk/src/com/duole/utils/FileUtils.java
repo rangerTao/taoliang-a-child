@@ -279,6 +279,7 @@ public class FileUtils {
 						if (!folder.exists()) {
 							folder.mkdirs();
 						}
+						Log.d("TAG", "file path " + file.getAbsolutePath());
 						file.createNewFile();
 						zipFile1.extractEntry(entry, file, pass);
 					}
@@ -288,6 +289,7 @@ public class FileUtils {
 
 		} catch (Exception cwj) {
 			cwj.printStackTrace();
+			new File(zipFile).delete();
 			File file = new File(targetDir);
 			if(emptyFolder(file)){
 				file.delete();

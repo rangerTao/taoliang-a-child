@@ -58,23 +58,23 @@ public class ItemListTask extends AsyncTask {
 			return false;
 		}
 		
-		//Whether download thread is running.
-//		if(!Constants.DOWNLOAD_RUNNING){
-//		if(Constants.dfu != null && !Constants.dfu.isAlive()){
-			
-			//Set the download thread as running.
+		if (!Constants.DOWNLOAD_RUNNING) {
+			// Set the download thread as running.
 			Constants.DOWNLOAD_RUNNING = true;
-			
-			//upload local client version
+
+			// upload local client version
 			DuoleNetUtils.uploadLocalVersion();
-			
-			//Get asset list from server.
+
+			// Get asset list from server.
 			gettedSourceList = getSourceList();
-			
-			//when error.
-			if(!gettedSourceList){
-				Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
+
+			// when error.
+			if (!gettedSourceList) {
+				Duole.appref.sendBroadcast(new Intent(
+						Constants.Refresh_Complete));
+				Constants.DOWNLOAD_RUNNING = false;
 			}
+		}
 		
 		if(gettedSourceList){
 			hmSource = new HashMap<String, Asset>();
@@ -90,18 +90,45 @@ public class ItemListTask extends AsyncTask {
 			Constants.alAssetDeleteList = DuoleUtils.getAssetDeleteList(
 					hmSource, Constants.AssetList);
 			
+			//Reset the hash map.
+			hmSource = new HashMap<String, Asset>();
+			//Put all asset into a hashmap.
+			for (int i = 0; i < Constants.AssetList.size(); i++) {
+				Asset ass = Constants.AssetList.get(i);
+				if (ass != null) {
+					hmSource.put(ass.getId(), ass);
+				}
+			}
+			
 			Constants.DownLoadTaskList = new ArrayList<Asset>();
+			
 			//Get the list of assets to be download.
 			if (Constants.AssetList != null && Constants.AssetList.size() > 0) {
-				for (int i = 0; i < Constants.AssetList.size(); i++) {
-					Asset ass = Constants.AssetList.get(i);
+				
+				for (int i = 0; i < Constants.alAsset.size(); i++) {
+//				for (int i = 0; i < Constants.AssetList.size(); i++) {
+					/*----------------2012.03.05-----------------------------*/
+//					Asset ass = Constants.AssetList.get(i);
+//					if (hmSource.containsKey(ass.getId())) {
+//						if (DuoleUtils.checkDownloadNecessary(ass,
+//								hmSource.get(ass.getId()))) {
+//							Constants.DownLoadTaskList.add(ass);
+//						}
+//					}
+					
+					
+					Asset ass = Constants.alAsset.get(i);
 					if (hmSource.containsKey(ass.getId())) {
 						if (DuoleUtils.checkDownloadNecessary(ass,
 								hmSource.get(ass.getId()))) {
 							Constants.DownLoadTaskList.add(ass);
 						}
+					}else{
+						Constants.DownLoadTaskList.add(ass);
 					}
+					/*----------------2012.03.05-----------------------------*/
 				}
+				
 			} else {
 				for (Asset asset : Constants.alAsset) {
 					if (DuoleUtils.checkDownloadNecessary(asset,
@@ -145,6 +172,8 @@ public class ItemListTask extends AsyncTask {
 		}
 		
 		initDownloadQueue();
+		
+		Constants.DOWNLOAD_RUNNING = false;
 		
 		return true;
 	}

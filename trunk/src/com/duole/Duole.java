@@ -17,6 +17,8 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,6 +27,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -40,6 +43,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -62,6 +66,7 @@ import com.duole.pojos.asset.Asset;
 import com.duole.service.AssetDownloadService;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
+import com.duole.service.download.dao.ConfigDao;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
@@ -122,6 +127,8 @@ public class Duole extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 //		systemSettings();
 		
 		setContentView(R.layout.main);
@@ -133,7 +140,8 @@ public class Duole extends BaseActivity {
 
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
 		startService(screenLock);
-
+		
+		startTheSetupWizard();
 		
 		appref = this;
 		
@@ -158,6 +166,48 @@ public class Duole extends BaseActivity {
 				setPageDividerSelected(index);
 			}
 		});
+	}
+	
+	/**
+	 * Start the setup wizard.
+	 */
+	private void startTheSetupWizard(){
+
+		ConfigDao cd = new ConfigDao(getApplicationContext());
+		Cursor cursor = cd.query("setup");
+		cursor.moveToFirst();
+		
+		if(cursor.getCount() > 0){
+			for(cursor.moveToFirst();!cursor.isAfterLast();cursor.moveToNext()){
+		        if(cursor.getString(0).equals(0) || cursor.getString(0) == null){
+		        	startSetupWizard();
+		        }
+		    }
+		}else{
+			startSetupWizard();
+		}
+		
+		cursor.close();
+		
+		ContentValues cv = new ContentValues();
+		cv.put("name", "setup");
+		cv.put("value", "1");
+		ConfigDao config = new ConfigDao(getApplicationContext());
+		config.save(cv);
+		
+	}
+	
+	private void startSetupWizard(){
+    	
+//		Uri uri = Uri.parse("www.duoleyuan.com");
+    	Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setType("duole/setup");
+		try{
+			startActivity(intent);
+		}catch (Exception e) {
+			Log.e("TAG", e.getMessage());
+		}
+		
 	}
 	
 	private void systemSettings(){
@@ -201,8 +251,6 @@ public class Duole extends BaseActivity {
 			if (DuoleUtils.checkCacheFiles()) {
 				// init the main view.
 				
-				//If a update is exists.install it.
-				DuoleUtils.instalUpdateApk(appref);
 				//Verify the installation of flash player.
 				verifyFlashPlayerInstallation();
 				//Init the view.
@@ -226,6 +274,9 @@ public class Duole extends BaseActivity {
 				Message msgRefresh = new Message();
 				msgRefresh.what = Constants.NET_TRAFFIC;
 				mHandler.sendMessageDelayed(msgRefresh, 5000);
+				
+				//If a update is exists.install it.
+				DuoleUtils.instalUpdateApk(appref);
 				
 			} else {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
@@ -462,6 +513,8 @@ public class Duole extends BaseActivity {
 				}
 			}
 		}
+		
+		llMain.setBackgroundResource(0);
 	}
 
 	/**
@@ -791,7 +844,7 @@ public class Duole extends BaseActivity {
 		Editor editor = sp.edit();
 		editor.putString("id", frontid);
 		editor.putString("base", basePath);
-
+		
 		editor.commit();
 
 		try{
@@ -810,6 +863,7 @@ public class Duole extends BaseActivity {
 						editor.putString("package", pkgName);
 						editor.commit();
 						startActivity(intent);
+						pkgName = packagename;
 					}else{
 						startActivityForResult(intent, 1);
 					}
@@ -880,9 +934,12 @@ public class Duole extends BaseActivity {
 	@Override
 	protected void onResume(){
 		
+		super.onResume();
+		
 		Log.e("TAG", "on resume");
 		
 		overridePendingTransition(R.anim.scalein, R.anim.scaleout);
+		
 		if(pkgName != null && !pkgName.equals("")){
 			forceStopActivity();
 			uploadGamePeriod();
@@ -910,7 +967,6 @@ public class Duole extends BaseActivity {
 			startMusicPlay();
 		}
 		
-		super.onResume();
 	}
 	
 

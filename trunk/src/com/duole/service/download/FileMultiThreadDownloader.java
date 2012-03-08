@@ -267,8 +267,6 @@ public class FileMultiThreadDownloader extends Thread{
 				float rate = (this.downloadSize - this.preSize);
 				rate = rate / 1024 + rate % 1024;
 				
-				Log.d("TAG", this.targetFile.getName() + " download rate is : "
-						+ (rate));
 				this.preSize = this.downloadSize;
 			}
 
