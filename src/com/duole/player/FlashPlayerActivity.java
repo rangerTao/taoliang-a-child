@@ -6,11 +6,14 @@ import com.duole.R;
 import com.duole.activity.PlayerBaseActivity;
 import com.duole.utils.Constants;
 
+import dalvik.system.VMRuntime;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebSettings.PluginState;
 import android.webkit.WebViewClient;
@@ -34,9 +37,6 @@ public class FlashPlayerActivity extends PlayerBaseActivity{
 		String filename = intent.getStringExtra("filename");
 		String url = "";
 		if(filename.startsWith("http")){
-//			if (!DuoleNetUtils.isNetworkAvailable(this)) {
-//				finish();
-//			}
 			url = filename;
 			if (url.contains("youku.com")) {
 				String id = filename.substring(filename.indexOf("sid/") + 4,
@@ -54,6 +54,8 @@ public class FlashPlayerActivity extends PlayerBaseActivity{
 		if(file.exists() || url.startsWith("http")){
 			wvPlay.getSettings().setPluginsEnabled(true);
 			wvPlay.getSettings().setPluginState(PluginState.ON);
+
+			wvPlay.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
 			wvPlay.loadUrl(url);
 		}else{

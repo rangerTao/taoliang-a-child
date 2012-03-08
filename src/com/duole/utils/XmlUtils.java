@@ -575,6 +575,108 @@ public class XmlUtils {
 		}
 	}
 	
+	public static void addNodeAndConfig(String filepath,DocumentBuilder db ,ArrayList<Asset> assetList) throws Exception{
+
+			FileInputStream iStream = new FileInputStream(new File(filepath));
+			Document document = db.parse(iStream);
+
+			for (int i = 0; i < assetList.size(); i++) {
+
+				Asset asset = assetList.get(i);
+
+				// the values
+				Text id = document.createTextNode(asset.getId().trim());
+				Text title = document.createTextNode(asset.getName().trim());
+				Text thumbnail = document.createTextNode(asset.getThumbnail().trim());
+				Text url = document.createTextNode(asset.getUrl().trim());
+				Text lastmodified = document.createTextNode(asset
+						.getLastmodified().trim());
+				Text type = document.createTextNode(asset.getType().trim());
+				Text frontId = document.createTextNode(asset.getFrontID().trim());
+				Text isFront = document.createTextNode(asset.getIsFront().trim());
+				Text md5 = document.createTextNode(asset.getMd5().trim());
+
+				// new elements
+				Element newElement = document.createElement("item");
+				Element newIdElement = document.createElement("id");
+				Element newTitleElement = document.createElement("title");
+				Element newThumbElement = document.createElement("thumbnail");
+				Element newUrlElement = document.createElement("url");
+				Element newLastModifiedElement = document
+						.createElement("lastmodified");
+				Element newTypeElement = document.createElement("type");
+				Element newFrontID = document.createElement("frontid");
+				Element newIsFront = document.createElement("isfront");
+				Element newMd5 = document.createElement("md5");
+				
+				
+				newIdElement.appendChild(id);
+				newTitleElement.appendChild(title);
+				newThumbElement.appendChild(thumbnail);
+				newUrlElement.appendChild(url);
+				newLastModifiedElement.appendChild(lastmodified);
+				newTypeElement.appendChild(type);
+				newFrontID.appendChild(frontId);
+				newIsFront.appendChild(isFront);
+				newMd5.appendChild(md5);
+
+				newElement.appendChild(newIdElement);
+				newElement.appendChild(newTitleElement);
+				newElement.appendChild(newThumbElement);
+				newElement.appendChild(newUrlElement);
+				newElement.appendChild(newLastModifiedElement);
+				newElement.appendChild(newTypeElement);
+				newElement.appendChild(newFrontID);
+				newElement.appendChild(newIsFront);
+				newElement.appendChild(newMd5);
+				
+				if(asset.getType().equals(Constants.RES_AUDIO)){
+					Text bg = document.createTextNode(asset.getBg().trim());
+					Element newBGElement = document.createElement("bg");
+					newBGElement.appendChild(bg);
+					newElement.appendChild(newBGElement);
+				}
+				
+				if(asset.getType().equals(Constants.RES_APK)){
+					
+					PackageManager pm = Duole.appref.getPackageManager();
+					File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+
+					PackageInfo info;
+					info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+
+					if(info != null){
+						Text packag = document.createTextNode(info.packageName);
+						Element newPackage = document.createElement("package");
+						newPackage.appendChild(packag);
+						newElement.appendChild(newPackage);
+						
+						Text mainActivity = document.createTextNode(info.activities[0].name);
+						Element newActivity = document.createElement("activity");
+						newActivity.appendChild(mainActivity);
+						newElement.appendChild(newActivity);
+						
+					}
+				}
+				
+				document.getDocumentElement().appendChild(newElement);
+
+			}
+
+			updateNode(document);
+			
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource domSource = new DOMSource(document);
+
+			StreamResult streamResult = new StreamResult(new File(filePath));
+			
+			transformer.transform(domSource, streamResult);
+			iStream.close();
+			
+	}
+	
 	public static void addSingleNode(String name,String value) throws IOException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

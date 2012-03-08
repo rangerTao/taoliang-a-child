@@ -1,6 +1,7 @@
 package com.duole.activity;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,6 +46,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.duole.Duole;
@@ -53,6 +55,7 @@ import com.duole.pojos.adapter.WifiNetworkAdapter;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
+import com.duole.utils.FileUtils;
 
 /**
  * To config the system preperties.
@@ -383,12 +386,56 @@ public class SystemConfigActivity extends PreferenceActivity {
 		if (preference.getKey().equals(Constants.Pre_CheckUpdate)) {
 			intent = new Intent(appref, CheckUpdateActivity.class);
 		}
+		
+		if (preference.getKey().equals(Constants.Pre_ClearLocal)){
+			clearLocalResource();
+		}
 
 		if (intent != null) {
 			startActivity(intent);
 		}
 
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
+	}
+	
+	/**
+	 * Clear local resources.
+	 */
+	private void clearLocalResource(){
+		
+		TextView tvTip = new TextView(getApplicationContext());
+		tvTip.setText("Caution");
+		new AlertDialog.Builder(appref).setTitle(R.string.caution).setMessage(R.string.clear_local)
+				.setPositiveButton(R.string.btnPositive, new OnClickListener() {
+					
+					public void onClick(DialogInterface dialog, int which) {
+						
+						for(File apk : new File(Constants.CacheDir + Constants.RES_APK).listFiles()){
+							
+							String pkgName = FileUtils.getPackagenameFromFile(getApplicationContext(), apk);
+							
+							try {
+								Runtime.getRuntime().exec("pm uninstall " + pkgName);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						
+						FileUtils.emptyFolder(new File(Constants.CacheDir));
+						
+						Constants.newItemExists = true;
+						Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
+						
+						DuoleUtils.checkCacheFiles();
+						
+						Duole.appref.mScrollLayout.snapToScreen(0);
+						
+					}
+				})
+				.setNegativeButton(R.string.btnNegative, null).create().show();
+		
+		
 	}
 	
 	/**
