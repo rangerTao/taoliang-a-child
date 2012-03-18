@@ -71,6 +71,7 @@ import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
+import com.duole.utils.WidgetUtils;
 import com.duole.utils.XmlUtils;
 import com.duole.widget.ScrollLayout;
 
@@ -141,8 +142,6 @@ public class Duole extends BaseActivity {
 		Intent screenLock = new Intent(this,UnLockScreenService.class);
 		startService(screenLock);
 		
-		startTheSetupWizard();
-		
 		appref = this;
 		
 		mScrollLayout = (ScrollLayout) findViewById(R.id.ScrollLayoutTest);
@@ -179,7 +178,7 @@ public class Duole extends BaseActivity {
 		
 		if(cursor.getCount() > 0){
 			for(cursor.moveToFirst();!cursor.isAfterLast();cursor.moveToNext()){
-		        if(cursor.getString(0).equals(0) || cursor.getString(0) == null){
+		        if(cursor.getString(0).equals("0") || cursor.getString(0) == null){
 		        	startSetupWizard();
 		        }
 		    }
@@ -189,18 +188,12 @@ public class Duole extends BaseActivity {
 		
 		cursor.close();
 		
-		ContentValues cv = new ContentValues();
-		cv.put("name", "setup");
-		cv.put("value", "1");
-		ConfigDao config = new ConfigDao(getApplicationContext());
-		config.save(cv);
-		
 	}
 	
 	private void startSetupWizard(){
     	
-//		Uri uri = Uri.parse("www.duoleyuan.com");
     	Intent intent = new Intent(Intent.ACTION_VIEW);
+    	intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setType("duole/setup");
 		try{
 			startActivity(intent);
@@ -282,8 +275,11 @@ public class Duole extends BaseActivity {
 				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
 			}
 
+			startTheSetupWizard();
+			
 			new ItemListTask().execute();
 
+			
 		} else {
 			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
 			
@@ -478,8 +474,11 @@ public class Duole extends BaseActivity {
 				this.setTotalTime(time);
 				this.seek(0);
 				this.stop();
-				getPb().setMax(time);
-				getPb().setProgress(0);
+				if(getPb() != null){
+					getPb().setMax(time);
+					getPb().setProgress(0);
+				}
+				
 				
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
@@ -513,8 +512,6 @@ public class Duole extends BaseActivity {
 				}
 			}
 		}
-		
-		llMain.setBackgroundResource(0);
 	}
 
 	/**
@@ -567,7 +564,7 @@ public class Duole extends BaseActivity {
 			appPage.setNumColumns(Constants.COLUMNS);
 
 			appPage.setPadding(40, 10, 40,0);
-
+			
 			appPage.setVerticalSpacing(30);
 			appPage.setColumnWidth(110);
 
@@ -719,14 +716,22 @@ public class Duole extends BaseActivity {
 			}
 			
 			// Launch a application.
-			if (url.endsWith(Constants.RES_APK)) {
+			if (url.endsWith(Constants.RES_APK) && !assItem.getType().equals(Constants.RES_WIDGET)) {
 
 				pkgName = assItem.getPackag();
 				if(pkgName == null){
 					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
 				}
 				startActivityByPkgName(pkgName);
+			}else if(url.endsWith(Constants.RES_APK)){
+				pkgName = assItem.getPackag();
+				if(pkgName == null){
+					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
+				}
+				WidgetUtils.startConfigureActivityByPkgName(getApplicationContext(),pkgName);
+				overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 			}
+			
 			// Launch the configure function.
 			if (assItem.getType().equals(Constants.RES_CONFIG)) {
 				intent = new Intent(appref, PasswordActivity.class);
@@ -785,7 +790,7 @@ public class Duole extends BaseActivity {
 //			}
 
 			// If not a application.
-			if (!assItem.getType().equals(Constants.RES_APK)) {
+			if (!assItem.getType().equals(Constants.RES_APK) && !assItem.getType().equals(Constants.RES_WIDGET)) {
 				mContext.startActivity(intent);
 				overridePendingTransition(R.anim.scalein, R.anim.scaleout);
 			}
@@ -962,8 +967,9 @@ public class Duole extends BaseActivity {
 		}
         this.mScrollLayout.refresh();
         
+        Log.d("TAG","Constants.entime_out  " + Constants.ENTIME_OUT);
+        
 		if ((Constants.ENTIME_OUT && !Constants.musicPlayerIsRunning)) {
-			Log.e("TAG","start music player rest");
 			startMusicPlay();
 		}
 		

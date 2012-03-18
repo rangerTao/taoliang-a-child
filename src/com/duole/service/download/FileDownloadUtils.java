@@ -46,7 +46,7 @@ public class FileDownloadUtils {
 					DuoleUtils.downloadVideo(asset, asset.getUrl());
 				}
 			}
-			if (type.equals(Constants.RES_APK) || url.endsWith("apk")) {
+			if (type.equals(Constants.RES_APK) || url.endsWith("apk") || type.equals(Constants.RES_WIDGET)) {
 				DuoleUtils.downloadApp(asset, asset.getUrl());
 			}
 

@@ -7,6 +7,7 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +18,11 @@ import android.widget.TextView;
 import com.duole.Duole;
 import com.duole.R;
 import com.duole.pojos.asset.Asset;
+import com.duole.service.download.dao.WidgetDao;
 import com.duole.utils.Constants;
+import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
+import com.duole.utils.WidgetUtils;
 
 public class AssetItemAdapter extends BaseAdapter {
 
@@ -64,7 +68,7 @@ public class AssetItemAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		Asset asset = mList.get(position);
-
+		
 		AssetItem assItem;
 		if (convertView == null) {
 			View v = LayoutInflater.from(mContext).inflate(R.layout.app_item,
@@ -78,7 +82,21 @@ public class AssetItemAdapter extends BaseAdapter {
 			v.setTag(assItem);
 			convertView = v;
 		} else {
-			assItem = (AssetItem) convertView.getTag();
+			try{
+				assItem = (AssetItem) convertView.getTag();
+			}catch (Exception e) {
+				View v = LayoutInflater.from(mContext).inflate(R.layout.app_item,
+						null);
+
+				assItem = new AssetItem();
+				assItem.ivKe = (ImageView) v.findViewById(R.id.ivKe);
+				assItem.ivAssetThumb = (ImageView) v.findViewById(R.id.ivAppIcon);
+				assItem.tvAssetName = (TextView) v.findViewById(R.id.tvAppName);
+
+				v.setTag(assItem);
+				convertView = v;
+			}
+			
 		}
 		
 		if(asset.getType().equals(Constants.RES_CONFIG)){
@@ -89,6 +107,29 @@ public class AssetItemAdapter extends BaseAdapter {
 			assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
 			
 			return convertView;
+		}
+		 
+		if(asset.getType().equals(Constants.RES_WIDGET)){
+			
+			WidgetDao wd = new WidgetDao(mContext);
+			
+			String wid = "";
+			String packagename = "";
+			if(asset.getPackag() != null && !asset.getPackag().equals("")){
+				packagename = asset.getPackag();
+				wid = wd.findWidgetId(packagename);
+				
+			}else{
+				packagename = FileUtils.getPackagenameFromAPK(mContext, asset);
+				wid = wd.findWidgetId(packagename);
+			}
+			if (!wid.equals("")) {
+				return WidgetUtils.getWidgetViewByWidgetID(mContext, wid,packagename);
+			} else {
+				return WidgetUtils.getWidgetViewByWidgetPackageName(mContext,
+						packagename);
+			}
+			
 		}
 		
 		if(Constants.alAssetCache.containsKey(asset.getId())){

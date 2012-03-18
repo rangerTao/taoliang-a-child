@@ -94,6 +94,7 @@ public class Constants {
 	public static final String RES_VIDEO = "video";
 	public static final String RES_THUMB = "thumbnail";
 	public static final String RES_APK = "apk";
+	public static final String RES_WIDGET = "widget";
 	public static final String RES_CONFIG = "config";
 	public static final String RES_CONFIG_STATUS = "status";
 	public static final String RES_ABOUT = "about";
@@ -176,6 +177,7 @@ public class Constants {
 	public static final String Pre_Register = "preRegister";
 	public static final String Pre_CheckUpdate = "preCheckUpdate";
 	public static final String Pre_ClearLocal = "preClearLocal";
+	public static final String Pre_startSetup = "preSetupWizard";
 	public static final String Pre_Storage = "preStorage";
 	public static final String Pre_Wifi = "preWIFI";
 	public static final String Pre_Screen_network = "preScreenNetwork";

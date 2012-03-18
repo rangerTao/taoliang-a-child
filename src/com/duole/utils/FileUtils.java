@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -49,6 +50,18 @@ public class FileUtils {
 		return false;
 
 	}
+	
+	/**
+	 * Get the size of used and free space on sdcard.
+	 * @param block counts.
+	 * @param block size.
+	 * @return
+	 */
+	public static long countUp(int a, int b){
+		BigDecimal bc = new BigDecimal(a);
+		BigDecimal bs = new BigDecimal(b);
+		return Integer.parseInt(bc.multiply(bs).divide(new BigDecimal(1000).multiply(new BigDecimal(1000))).setScale(0,BigDecimal.ROUND_UP).toString());
+	}
 
 	// move files
 	public static void moveFile(File source, File target) {
@@ -67,7 +80,7 @@ public class FileUtils {
 			int byteread = 0;
 			File oldfile = new File(oldPathFile);
 			if (oldfile.exists()) {
-				InputStream inStream = new FileInputStream(oldPathFile); // ¶ÁÈëÔ­ÎÄ¼þ
+				InputStream inStream = new FileInputStream(oldPathFile); // ï¿½ï¿½ï¿½ï¿½Ô­ï¿½Ä¼ï¿½
 				FileOutputStream fs = new FileOutputStream(newPathFile);
 				byte[] buffer = new byte[512];
 				while ((byteread = inStream.read(buffer)) != -1) {

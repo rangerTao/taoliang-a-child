@@ -20,6 +20,7 @@ import com.duole.thread.DeleteAssetFilesThread;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
+import com.duole.utils.FileUtils;
 import com.duole.utils.JsonUtils;
 import com.duole.utils.XmlUtils;
 
@@ -56,6 +57,11 @@ public class ItemListTask extends AsyncTask {
 		if(!DuoleUtils.checkTFCard()){
 			Toast.makeText(Duole.appref, "no tf", 2000);
 			return false;
+		}
+		
+		if(!DuoleUtils.checkTFUsage()){
+			//swipe the cache dir.
+			FileUtils.clearUselessResource();
 		}
 		
 		if (!Constants.DOWNLOAD_RUNNING) {
@@ -154,7 +160,7 @@ public class ItemListTask extends AsyncTask {
 
 		//there are assets need to delete.
 		if (Constants.alAssetDeleteList.size() > 0) {
-			new DeleteAssetFilesThread(Constants.alAssetDeleteList).start();
+//			new DeleteAssetFilesThread(Constants.alAssetDeleteList).start();
 		}
 
 		//if there is noting wrong with the asset list.

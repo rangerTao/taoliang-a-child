@@ -58,8 +58,8 @@ public class BackgroundRefreshReceiver extends BroadcastReceiver {
 					Constants.SLEEP_TIME = true;
 					
 					Constants.ENTIME_OUT = false;
-					//swipe the cache dir.
-					FileUtils.clearUselessResource();
+//					//swipe the cache dir.
+//					FileUtils.clearUselessResource();
 					
 					DuoleSysConfigUtils.disableWifi(context);
 					

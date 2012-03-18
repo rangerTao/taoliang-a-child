@@ -30,6 +30,7 @@
 	    <Preference android:title="@string/security_changePasswd"
 			android:key="preSecurityChangePasswd"></Preference>
 		<Preference android:key="preCheckUpdate" android:title="@string/check_update" android:enabled="true"></Preference>
+		<Preference android:key="preSetupWizard" android:title="@string/startSetup" android:enabled="true"/>
 		<Preference android:key="preClearLocal" android:title="@string/local_clear" android:enabled="true"></Preference>
 	</PreferenceCategory>
 

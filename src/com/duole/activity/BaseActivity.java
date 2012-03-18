@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -87,10 +88,19 @@ public class BaseActivity extends Activity {
 		MusicPlay.putExtra("type", "rest");
 		
 		//Take main task to front
-		Intent intent = new Intent(Duole.appref,Duole.class);
-		startActivity(intent);
 		
-		startActivity(MusicPlay);
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setType("duole/rest");
+		try{
+			startActivity(intent);
+			Duole.restCountDown.resume();
+		}catch (Exception e) {
+			e.printStackTrace();
+			intent = new Intent(Duole.appref,Duole.class);
+			startActivity(intent);
+			
+			startActivity(MusicPlay);
+		}
 	}
 	
 	public void SetFullScreen() {

@@ -545,6 +545,22 @@ public class XmlUtils {
 					}
 				}
 				
+				if(asset.getType().equals(Constants.RES_WIDGET)){
+					PackageManager pm = Duole.appref.getPackageManager();
+					File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+
+					PackageInfo info;
+					info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+
+					if(info != null){
+						Text packag = document.createTextNode(info.packageName);
+						Element newPackage = document.createElement("package");
+						newPackage.appendChild(packag);
+						newElement.appendChild(newPackage);
+						
+					}
+				}
+				
 				document.getDocumentElement().appendChild(newElement);
 
 			}

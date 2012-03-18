@@ -18,6 +18,7 @@ public class DuoleProvider extends ContentProvider {
 	
 	private static final int MUSIC_ALL = 1;
 	private static final int CONFIG = 2;
+	private static final int CONFIG_CONDITION = 3;
 	
 	static {
 		sURLMatcher.addURI("com.duole.provider", "music", MUSIC_ALL);
@@ -65,6 +66,7 @@ public class DuoleProvider extends ContentProvider {
 		
 		int match = sURLMatcher.match(uri);
 		
+		Log.d("TAG", "match " + match);
 		switch (match) {
 		
 		case MUSIC_ALL:
@@ -73,9 +75,11 @@ public class DuoleProvider extends ContentProvider {
 			break;
 		case CONFIG:
 			ConfigDao cd = new ConfigDao(Duole.appref);
-			cursor = cd.queryAll();
+			if(selection.equals(""))
+				cursor = cd.queryAll();
+			else
+				cursor = cd.query(selection);
 			break;
-			
 		}
 		
 		return cursor;

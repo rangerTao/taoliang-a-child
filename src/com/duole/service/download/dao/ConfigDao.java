@@ -75,6 +75,30 @@ public class ConfigDao {
 	}
 	
 	/**
+	 * save the length of downloaded data.
+	 * 
+	 * @param path
+	 * @param map
+	 */
+	public void save(String name,String value){
+		
+		if(name != null && value != null){
+			
+			Cursor cursor = query(name);
+			
+			int size = cursor.getCount();
+			cursor.close();
+			
+			if(size > 0){
+				update(name, value);
+			}else{
+				insert(name, value);
+			}
+		}
+		
+	}
+	
+	/**
 	 * update the Configuration.
 	 * 
 	 * @param path
