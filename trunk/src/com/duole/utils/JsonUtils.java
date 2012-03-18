@@ -11,7 +11,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
+import com.duole.service.download.dao.ConfigDao;
 
 public class JsonUtils {
 
@@ -26,6 +28,7 @@ public class JsonUtils {
 		File client;
 		//Get the verison of client.
 		String version = "";
+		ConfigDao configDao = new ConfigDao(Duole.appref);
 		try{
 			version = jsonObject.getString("ver");
 		}catch (Exception e) {
@@ -132,6 +135,8 @@ public class JsonUtils {
 			DuoleUtils.downloadPicSingle(new URL(Constants.Duole + bgurl), file);
 			Constants.bgurl = bgurl;
 			
+			configDao.save(Constants.XML_BG,file.getAbsolutePath());
+			
 			Constants.newItemExists = true;
 		}
 		
@@ -163,6 +168,8 @@ public class JsonUtils {
 					+ bgurl), file);
 			Constants.bgRestUrl = bgurl;
 			
+			configDao.save(Constants.XML_BGURL,file.getAbsolutePath());
+			
 			Constants.newItemExists = true;
 		}
 		
@@ -179,6 +186,7 @@ public class JsonUtils {
 			Constants.restart = jsonObject.getString("tipsd");
 			DuoleUtils.downloadPicSingle(new URL(Constants.Duole
 					+ Constants.restart), file);
+			configDao.save(Constants.XML_TIPSTART, file.getAbsolutePath());
 		}
 		
 		String en = Constants.entime;
@@ -199,6 +207,12 @@ public class JsonUtils {
 		
 		//the url of  tip sound.
 		Constants.restart = jsonObject.getString("tipsd");
+		
+		configDao.save("base",Constants.CacheDir);
+		configDao.save(Constants.XML_ENTIME, Constants.entime);
+		configDao.save(Constants.XML_RESTIME, Constants.restime);
+		configDao.save(Constants.XML_SLEEPEND, Constants.sleepend);
+		configDao.save(Constants.XML_SLEEPSTART, Constants.sleepstart);
 		
 		//Update the valus getted from json.
 		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);

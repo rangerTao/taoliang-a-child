@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.duole.Duole;
+import com.duole.service.download.dao.ConfigDao;
 import com.duole.utils.Constants;
 import com.duole.utils.XmlUtils;
 
@@ -17,7 +18,7 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if(intent.getAction().equals(Constants.Event_AppStart)){
-			antiFatigueConfiguration();
+			antiFatigueConfiguration(context);
 			
 			if(Duole.gameCountDown != null){
 				Duole.gameCountDown.resume();
@@ -35,7 +36,7 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 	/**
 	 * Plan the anti fatigue schedule base on the entertainment period and rest period
 	 */
-	public void antiFatigueConfiguration(){
+	public void antiFatigueConfiguration(Context context){
 		
 		String temp = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
 		Log.v("TAG", "last start" +  temp);
@@ -46,6 +47,9 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 		Log.v("TAG", "current millis" + current);
 		
 		if(Math.abs((current - lastDay)) > Constants.timePool){
+			ConfigDao configDao = new ConfigDao(context);
+			
+			configDao.save(Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			
 			long time1 = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
@@ -56,6 +60,8 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 			Constants.timePool = time1 + time2;
 			
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_TIMEPOOL, Constants.timePool + "");
+			
+			configDao.save(Constants.XML_TIMEPOOL, Constants.timePool + "");
 			
 			Log.d("TAG", Constants.timePool + "  time pool");
 			

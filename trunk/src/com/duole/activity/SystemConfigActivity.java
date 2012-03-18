@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.NetworkInfo;
@@ -52,6 +53,7 @@ import android.widget.Toast;
 import com.duole.Duole;
 import com.duole.R;
 import com.duole.pojos.adapter.WifiNetworkAdapter;
+import com.duole.service.download.dao.ConfigDao;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
 import com.duole.utils.DuoleUtils;
@@ -76,6 +78,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 	PreferenceCategory pcUserInfo;
 	Preference preStorage;
 	CheckBoxPreference preWifi;
+	Preference preSetupWizard;
 	Preference preListWifi;
 	Preference preCheckUpdate;
 	Preference preCurTime;
@@ -127,6 +130,14 @@ public class SystemConfigActivity extends PreferenceActivity {
 		
 		//init the content of anti fatigure views.
 		initAntiFatigureViews();
+		
+		//init the status of setup wizard.
+		initCheckboxSetupWizard();
+	}
+	
+	private void initCheckboxSetupWizard(){
+		
+		preSetupWizard = (Preference) findPreference(Constants.Pre_startSetup);
 	}
 	
 	private void getCurrentTime(){
@@ -150,9 +161,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 			File sdcard = Environment.getExternalStorageDirectory();
 			StatFs statfs = new StatFs(sdcard.getAbsolutePath());
 			
-			long totalSize = countUp(statfs.getBlockCount(),statfs.getBlockSize());
+			long totalSize = FileUtils.countUp(statfs.getBlockCount(),statfs.getBlockSize());
 			long usedSize = totalSize
-					- countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
+					- FileUtils.countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
 			if (totalSize > 1024) {
 				float total = totalSize / (float) 1024;
 				float used = usedSize / (float) 1024;
@@ -306,7 +317,6 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 	@Override
 	protected void onResume() {
-//		getUserInfo();
 		super.onResume();
 	}
 
@@ -390,12 +400,32 @@ public class SystemConfigActivity extends PreferenceActivity {
 		if (preference.getKey().equals(Constants.Pre_ClearLocal)){
 			clearLocalResource();
 		}
+		
+		if (preference.getKey().equals(Constants.Pre_startSetup)){
+			startSetupWizard();
+		}
 
 		if (intent != null) {
 			startActivity(intent);
 		}
 
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
+	}
+	
+	private void startSetupWizard(){
+		
+		ConfigDao cd = new ConfigDao(getApplicationContext());
+		cd.save("setup", "0");
+		
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setType("duole/setup");
+		try{
+			getApplicationContext().startActivity(intent);
+		}catch (Exception e) {
+			Log.e("TAG", e.getMessage());
+		}
+		
 	}
 	
 	/**
@@ -436,18 +466,6 @@ public class SystemConfigActivity extends PreferenceActivity {
 				.setNegativeButton(R.string.btnNegative, null).create().show();
 		
 		
-	}
-	
-	/**
-	 * Get the size of used and free space on sdcard.
-	 * @param block counts.
-	 * @param block size.
-	 * @return
-	 */
-	private long countUp(int a, int b){
-		BigDecimal bc = new BigDecimal(a);
-		BigDecimal bs = new BigDecimal(b);
-		return Integer.parseInt(bc.multiply(bs).divide(new BigDecimal(1000).multiply(new BigDecimal(1000))).setScale(0,BigDecimal.ROUND_UP).toString());
 	}
 	
 	/**

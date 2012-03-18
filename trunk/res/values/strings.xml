@@ -50,6 +50,7 @@
     <string name="check_update">\u68c0\u67e5\u66f4\u65b0</string>
     <string name="client_uptodate">\u5ba2\u6237\u7aef\u5df2\u7ecf\u662f\u6700\u65b0\u3002</string>
     <string name="local_clear">\u91cd\u7f6e</string>
+    <string name="startSetup">\u8bbe\u7f6e\u5411\u5bfc</string>
 
     <!-- tips -->
     <string name="network_unavailable">\u7f51\u7edc\u4e0d\u53ef\u7528\uff0c\u8bf7\u5148\u8fdb\u884c\u7f51\u7edc\u8bbe\u7f6e\u3002</string>
@@ -102,6 +103,8 @@
     <string name="player_tip">\u64ad\u653e\u6240\u9009\u89c6\u9891\uff0c\u9700\u8981\u9009\u62e9\u76f8\u5e94\u64ad\u653e\u5668\u3002\n\u8bf7\u767b\u5f55\u0077\u0077\u0077\u002e\u0064\u0075\u006f\u006c\u0065\u0079\u0075\u0061\u006e\u002e\u0063\u006f\u006d\uff0c\u8fdb\u5165\u201c\u4eb2\u5b50\u6e38\u620f\u201d\u680f\u76ee\u9009\u62e9\u64ad\u653e\u5668\u3002</string>
     <string name="player_notfound_title">\u672a\u53d1\u73b0\u89c6\u9891\u64ad\u653e\u5668\u3002</string>
 
-	<!--  alert -->
-	<string name="clear_local">\u672c\u6b21\u64cd\u4f5c\u5c06\u91cd\u7f6e\u5ba2\u6237\u7aef\u672c\u5730\u8d44\u6e90\u3002</string>        
+    <!-- alert -->
+    <string name="clear_local">\u672c\u6b21\u64cd\u4f5c\u5c06\u91cd\u7f6e\u5ba2\u6237\u7aef\u672c\u5730\u8d44\u6e90\u3002</string>
+    <string name="gadget_error_text">Problem loading widget</string>
+
 </resources>

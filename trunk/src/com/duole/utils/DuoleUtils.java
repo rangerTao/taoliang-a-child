@@ -45,6 +45,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.StatFs;
 import android.provider.ContactsContract.Contacts.Data;
 import android.provider.Settings.System;
 import android.util.Log;
@@ -149,7 +150,27 @@ public class DuoleUtils {
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			return false;
 		}
-
+		
+		return true;
+	}
+	
+	public static boolean checkTFUsage(){
+		
+		File sdcard = Environment.getExternalStorageDirectory();
+		StatFs statfs = new StatFs(sdcard.getAbsolutePath());
+		
+		long totalSize = FileUtils.countUp(statfs.getBlockCount(),statfs.getBlockSize());
+		long usedSize = totalSize
+				- FileUtils.countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
+		
+		if(usedSize >= totalSize){
+			return false;
+		}
+		
+		if(((usedSize / (float) 1024) % ( totalSize / (float) 1024)) > 0.8){
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -652,15 +673,10 @@ public class DuoleUtils {
 		}
 
 		// Source file does not exists.
-		if (type.equals(Constants.RES_APK)) {
-			file = new File(Constants.CacheDir + type
+		if (type.equals(Constants.RES_APK) || type.equals(Constants.RES_WIDGET)) {
+			file = new File(Constants.CacheDir + Constants.RES_APK
 					+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
-			// if(asset.getUrl().startsWith("http") &&
-			// !asset.getUrl().contains("duoleyuan")){
-			// Constants.newItemExists = true;
-			// return false;
-			// }
 			if (!file.exists()) {
 				return true;
 			} else if (file.exists()) {
@@ -760,22 +776,6 @@ public class DuoleUtils {
 			XmlUtils.deleteAllItemNodes();
 
 			XmlUtils.addNode(assets);
-			
-//			File file = new File(Constants.ItemList + ".bak.bak");
-//			file.createNewFile();
-//			InputStream iStream = new FileInputStream(file);
-//			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-//			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
-//			
-//			XmlUtils.initFile(iStream, dBuilder, file);
-//			
-//			try{
-//				XmlUtils.addNodeAndConfig(file.getAbsolutePath(), dBuilder, assets);
-//				
-//				FileUtils.copyFile(file.getAbsolutePath(), Constants.ItemList);
-//			}catch (Exception e) {
-//				return false;
-//			}
 
 		} catch (Exception e) {
 			File file = new File(Constants.ItemList);
@@ -1023,6 +1023,11 @@ public class DuoleUtils {
 			if (type.trim().toLowerCase().equals("")) {
 				type = DuoleUtils.checkAssetType(asset);
 			}
+			
+			if(asset.getType().equals(Constants.RES_WIDGET)){
+				type = Constants.RES_APK;
+			}
+			
 			String path = asset.getUrl();
 			String isfront = asset.getIsFront();
 
