@@ -28,6 +28,8 @@ public class Constants {
 	public static boolean musicPlayerIsRunning = false;
 	public static boolean clientApkDownloaded = false;
 	public static boolean viewrefreshenable = true;
+	
+	public static boolean power_save = false;
 	//Default storage dir.
 	public static final String CacheDir = "/sdcard/DuoleCache/";
 	
@@ -77,6 +79,9 @@ public class Constants {
 	public static final int REST_TIME = 1;
 	public static final int NET_TRAFFIC = 11;
 	public static final int STOP_ACTIVITY = 999;
+	
+	public static final int REFRESH_CONTENT = 998;
+	public static final int RESTART_REFRESH = 997;
 	
 	
 	//Whether app is running.
@@ -164,6 +169,7 @@ public class Constants {
 	public static final SimpleDateFormat sdf_hour = new SimpleDateFormat("HH");
 	
 	//System config preference.
+	public static final String pre_power_save = "prePowerSave";
 	public static final String Pre_network = "preNetwork";
 	public static final String Pre_volume = "preVolume";
 	public static final String Pre_bright = "preBright";

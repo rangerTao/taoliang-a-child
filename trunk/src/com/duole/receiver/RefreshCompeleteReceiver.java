@@ -113,6 +113,8 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 				AssetItemAdapter aia = new AssetItemAdapter(Duole.appref, temp,
 						i);
 				appPage.setAdapter(aia);
+				
+				appPage.setSelector(R.drawable.grid_selector);
 
 				appPage.setLayoutParams(new ViewGroup.LayoutParams(
 						LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
@@ -140,7 +142,12 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 
 		}
 		
-		int llChildCount = Duole.appref.llPageDivider.getChildCount();
+		int llChildCount = 0;
+		
+		if(Duole.appref.llPageDivider != null){
+			llChildCount = Duole.appref.llPageDivider.getChildCount();
+		}
+		
 		if(PageCount <= llChildCount){
 			for(int i = llChildCount; i > PageCount ; i --){
 				Duole.appref.llPageDivider.removeViewAt(i - 1);

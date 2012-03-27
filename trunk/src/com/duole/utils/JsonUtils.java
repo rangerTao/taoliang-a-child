@@ -14,6 +14,7 @@ import android.util.Log;
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
 import com.duole.service.download.dao.ConfigDao;
+import com.duole.thread.CheckBaseAppExistenceAndInstall;
 
 public class JsonUtils {
 
@@ -106,6 +107,13 @@ public class JsonUtils {
 			e.printStackTrace();
 		}
 		
+		//Deal with the base apps.
+		if(jsonObject.has("base")){
+			
+			CheckBaseAppExistenceAndInstall cbaeai = new CheckBaseAppExistenceAndInstall(Duole.appref, jsonObject.getJSONObject("base"));
+			cbaeai.start();
+			
+		}
 		
 		File file = null;
 		//Background.
@@ -208,11 +216,15 @@ public class JsonUtils {
 		//the url of  tip sound.
 		Constants.restart = jsonObject.getString("tipsd");
 		
-		configDao.save("base",Constants.CacheDir);
-		configDao.save(Constants.XML_ENTIME, Constants.entime);
-		configDao.save(Constants.XML_RESTIME, Constants.restime);
-		configDao.save(Constants.XML_SLEEPEND, Constants.sleepend);
-		configDao.save(Constants.XML_SLEEPSTART, Constants.sleepstart);
+		try{
+			configDao.save("base",Constants.CacheDir);
+			configDao.save(Constants.XML_ENTIME, Constants.entime);
+			configDao.save(Constants.XML_RESTIME, Constants.restime);
+			configDao.save(Constants.XML_SLEEPEND, Constants.sleepend);
+			configDao.save(Constants.XML_SLEEPSTART, Constants.sleepstart);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		//Update the valus getted from json.
 		XmlUtils.updateSingleNode(Constants.XML_ENTIME, Constants.entime);

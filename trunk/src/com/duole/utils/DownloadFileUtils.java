@@ -77,7 +77,6 @@ public class DownloadFileUtils extends Thread {
 			e.printStackTrace();
 			return false;
 		}
-		Log.d("TAG", "download finish");
 		return true;
 	}
 

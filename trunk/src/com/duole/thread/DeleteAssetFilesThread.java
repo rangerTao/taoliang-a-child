@@ -42,7 +42,7 @@ public class DeleteAssetFilesThread extends Thread {
 						+ ass.getThumbnail().substring(
 								ass.getThumbnail().lastIndexOf("/")));
 				if (file.exists()) {
-					file.delete();
+//					file.delete();
 				}
 			}
 			
@@ -53,7 +53,7 @@ public class DeleteAssetFilesThread extends Thread {
 				file = new File(Constants.CacheDir + Constants.RES_AUDIO
 						+ ass.getUrl().substring(ass.getUrl().lastIndexOf("/")));
 				if (file.exists()) {
-					file.delete();
+//					file.delete();
 				}
 			}
 
@@ -62,7 +62,7 @@ public class DeleteAssetFilesThread extends Thread {
 				file = new File(Constants.CacheDir + Constants.RES_GAME
 						+ ass.getUrl().substring(ass.getUrl().lastIndexOf("/")));
 				if (file.exists()) {
-					file.delete();
+//					file.delete();
 				}
 			}
 			
@@ -86,7 +86,7 @@ public class DeleteAssetFilesThread extends Thread {
 					e.printStackTrace();
 				}
 				if (file.exists()) {
-					file.delete();
+//					file.delete();
 				}
 			}
 
@@ -95,7 +95,7 @@ public class DeleteAssetFilesThread extends Thread {
 				file = new File(Constants.CacheDir + Constants.RES_VIDEO
 						+ ass.getUrl().substring(ass.getUrl().lastIndexOf("/")));
 				if (file.exists()) {
-					file.delete();
+//					file.delete();
 				}
 			}
 			

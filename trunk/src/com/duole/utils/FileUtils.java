@@ -332,6 +332,7 @@ public class FileUtils {
 		if(info != null){
 			return info.packageName;
 		}else{
+			file.delete();
 			return "";
 		}
 	}
@@ -358,13 +359,16 @@ public class FileUtils {
 	
 	public static boolean emptyFolder(File file){
 		
-		for(File temp : file.listFiles()){
-			if(temp.isDirectory()){
-				emptyFolder(temp);
-				temp.delete();
-			}else{
-				temp.delete();
+		for (File temp : file.listFiles()) {
+			if (temp != null) {
+				if (temp.isDirectory()) {
+					emptyFolder(temp);
+					temp.delete();
+				} else {
+					temp.delete();
+				}
 			}
+
 		}
 		
 		return true;

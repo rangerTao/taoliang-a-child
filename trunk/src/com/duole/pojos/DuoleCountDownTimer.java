@@ -2,6 +2,7 @@ package com.duole.pojos;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.ProgressBar;
 
 public abstract class DuoleCountDownTimer {

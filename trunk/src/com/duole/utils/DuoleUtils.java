@@ -56,6 +56,7 @@ import android.widget.Toast;
 import com.duole.Duole;
 import com.duole.R;
 import com.duole.pojos.asset.Asset;
+import com.duole.pojos.asset.BaseApp;
 import com.duole.service.download.FileMultiThreadDownloader;
 import com.duole.service.download.OnDownloadCompleteListener;
 import com.duole.service.download.OnDownloadErrorListener;
@@ -167,7 +168,7 @@ public class DuoleUtils {
 			return false;
 		}
 		
-		if(((usedSize / (float) 1024) % ( totalSize / (float) 1024)) > 0.8){
+		if(usedSize > totalSize * 0.8f){
 			return false;
 		}
 		
@@ -275,7 +276,91 @@ public class DuoleUtils {
 
 					try {
 						Process p = Runtime.getRuntime().exec(
-								"pm install " + target.getAbsolutePath());
+								"pm install -r" + target.getAbsolutePath());
+						p.waitFor();
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				cache.delete();
+			}
+		});
+
+		ftd.setOnDownloadErrorListener(new OnDownloadErrorListener() {
+
+			public void onError() {
+
+			}
+		});
+
+		ftd.start();
+
+		synchronized (ftd) {
+			try {
+				ftd.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return false;
+
+	}
+	
+	/**
+	 * Down load app from server.
+	 * 
+	 * @param asset
+	 * @param video
+	 * @return
+	 */
+	public static boolean downloadBaseApp(BaseApp ba,String path) {
+
+		// Reorganize the url.
+		URL url = checkUrl(Constants.Duole + ba.getbPath());
+
+		Log.v("TAG", url.toString());
+
+		// the file used to save the video.
+		File file = new File(path);
+
+		if (file.exists()) {
+			return true;
+		}
+
+		File cacheFile = new File(Constants.CacheDir + "/temp/");
+		
+		Asset asset = new Asset();
+		asset.setMd5(ba.getFilemd5());
+		asset.setUrl(ba.getbPath());
+
+		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(
+				Duole.appref, asset, url.toString(), cacheFile, file, 7);
+
+		ftd.setOnDownloadCompleteListener(new OnDownloadCompleteListener() {
+
+			public void onDownloadComplete(Asset asset, File cache, File target) {
+
+				if (((asset.getUrl().startsWith("http") || asset.getUrl()
+						.startsWith("ftp")) && !asset.getUrl().contains(
+						Constants.siteName))
+						|| asset.getMd5().equals("false")
+						|| asset.getMd5().equals(
+								HashUtils.getMD5(cache.getAbsolutePath()))) {
+
+					FileUtils.copyFile(cache.getAbsolutePath(),
+							target.getAbsolutePath());
+
+					try {
+						Process p = Runtime.getRuntime().exec(
+								"pm install -r " + target.getAbsolutePath());
 						p.waitFor();
 
 					} catch (IOException e) {
@@ -1381,6 +1466,22 @@ public class DuoleUtils {
 			return "";
 		}
 
+	}
+	
+	public static int getContentFilterCount(String filter ,Context context){
+		
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setType(filter);
+	     
+        List<ResolveInfo> rList;
+        
+        PackageManager mPm = context.getPackageManager();
+        
+        rList = mPm.queryIntentActivities(
+                intent, PackageManager.MATCH_DEFAULT_ONLY);
+        
+        return rList.size();
 	}
 }
 

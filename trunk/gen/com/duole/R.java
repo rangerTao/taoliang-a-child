@@ -8,151 +8,235 @@
 package com.duole;
 
 public final class R {
+    public static final class anim {
+        public static final int musicscale=0x7f040000;
+        public static final int scalein=0x7f040001;
+        public static final int scaleout=0x7f040002;
+    }
+    public static final class array {
+        public static final int wifi_status=0x7f060000;
+        public static final int wifi_status_with_ssid=0x7f060001;
+    }
     public static final class attr {
+    }
+    public static final class color {
+        public static final int appwidget_error_color=0x7f070004;
+        public static final int bubble_dark_background=0x7f070002;
+        public static final int delete_color_filter=0x7f070003;
+        public static final int gesture_color=0x7f070006;
+        public static final int grid_dark_background=0x7f070001;
+        public static final int snag_callout_color=0x7f070005;
+        public static final int uncertain_gesture_color=0x7f070007;
+        public static final int window_background=0x7f070000;
     }
     public static final class drawable {
         public static final int bg86=0x7f020000;
-        public static final int icon=0x7f020001;
-        public static final int ke=0x7f020002;
-        public static final int network=0x7f020003;
-        public static final int pagedivider=0x7f020004;
-        public static final int pagedividerselected=0x7f020005;
+        public static final int bg_appwidget_error=0x7f020001;
+        public static final int grid_selector=0x7f020002;
+        public static final int highlight_pressed=0x7f020003;
+        public static final int icon=0x7f020004;
+        public static final int ke=0x7f020005;
+        public static final int ke_music=0x7f020006;
+        public static final int musicbg=0x7f020007;
+        public static final int network=0x7f020008;
+        public static final int nopic=0x7f020009;
+        public static final int pagedivider=0x7f02000a;
+        public static final int pagedividerselected=0x7f02000b;
+        public static final int pause=0x7f02000c;
+        public static final int play=0x7f02000d;
+        public static final int radius=0x7f02000e;
+        public static final int trans=0x7f02000f;
     }
     public static final class id {
-        public static final int ScrollLayoutTest=0x7f07000b;
-        public static final int btnCancel=0x7f070008;
-        public static final int btnConfirm=0x7f070007;
-        public static final int etNewPass=0x7f070014;
-        public static final int etNewPassConfirm=0x7f070016;
-        public static final int etOldPass=0x7f070012;
-        public static final int etPassword=0x7f07001b;
-        public static final int etUserName=0x7f070019;
-        public static final int ivAppIcon=0x7f070000;
-        public static final int ivBackground=0x7f07000f;
-        public static final int ivKe=0x7f070001;
-        public static final int ivMusicThumb=0x7f07001c;
-        public static final int llMusicPlayer=0x7f07000d;
-        public static final int llPageDividerTip=0x7f07000c;
-        public static final int musicGallery=0x7f07000e;
-        public static final int pbLoad=0x7f070004;
-        public static final int progressBar1=0x7f07001f;
-        public static final int relativeLayout1=0x7f070003;
-        public static final int rlContent=0x7f070005;
-        public static final int rlMain=0x7f07000a;
-        public static final int textView1=0x7f07001e;
-        public static final int tvAppName=0x7f070002;
-        public static final int tvDeviceID=0x7f070017;
-        public static final int tvIndex=0x7f070010;
-        public static final int tvMusicTitle=0x7f07001d;
-        public static final int tvNewPass=0x7f070013;
-        public static final int tvNewPassConfirm=0x7f070015;
-        public static final int tvPassword=0x7f07001a;
-        public static final int tvSSID=0x7f070021;
-        public static final int tvTipOldPass=0x7f070011;
-        public static final int tvUpdate=0x7f070006;
-        public static final int tvUserName=0x7f070018;
-        public static final int vvVideoPlayer=0x7f070020;
-        public static final int wvFlash=0x7f070009;
+        public static final int BatteryStatus=0x7f0a002d;
+        public static final int ScrollLayoutTest=0x7f0a000d;
+        public static final int WifiStatus=0x7f0a002b;
+        public static final int alIcon=0x7f0a0000;
+        public static final int btnCancel=0x7f0a0009;
+        public static final int btnClose=0x7f0a0032;
+        public static final int btnConfirm=0x7f0a0008;
+        public static final int btnMinuteAdd=0x7f0a0026;
+        public static final int btnMinuteDe=0x7f0a0028;
+        public static final int btnPlay=0x7f0a0014;
+        public static final int etNewPass=0x7f0a001b;
+        public static final int etNewPassConfirm=0x7f0a001d;
+        public static final int etOldPass=0x7f0a0019;
+        public static final int etPassword=0x7f0a0022;
+        public static final int etUserName=0x7f0a0020;
+        public static final int ivAppIcon=0x7f0a0001;
+        public static final int ivBackground=0x7f0a0017;
+        public static final int ivKe=0x7f0a0002;
+        public static final int ivMusicThumb=0x7f0a0023;
+        public static final int llMain=0x7f0a000b;
+        public static final int llMinutePicker=0x7f0a0025;
+        public static final int llMusicPlayer=0x7f0a0011;
+        public static final int llPageDividerTip=0x7f0a000f;
+        public static final int musicControl=0x7f0a0013;
+        public static final int musicGallery=0x7f0a0012;
+        public static final int pbEnTime=0x7f0a0010;
+        public static final int pbLoad=0x7f0a0005;
+        public static final int pbRestTime=0x7f0a0016;
+        public static final int progressBar1=0x7f0a0034;
+        public static final int relativeLayout1=0x7f0a0004;
+        public static final int rlContent=0x7f0a0006;
+        public static final int rlMain=0x7f0a000c;
+        public static final int sbBrightness=0x7f0a0031;
+        public static final int sbVolume=0x7f0a002f;
+        public static final int textView1=0x7f0a0033;
+        public static final int tvAppName=0x7f0a0003;
+        public static final int tvBatteryStatus=0x7f0a002c;
+        public static final int tvBrightnessTweak=0x7f0a0030;
+        public static final int tvDeviceID=0x7f0a001e;
+        public static final int tvMinute=0x7f0a0027;
+        public static final int tvMinuteTip=0x7f0a0029;
+        public static final int tvMusicTitle=0x7f0a0024;
+        public static final int tvNewPass=0x7f0a001a;
+        public static final int tvNewPassConfirm=0x7f0a001c;
+        public static final int tvPassword=0x7f0a0021;
+        public static final int tvSSID=0x7f0a0036;
+        public static final int tvTipOldPass=0x7f0a0018;
+        public static final int tvTrafficStats=0x7f0a000e;
+        public static final int tvUpdate=0x7f0a0007;
+        public static final int tvUserName=0x7f0a001f;
+        public static final int tvVolumeTweak=0x7f0a002e;
+        public static final int tvWifiStatus=0x7f0a002a;
+        public static final int volumeTip=0x7f0a0015;
+        public static final int vvVideoPlayer=0x7f0a0035;
+        public static final int wvFlash=0x7f0a000a;
     }
     public static final class layout {
         public static final int app_item=0x7f030000;
-        public static final int checkupdate=0x7f030001;
-        public static final int flashplayer=0x7f030002;
-        public static final int main=0x7f030003;
-        public static final int musicplayer=0x7f030004;
-        public static final int pagedividerselected=0x7f030005;
-        public static final int passwordinput=0x7f030006;
-        public static final int registerdevice=0x7f030007;
-        public static final int singlemusicplayer=0x7f030008;
-        public static final int updateprogress=0x7f030009;
-        public static final int videoplayer=0x7f03000a;
-        public static final int wificonnection=0x7f03000b;
+        public static final int appwidget_error=0x7f030001;
+        public static final int checkupdate=0x7f030002;
+        public static final int flashplayer=0x7f030003;
+        public static final int main=0x7f030004;
+        public static final int musicplayer=0x7f030005;
+        public static final int pagedividerselected=0x7f030006;
+        public static final int passwordinput=0x7f030007;
+        public static final int registerdevice=0x7f030008;
+        public static final int singlemusicplayer=0x7f030009;
+        public static final int sleeptimexit=0x7f03000a;
+        public static final int systemtweak=0x7f03000b;
+        public static final int updateprogress=0x7f03000c;
+        public static final int videoplayer=0x7f03000d;
+        public static final int wificonnection=0x7f03000e;
     }
     public static final class string {
-        public static final int about=0x7f060013;
-        public static final int app_name=0x7f060000;
-        public static final int babyname=0x7f06000a;
-        public static final int bindDeviceTitle=0x7f060010;
-        public static final int birthday=0x7f06000b;
-        public static final int bright_tweak=0x7f060012;
+        public static final int about=0x7f090014;
+        /**  anti fatgure 
+         */
+        public static final int anti_fatigure=0x7f090048;
+        public static final int anti_rest=0x7f09004b;
+        public static final int app_name=0x7f090000;
+        public static final int babyname=0x7f09000b;
+        public static final int batterylevel=0x7f090050;
+        public static final int bindDeviceTitle=0x7f090011;
+        public static final int birthday=0x7f09000c;
+        public static final int bright_tweak=0x7f090013;
         /**  button 
          */
-        public static final int btnClose=0x7f060018;
-        public static final int btnNegative=0x7f06001a;
-        public static final int btnPositive=0x7f060019;
-        public static final int change_log=0x7f060017;
-        public static final int check_update=0x7f060025;
-        public static final int client_uptodate=0x7f060026;
-        public static final int config=0x7f06000d;
-        public static final int date=0x7f060002;
-        public static final int device_active=0x7f06001e;
-        public static final int device_id=0x7f060008;
-        public static final int download_error=0x7f060039;
-        public static final int downloading=0x7f06002a;
-        public static final int getting_user_info=0x7f06000f;
+        public static final int btnClose=0x7f09001b;
+        public static final int btnNegative=0x7f09001d;
+        public static final int btnPositive=0x7f09001c;
+        public static final int caution=0x7f09001a;
+        public static final int change_log=0x7f090019;
+        public static final int check_update=0x7f090028;
+        /**  alert 
+         */
+        public static final int clear_local=0x7f090055;
+        public static final int client_uptodate=0x7f090029;
+        public static final int config=0x7f09000e;
+        public static final int current_time=0x7f090016;
+        public static final int date=0x7f090002;
+        public static final int device_active=0x7f090021;
+        public static final int device_id=0x7f090009;
+        public static final int download_error=0x7f090041;
+        public static final int downloading=0x7f09002f;
+        public static final int drag_change_volume=0x7f090034;
+        public static final int enterteiment=0x7f09004a;
+        public static final int entime=0x7f090049;
+        public static final int gadget_error_text=0x7f090056;
+        public static final int getting_user_info=0x7f090010;
         /**  password 
          */
-        public static final int input_password=0x7f06002f;
-        public static final int itemlist_lost=0x7f060001;
-        public static final int network=0x7f060005;
-        public static final int network_config=0x7f060003;
-        public static final int network_config_summary=0x7f060006;
+        public static final int input_password=0x7f090036;
+        public static final int itemlist_lost=0x7f090001;
+        public static final int local_clear=0x7f09002a;
+        public static final int minute=0x7f090003;
+        public static final int network=0x7f090006;
+        public static final int network_config=0x7f090004;
+        public static final int network_config_summary=0x7f090007;
         /**  tips 
          */
-        public static final int network_unavailable=0x7f060027;
-        public static final int password=0x7f060030;
-        public static final int password_cannot_null=0x7f060038;
-        public static final int password_confirm=0x7f060033;
-        public static final int password_new=0x7f060032;
-        public static final int password_not_same=0x7f060037;
-        public static final int password_old=0x7f060031;
-        public static final int password_old_wrong=0x7f060036;
-        public static final int password_retype=0x7f060035;
-        public static final int password_set_success=0x7f060029;
+        public static final int network_unavailable=0x7f09002c;
+        public static final int password=0x7f090037;
+        public static final int password_cannot_null=0x7f090040;
+        public static final int password_confirm=0x7f09003a;
+        public static final int password_new=0x7f090039;
+        public static final int password_not_same=0x7f09003f;
+        public static final int password_old=0x7f090038;
+        public static final int password_old_wrong=0x7f09003e;
+        public static final int password_retype=0x7f09003d;
+        public static final int password_set_success=0x7f09002e;
         /**  error 
          */
-        public static final int password_wrong=0x7f060034;
-        public static final int register_device=0x7f060028;
-        public static final int security_changePasswd=0x7f060024;
-        public static final int security_exit=0x7f060023;
+        public static final int password_wrong=0x7f09003b;
+        public static final int passwrod_wrong_full=0x7f09003c;
+        public static final int player_notfound_title=0x7f090054;
+        public static final int player_tip=0x7f090053;
+        public static final int power_save=0x7f090057;
+        public static final int power_save_tip=0x7f090058;
+        public static final int register_device=0x7f09002d;
+        public static final int restime=0x7f09004d;
+        public static final int security_changePasswd=0x7f090027;
+        public static final int security_exit=0x7f090026;
         /**  security 
          */
-        public static final int security_title=0x7f060022;
-        public static final int sex=0x7f06000c;
-        public static final int sex_female=0x7f060020;
+        public static final int security_title=0x7f090025;
+        public static final int settime=0x7f090035;
+        public static final int sex=0x7f09000d;
+        public static final int sex_female=0x7f090023;
         /**  sex 
          */
-        public static final int sex_male=0x7f06001f;
-        public static final int sex_unborn=0x7f060021;
-        public static final int storage=0x7f06002b;
-        public static final int strDeviceId=0x7f06001b;
-        public static final int strPassword=0x7f06001d;
-        public static final int strUserName=0x7f06001c;
-        public static final int system_tweak=0x7f060007;
-        public static final int tf_total=0x7f06002d;
-        public static final int tf_unmounted=0x7f06002c;
-        public static final int tf_used=0x7f06002e;
-        public static final int update_start=0x7f060014;
-        public static final int user_info=0x7f06000e;
-        public static final int username=0x7f060009;
-        public static final int version=0x7f060016;
-        public static final int version_new=0x7f060015;
-        public static final int volume_tweak=0x7f060011;
-        public static final int wifi_closed=0x7f06003d;
-        public static final int wifi_closing=0x7f06003c;
-        public static final int wifi_connection=0x7f060004;
-        public static final int wifi_enabled=0x7f06003b;
+        public static final int sex_male=0x7f090022;
+        public static final int sex_unborn=0x7f090024;
+        public static final int sleep=0x7f09004c;
+        public static final int sleep_delay_title=0x7f090052;
+        public static final int sleepend=0x7f09004f;
+        public static final int sleepstart=0x7f09004e;
+        public static final int startSetup=0x7f09002b;
+        public static final int storage=0x7f090030;
+        public static final int strDeviceId=0x7f09001e;
+        public static final int strPassword=0x7f090020;
+        public static final int strUserName=0x7f09001f;
+        public static final int system_tweak=0x7f090008;
+        public static final int systemstatus=0x7f090051;
+        public static final int tf_total=0x7f090032;
+        public static final int tf_unmounted=0x7f090031;
+        public static final int tf_used=0x7f090033;
+        public static final int update_start=0x7f090015;
+        public static final int user_info=0x7f09000f;
+        public static final int username=0x7f09000a;
+        public static final int version=0x7f090018;
+        public static final int version_new=0x7f090017;
+        public static final int volume_tweak=0x7f090012;
+        public static final int wifi_closed=0x7f090045;
+        public static final int wifi_closing=0x7f090044;
+        public static final int wifi_connection=0x7f090005;
+        public static final int wifi_enabled=0x7f090043;
         /**  wifi 
          */
-        public static final int wifi_enabling=0x7f06003a;
-        public static final int wifi_opened=0x7f06003f;
-        public static final int wifi_unknown=0x7f06003e;
+        public static final int wifi_enabling=0x7f090042;
+        public static final int wifi_opened=0x7f090047;
+        public static final int wifi_unknown=0x7f090046;
     }
     public static final class style {
-        public static final int DuoleText=0x7f050000;
+        public static final int DuoleText=0x7f080000;
+        public static final int Theme_Translucent=0x7f080001;
+        public static final int Theme_wallpaper=0x7f080002;
     }
     public static final class xml {
-        public static final int itemlist=0x7f040000;
-        public static final int systemconfig=0x7f040001;
+        public static final int itemlist=0x7f050000;
+        public static final int systemconfig=0x7f050001;
     }
 }

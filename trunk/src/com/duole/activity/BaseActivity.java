@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.duole.Duole;
+import com.duole.asynctask.ItemListTask;
 import com.duole.player.MusicPlayerActivity;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleUtils;
@@ -29,6 +30,7 @@ import com.duole.utils.FileUtils;
 public class BaseActivity extends Activity {
 
 	public static String pkgName;
+	public static boolean inited = false;
 	
 	public long playStart = 0;
 	public String resourceId = "";
@@ -38,6 +40,7 @@ public class BaseActivity extends Activity {
 	long netTrafficCur = 0;
 	
 	DecimalFormat df = new DecimalFormat("0.00");
+	
 	public Handler mHandler = new Handler(){
 		
 		@Override
@@ -49,7 +52,6 @@ public class BaseActivity extends Activity {
 				break;
 			case Constants.NET_TRAFFIC:
 				if(tvTrafficStats != null){
-					
 					
 					netTrafficCur = TrafficStats.getTotalRxBytes();
 					
@@ -76,11 +78,28 @@ public class BaseActivity extends Activity {
 					
 					sendMessageDelayed(obtainMessage(Constants.NET_TRAFFIC), 5000);
 				}
+				break;
+			case Constants.REFRESH_CONTENT:
+				
+				if(!inited){
+					refresh_content();
+					Message msgdelayed = new Message();
+					msg.what = Constants.REFRESH_CONTENT;
+					sendMessageDelayed(msgdelayed, 2000);
+				}
+				
+				break;
+			case Constants.RESTART_REFRESH:
+				new ItemListTask().execute();
 			}
 			super.handleMessage(msg);
 		}
 		
 	};
+	
+	protected void refresh_content(){
+		
+	}
 	
 	public void startMusicPlay(){
 		Intent MusicPlay = new Intent(this,MusicPlayerActivity.class);
@@ -88,8 +107,10 @@ public class BaseActivity extends Activity {
 		MusicPlay.putExtra("type", "rest");
 		
 		//Take main task to front
+		Intent intent = new Intent(Duole.appref,Duole.class);
+		startActivity(intent);
 		
-		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent = new Intent(Intent.ACTION_VIEW);
 		intent.setType("duole/rest");
 		try{
 			startActivity(intent);
