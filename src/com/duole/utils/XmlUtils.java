@@ -292,9 +292,21 @@ public class XmlUtils {
 				Log.d("TAG", "reading xml error");
 				Log.d("TAG", "Fix the item list with backup file.");
 				new File(filePath).delete();
-				FileUtils.copyFile(filePath  + ".bak", filePath);
-				
-				return readFile(filePath+".bak", dBuilder,false);
+				try{
+					XmlUtils.readFile(filePath+".bak", dBuilder,false);
+					
+					FileUtils.copyFile(filePath  + ".bak", filePath);
+					
+					return readFile(filePath+".bak", dBuilder,false);
+				}catch (Exception ex) {
+					
+					ex.printStackTrace();
+					initFile(null, dBuilder, new File(filePath));
+					
+					new File(filePath + ".bak").delete();
+					initFile(null, dBuilder, new File(filePath + ".bak"));
+					
+				}
 				
 			}else {
 				return result;

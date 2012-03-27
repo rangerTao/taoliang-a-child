@@ -576,7 +576,10 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			scaleAnimation.setDuration(1000);
 			animationSet.addAnimation(scaleAnimation);
 			animationSet.setFillAfter(true);
-			view.startAnimation(animationSet);
+			if(view != null){
+				view.startAnimation(animationSet);
+			}
+			
 			manimationSet = animationSet;
 
 		} else {
@@ -631,7 +634,7 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 
 	private void musicControl() {
 
-		if (mp.isPlaying()) {
+		if (mp != null && mp.isPlaying()) {
 			pauseMusic();
 		} else {
 			playMusic();
@@ -647,7 +650,13 @@ public class MusicPlayerActivity extends PlayerBaseActivity implements
 			mHandler.post(new Runnable() {
 				
 				public void run() {
-					mp.start();
+					
+					try{
+						mp.start();
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+					
 				}
 			});
 			

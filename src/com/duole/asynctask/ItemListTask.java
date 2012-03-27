@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Message;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -59,7 +60,9 @@ public class ItemListTask extends AsyncTask {
 			return false;
 		}
 		
+		Log.d("TAG","duoleutils.checktfusage :" + DuoleUtils.checkTFUsage());
 		if(!DuoleUtils.checkTFUsage()){
+			
 			//swipe the cache dir.
 			FileUtils.clearUselessResource();
 		}
@@ -160,7 +163,7 @@ public class ItemListTask extends AsyncTask {
 
 		//there are assets need to delete.
 		if (Constants.alAssetDeleteList.size() > 0) {
-//			new DeleteAssetFilesThread(Constants.alAssetDeleteList).start();
+			new DeleteAssetFilesThread(Constants.alAssetDeleteList).start();
 		}
 
 		//if there is noting wrong with the asset list.
@@ -186,27 +189,35 @@ public class ItemListTask extends AsyncTask {
 	
 	private void initDownloadQueue(){
 
+		
 		int i = 0;
-		for(Asset asset : Constants.DownLoadTaskList){
-			
-			if(!Constants.queueMap.containsKey(asset.getUrl())){
-				i ++;
-				Constants.queueMap.put(asset.getUrl(), asset);
-				Constants.dtq.push_back(asset);
+		
+		if(Constants.DownLoadTaskList != null){
+			for(Asset asset : Constants.DownLoadTaskList){
+				
+				if(!Constants.queueMap.containsKey(asset.getUrl())){
+					i ++;
+					Constants.queueMap.put(asset.getUrl(), asset);
+					Constants.dtq.push_back(asset);
+				}
 			}
 		}
+		
 		
 		Log.d("TAG", String.format("%d task has been add to the queue.", i));
 		
 		i = 0;
-		for(Asset asset : Constants.alAssetDeleteList){
-			
-			if(Constants.queueMap.containsKey(asset.getUrl())){
-				i ++ ;
-				Constants.queueMap.remove(asset.getUrl());
-				Constants.dtq.remove(asset);
+		if(Constants.alAssetDeleteList != null){
+			for(Asset asset : Constants.alAssetDeleteList){
+				
+				if(Constants.queueMap.containsKey(asset.getUrl())){
+					i ++ ;
+					Constants.queueMap.remove(asset.getUrl());
+					Constants.dtq.remove(asset);
+				}
 			}
 		}
+		
 		
 		Log.d("TAG", String.format("%d task has been removed from the queue.", i));
 		
@@ -215,7 +226,11 @@ public class ItemListTask extends AsyncTask {
 					BackgroundRefreshService.class), Duole.appref.mConnection,
 					Context.BIND_AUTO_CREATE);
 		}catch (Exception e) {
+			Log.e("TAG", e.getMessage() + "    bind service");
 			e.printStackTrace();
+			Message msg = new Message();
+			msg.what = Constants.RESTART_REFRESH;
+			Duole.appref.mHandler.sendMessageDelayed(msg, 1 * 60 * 1000);
 		}
 	}
 	

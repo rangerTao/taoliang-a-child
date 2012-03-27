@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,6 +129,11 @@ public class Duole extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+		
+
+		Log.e("TAG", dm.widthPixels + "     " + dm.heightPixels);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 //		systemSettings();
@@ -242,7 +248,8 @@ public class Duole extends BaseActivity {
 		if (DuoleUtils.checkTFCard()) {
 			// init the cache folders.
 			if (DuoleUtils.checkCacheFiles()) {
-				// init the main view.
+
+				inited = true;
 				
 				//Verify the installation of flash player.
 				verifyFlashPlayerInstallation();
@@ -281,11 +288,14 @@ public class Duole extends BaseActivity {
 
 			
 		} else {
-			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
+//			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
 			
 			IntentFilter intentFilter = new IntentFilter("android.intent.action.MEDIA_MOUNTED");
 			try{
-				registerReceiver(mountedReceiver, intentFilter);
+//				registerReceiver(mountedReceiver, intentFilter);
+				Message msg = new Message();
+				msg.what = Constants.REFRESH_CONTENT;
+				mHandler.sendMessageDelayed(msg,2000);
 			}catch(Exception e ){
 				Log.v("TAG", e.getMessage());
 			}
@@ -294,6 +304,19 @@ public class Duole extends BaseActivity {
 		
 	}
 	
+	
+	
+	@Override
+	protected void refresh_content() {
+		super.refresh_content();
+		try {
+			initContents();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Initialize the entermaintent progress bar.
 	 */
@@ -418,8 +441,8 @@ public class Duole extends BaseActivity {
 			}else if(poor > 0 && poor < total){
 				restSeek = poor - entime;
 				Constants.ENTIME_OUT = true;
+				startMusicPlay();
 			}
-			
 		}
 		
 		Log.v("TAG","entiem " + entime);
@@ -479,6 +502,13 @@ public class Duole extends BaseActivity {
 					getPb().setProgress(0);
 				}
 				
+				if(gameCountDown != null){
+					time = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+					gameCountDown.setTotalTime(time);
+					gameCountDown.seek(0);
+					
+					initEnTimeProgressBar();
+				}
 				
 				appref.sendBroadcast(new Intent("com.duole.restime.out"));
 			}
@@ -557,12 +587,14 @@ public class Duole extends BaseActivity {
 			// get the "i" page data
 			appPage.setAdapter(new AssetItemAdapter(Duole.appref,
 					temp, i));
+			
+			appPage.setSelector(R.drawable.grid_selector);
 
 			appPage.setLayoutParams(new ViewGroup.LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 			appPage.setNumColumns(Constants.COLUMNS);
-
+			
 			appPage.setPadding(40, 10, 40,0);
 			
 			appPage.setVerticalSpacing(30);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import android.os.Handler;
 import android.os.StatFs;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
@@ -53,6 +55,7 @@ import android.widget.Toast;
 import com.duole.Duole;
 import com.duole.R;
 import com.duole.pojos.adapter.WifiNetworkAdapter;
+import com.duole.pojos.asset.Asset;
 import com.duole.service.download.dao.ConfigDao;
 import com.duole.utils.Constants;
 import com.duole.utils.DuoleNetUtils;
@@ -61,6 +64,7 @@ import com.duole.utils.FileUtils;
 
 /**
  * To config the system preperties.
+ * 
  * @version 1.0
  * @author taoliang
  * 
@@ -78,11 +82,12 @@ public class SystemConfigActivity extends PreferenceActivity {
 	PreferenceCategory pcUserInfo;
 	Preference preStorage;
 	CheckBoxPreference preWifi;
+	CheckBoxPreference prePower_save;
 	Preference preSetupWizard;
 	Preference preListWifi;
 	Preference preCheckUpdate;
 	Preference preCurTime;
-	
+
 	Preference preTimeEclipsed;
 	Preference preSleep;
 
@@ -105,65 +110,125 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		this.addPreferencesFromResource(R.xml.systemconfig);
 
-		//init preferences.
+		// init preferences.
 		pcUserInfo = (PreferenceCategory) findPreference(Constants.Pre_Pc_UserInfo);
 		preGettingUserInfo = this.findPreference(Constants.Pre_GettingUserInfo);
 		preID = this.findPreference(Constants.Pre_deviceid);
 		preID.setSummary(DuoleUtils.getAndroidId());
-		preCheckUpdate = (Preference)findPreference("preCheckUpdate");
+		preCheckUpdate = (Preference) findPreference("preCheckUpdate");
 		preCurTime = (Preference) findPreference("curTime");
-		
-		preCheckUpdate.setSummary("\u5f53\u524d\u7248\u672c\uff1a" + DuoleUtils.getVersion(this));
+		prePower_save = (CheckBoxPreference) findPreference(Constants.pre_power_save);
+
+		preCheckUpdate.setSummary("\u5f53\u524d\u7248\u672c\uff1a"
+				+ DuoleUtils.getVersion(this));
 
 		preStorage = this.findPreference(Constants.Pre_Storage);
-		
+
 		getCurrentTime();
 
-		//Get the usage of sd card.
+		// Get the usage of sd card.
 		getUsageOfSdcard();
-		
-		//init the settings of wifi.
+
+		// init the settings of wifi.
 		initWifiSetting();
 
-		//get the detail info of user.
+		// get the detail info of user.
 		getUserInfo();
-		
-		//init the content of anti fatigure views.
+
+		// init the content of anti fatigure views.
 		initAntiFatigureViews();
-		
-		//init the status of setup wizard.
+
+		// init the status of setup wizard.
 		initCheckboxSetupWizard();
+
+		initPowersaveSetting();
 	}
-	
-	private void initCheckboxSetupWizard(){
-		
+
+	private void initPowersaveSetting() {
+
+		final ConfigDao cd = new ConfigDao(getApplicationContext());
+		Cursor cursor = cd.query("power_save");
+
+		cursor.moveToFirst();
+
+		if (cursor.getCount() > 0) {
+			for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor
+					.moveToNext()) {
+				if (cursor.getString(0).equals("0")
+						|| cursor.getString(0) == null) {
+					prePower_save.setChecked(false);
+				} else if (cursor.getString(0).equals("1")) {
+					prePower_save.setChecked(true);
+				}
+			}
+		} else {
+			prePower_save.setChecked(false);
+		}
+
+		cursor.close();
+
+		prePower_save
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+					public boolean onPreferenceClick(Preference arg0) {
+
+						boolean save = prePower_save.isChecked();
+
+						if (save) {
+
+							new AlertDialog.Builder(appref)
+									.setTitle(R.string.caution)
+									.setMessage(R.string.power_save_tip)
+									.setNegativeButton(R.string.btnPositive,null).create().show();
+
+							cd.save("power_save", "1");
+						} else {
+							cd.save("power_save", "0");
+						}
+
+						return false;
+					}
+				});
+
+	}
+
+	private void initCheckboxSetupWizard() {
+
 		preSetupWizard = (Preference) findPreference(Constants.Pre_startSetup);
+
+		if (DuoleUtils.getContentFilterCount("duole/setup", appref) < 1) {
+			preSetupWizard.setEnabled(false);
+			preSetupWizard.setSelectable(false);
+		}
+
 	}
-	
-	private void getCurrentTime(){
-		
-		//Set the time format as Year-month-day hour:minute:second.
+
+	private void getCurrentTime() {
+
+		// Set the time format as Year-month-day hour:minute:second.
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time = sdf.format(new Date(System.currentTimeMillis()));
-		
+
 		preCurTime.setTitle(time);
 	}
-	
+
 	/**
 	 * Get the usage of sdcard.
 	 */
-	private void getUsageOfSdcard(){
-		//if tf card is ejected.
+	private void getUsageOfSdcard() {
+		// if tf card is ejected.
 		if (!DuoleUtils.checkTFCard()) {
 			preStorage.setTitle(getString(R.string.tf_unmounted));
 		} else {
-			//get the info of tf card.
+			// get the info of tf card.
 			File sdcard = Environment.getExternalStorageDirectory();
 			StatFs statfs = new StatFs(sdcard.getAbsolutePath());
-			
-			long totalSize = FileUtils.countUp(statfs.getBlockCount(),statfs.getBlockSize());
+
+			long totalSize = FileUtils.countUp(statfs.getBlockCount(),
+					statfs.getBlockSize());
 			long usedSize = totalSize
-					- FileUtils.countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
+					- FileUtils.countUp(statfs.getFreeBlocks(),
+							statfs.getBlockSize());
 			if (totalSize > 1024) {
 				float total = totalSize / (float) 1024;
 				float used = usedSize / (float) 1024;
@@ -179,21 +244,28 @@ public class SystemConfigActivity extends PreferenceActivity {
 			}
 		}
 	}
-	
+
 	/**
 	 * init the anti fatigure infos.
 	 */
-	private void initAntiFatigureViews(){
-		
+	private void initAntiFatigureViews() {
+
 		preTimeEclipsed = findPreference("preTimeEclipsed");
 		preSleep = findPreference("preSleep");
-		
-		preTimeEclipsed.setTitle(getString(R.string.enterteiment) + ":  " + Constants.entime + getString(R.string.minute) + "        " + getString(R.string.anti_rest)+ ":  " + Constants.restime + getString(R.string.minute));
-		String entime = getString(R.string.entime) + " : " + Duole.appref.gameCountDown.getRemainTime(); 
-		String sleepTime = getString(R.string.sleepstart) + " : " + Constants.sleepstart +":00" + "     " + getString(R.string.sleepend) + " : " + Constants.sleepend+":00";
+
+		preTimeEclipsed.setTitle(getString(R.string.enterteiment) + ":  "
+				+ Constants.entime + getString(R.string.minute) + "        "
+				+ getString(R.string.anti_rest) + ":  " + Constants.restime
+				+ getString(R.string.minute));
+		String entime = getString(R.string.entime) + " : "
+				+ Duole.appref.gameCountDown.getRemainTime();
+		String sleepTime = getString(R.string.sleepstart) + " : "
+				+ Constants.sleepstart + ":00" + "     "
+				+ getString(R.string.sleepend) + " : " + Constants.sleepend
+				+ ":00";
 		preTimeEclipsed.setSummary(entime);
 		preSleep.setSummary(sleepTime);
-		
+
 	}
 
 	/**
@@ -205,7 +277,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 				.getSystemService(Context.WIFI_SERVICE);
 		preListWifi = (Preference) findPreference("preListWifi");
 
-		//register a receiver to receive wifi related broadcasts.
+		// register a receiver to receive wifi related broadcasts.
 		connectSavedWifi();
 
 		boolean isWifiEnabled = isWifiEnabled();
@@ -251,60 +323,64 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 	}
 
-	//a broadcast receiver to receive broadcasts related with wifi.
+	// a broadcast receiver to receive broadcasts related with wifi.
 	BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
-			if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent.getAction())) {
-                handleStateChanged(WifiInfo.getDetailedStateOf((SupplicantState)
-                        intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE)));
-            }else if(WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent.getAction())){
-    			switch (wifiManager.getWifiState()) {
-    			case WifiManager.WIFI_STATE_DISABLED:
-    				preWifi.setSummary(appref.getString(R.string.wifi_closed));
-    				break;
-    			case WifiManager.WIFI_STATE_DISABLING:
-    				preWifi.setSummary(appref.getString(R.string.wifi_closing));
-    				break;
-    			case WifiManager.WIFI_STATE_ENABLED:
-    				wifiInfo = wifiManager.getConnectionInfo();
-    				if (wifiInfo.getNetworkId() != -1) {
-    					preWifi.setSummary(getString(R.string.wifi_enabled)
-    							+ wifiInfo.getSSID());
-    				} else {
-    					preWifi.setSummary(getString(R.string.wifi_opened));
-    				}
-    				break;
-    			case WifiManager.WIFI_STATE_ENABLING:
-    				wifiInfo = wifiManager.getConnectionInfo();
-    				preWifi.setSummary(appref.getString(R.string.wifi_enabling)
-    						+ wifiInfo.getSSID());
-    				break;
-    			case WifiManager.WIFI_STATE_UNKNOWN:
-    				break;
-    			}
-            }else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
-                handleStateChanged(((NetworkInfo) intent.getParcelableExtra(
-                        WifiManager.EXTRA_NETWORK_INFO)).getDetailedState());
-            }
-			
+			if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent
+					.getAction())) {
+				handleStateChanged(WifiInfo
+						.getDetailedStateOf((SupplicantState) intent
+								.getParcelableExtra(WifiManager.EXTRA_NEW_STATE)));
+			} else if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent
+					.getAction())) {
+				switch (wifiManager.getWifiState()) {
+				case WifiManager.WIFI_STATE_DISABLED:
+					preWifi.setSummary(appref.getString(R.string.wifi_closed));
+					break;
+				case WifiManager.WIFI_STATE_DISABLING:
+					preWifi.setSummary(appref.getString(R.string.wifi_closing));
+					break;
+				case WifiManager.WIFI_STATE_ENABLED:
+					wifiInfo = wifiManager.getConnectionInfo();
+					if (wifiInfo.getNetworkId() != -1) {
+						preWifi.setSummary(getString(R.string.wifi_enabled)
+								+ wifiInfo.getSSID());
+					} else {
+						preWifi.setSummary(getString(R.string.wifi_opened));
+					}
+					break;
+				case WifiManager.WIFI_STATE_ENABLING:
+					wifiInfo = wifiManager.getConnectionInfo();
+					preWifi.setSummary(appref.getString(R.string.wifi_enabling)
+							+ wifiInfo.getSSID());
+					break;
+				case WifiManager.WIFI_STATE_UNKNOWN:
+					break;
+				}
+			} else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent
+					.getAction())) {
+				handleStateChanged(((NetworkInfo) intent
+						.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO))
+						.getDetailedState());
+			}
 
 		}
 
 	};
-	
-    private void handleStateChanged(NetworkInfo.DetailedState state) {
-        // WifiInfo is valid if and only if Wi-Fi is enabled.
-        // Here we use the state of the check box as an optimization.
-        if (state != null && preWifi.isChecked()) {
-            WifiInfo info = wifiManager.getConnectionInfo();
-            if (info != null) {
-            	preWifi.setSummary(Summary.get(appref, info.getSSID(), state));
-            }
-        }
-    }
+
+	private void handleStateChanged(NetworkInfo.DetailedState state) {
+		// WifiInfo is valid if and only if Wi-Fi is enabled.
+		// Here we use the state of the check box as an optimization.
+		if (state != null && preWifi.isChecked()) {
+			WifiInfo info = wifiManager.getConnectionInfo();
+			if (info != null) {
+				preWifi.setSummary(Summary.get(appref, info.getSSID(), state));
+			}
+		}
+	}
 
 	private boolean isWifiEnabled() {
 
@@ -372,15 +448,15 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		// wifi.
 		if (preference.getKey().equals("preListWifi")) {
-			try{
+			try {
 				configWifi();
-			}catch(Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 
-		//password
+		// password
 		if (preference.getKey().equals(Constants.Pre_Security_ChangePasswd)) {
 			intent = new Intent(appref, PasswordActivity.class);
 			intent.putExtra("type", "1");
@@ -388,7 +464,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		// exit
 		if (preference.getKey().equals(Constants.Pre_Security_Exit)) {
-				
+
 			DuoleUtils.execAsRoot("reboot -p");
 		}
 
@@ -396,12 +472,12 @@ public class SystemConfigActivity extends PreferenceActivity {
 		if (preference.getKey().equals(Constants.Pre_CheckUpdate)) {
 			intent = new Intent(appref, CheckUpdateActivity.class);
 		}
-		
-		if (preference.getKey().equals(Constants.Pre_ClearLocal)){
+
+		if (preference.getKey().equals(Constants.Pre_ClearLocal)) {
 			clearLocalResource();
 		}
-		
-		if (preference.getKey().equals(Constants.Pre_startSetup)){
+
+		if (preference.getKey().equals(Constants.Pre_startSetup)) {
 			startSetupWizard();
 		}
 
@@ -411,90 +487,93 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}
-	
-	private void startSetupWizard(){
-		
+
+	private void startSetupWizard() {
+
 		ConfigDao cd = new ConfigDao(getApplicationContext());
 		cd.save("setup", "0");
-		
+
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setType("duole/setup");
-		try{
+		try {
 			getApplicationContext().startActivity(intent);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			Log.e("TAG", e.getMessage());
 		}
-		
+
 	}
-	
+
 	/**
 	 * Clear local resources.
 	 */
-	private void clearLocalResource(){
-		
+	private void clearLocalResource() {
+
 		TextView tvTip = new TextView(getApplicationContext());
 		tvTip.setText("Caution");
-		new AlertDialog.Builder(appref).setTitle(R.string.caution).setMessage(R.string.clear_local)
+		new AlertDialog.Builder(appref)
+				.setTitle(R.string.caution)
+				.setMessage(R.string.clear_local)
 				.setPositiveButton(R.string.btnPositive, new OnClickListener() {
-					
+
 					public void onClick(DialogInterface dialog, int which) {
-						
-						for(File apk : new File(Constants.CacheDir + Constants.RES_APK).listFiles()){
-							
-							String pkgName = FileUtils.getPackagenameFromFile(getApplicationContext(), apk);
-							
+
+						for (File apk : new File(Constants.CacheDir
+								+ Constants.RES_APK).listFiles()) {
+
+							String pkgName = FileUtils.getPackagenameFromFile(
+									getApplicationContext(), apk);
+
 							try {
-								Runtime.getRuntime().exec("pm uninstall " + pkgName);
+								Runtime.getRuntime().exec(
+										"pm uninstall " + pkgName);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
-						
+
 						FileUtils.emptyFolder(new File(Constants.CacheDir));
-						
+
 						Constants.newItemExists = true;
-						Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
-						
+						Constants.AssetList = new ArrayList<Asset>();
+						Duole.appref.sendBroadcast(new Intent(
+								Constants.Refresh_Complete));
+
 						DuoleUtils.checkCacheFiles();
-						
+
 						Duole.appref.mScrollLayout.snapToScreen(0);
-						
+
 					}
-				})
-				.setNegativeButton(R.string.btnNegative, null).create().show();
-		
-		
+				}).setNegativeButton(R.string.btnNegative, null).create()
+				.show();
+
 	}
-	
+
 	/**
 	 * Config wifi connections.
 	 */
-	private void configWifi(){
+	private void configWifi() {
 		ListView lvWifi = new ListView(appref);
 		lvWifi.setCacheColorHint(Color.parseColor("#00000000"));
 
-		//The dialog of connections.
-		adWifi = new AlertDialog.Builder(appref)
-				.setTitle("Wifi")
+		// The dialog of connections.
+		adWifi = new AlertDialog.Builder(appref).setTitle("Wifi")
 				.setView(lvWifi)
-				.setNegativeButton(R.string.btnClose,
-						new OnClickListener() {
+				.setNegativeButton(R.string.btnClose, new OnClickListener() {
 
-							public void onClick(DialogInterface arg0,
-									int arg1) {
-								// TODO Auto-generated method stub
+					public void onClick(DialogInterface arg0, int arg1) {
+						// TODO Auto-generated method stub
 
-							}
+					}
 
-						}).create();
+				}).create();
 
 		wifiManager.startScan();
 		scanResults = wifiManager.getScanResults();
 		lvWifi.setAdapter(new WifiNetworkAdapter(scanResults, appref));
 
-		//When click one of the connections show in the dialog.
+		// When click one of the connections show in the dialog.
 		lvWifi.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -502,31 +581,32 @@ public class SystemConfigActivity extends PreferenceActivity {
 				final ScanResult sr = scanResults.get(position);
 				final EditText etPassword = new EditText(appref);
 				boolean isConfiged = false;
-				etPassword
-						.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD| InputType.TYPE_CLASS_TEXT);
+				etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD
+						| InputType.TYPE_CLASS_TEXT);
 				List<WifiConfiguration> wificonfigs = wifiManager
 						.getConfiguredNetworks();
-				
-				//find out whether there is any wifi is configured.
+
+				// find out whether there is any wifi is configured.
 				for (WifiConfiguration temp : wificonfigs) {
-					
+
 					if (temp.SSID.equals("\"" + sr.SSID + "\"")) {
-						
-						isConfiged = wifiManager.enableNetwork(temp.networkId, true);
-						
+
+						isConfiged = wifiManager.enableNetwork(temp.networkId,
+								true);
+
 						WifiInfo wifiinfo = wifiManager.getConnectionInfo();
-						
-						if(wifiinfo.getNetworkId() == -1){
+
+						if (wifiinfo.getNetworkId() == -1) {
 							wifiManager.removeNetwork(temp.networkId);
 							isConfiged = false;
 						}
-						
+
 						if (adWifi != null)
 							adWifi.dismiss();
 					}
 				}
-				
-				//if none
+
+				// if none
 				if (!isConfiged) {
 
 					int res = 0;
@@ -535,16 +615,14 @@ public class SystemConfigActivity extends PreferenceActivity {
 						config.SSID = "\"" + sr.SSID + "\"";
 						config.allowedKeyManagement.set(KeyMgmt.NONE);
 						int networkId = wifiManager.addNetwork(config);
-						if(networkId != -1){
+						if (networkId != -1) {
 							wifiManager.enableNetwork(networkId, false);
 							wifiManager.saveConfiguration();
 							if (adWifi != null) {
 								adWifi.dismiss();
 							}
 						}
-						
-						
-						
+
 					} else {
 
 						wifiPass = new AlertDialog.Builder(appref)
@@ -643,8 +721,9 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 	/**
 	 * Get detail user info.
+	 * 
 	 * @author taoliang
-	 *
+	 * 
 	 */
 	class GetUserInfoTask extends AsyncTask {
 
@@ -739,20 +818,20 @@ public class SystemConfigActivity extends PreferenceActivity {
 
 }
 
-
 class Summary {
-    static String get(Context context, String ssid, DetailedState state) {
-        String[] formats = context.getResources().getStringArray((ssid == null)
-                ? R.array.wifi_status : R.array.wifi_status_with_ssid);
-        int index = state.ordinal();
+	static String get(Context context, String ssid, DetailedState state) {
+		String[] formats = context.getResources().getStringArray(
+				(ssid == null) ? R.array.wifi_status
+						: R.array.wifi_status_with_ssid);
+		int index = state.ordinal();
 
-        if (index >= formats.length || formats[index].length() == 0) {
-            return null;
-        }
-        return String.format(formats[index], ssid);
-    }
+		if (index >= formats.length || formats[index].length() == 0) {
+			return null;
+		}
+		return String.format(formats[index], ssid);
+	}
 
-    static String get(Context context, DetailedState state) {
-        return get(context, null, state);
-    }
+	static String get(Context context, DetailedState state) {
+		return get(context, null, state);
+	}
 }
