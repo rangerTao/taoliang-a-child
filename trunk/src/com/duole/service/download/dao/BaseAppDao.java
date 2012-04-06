@@ -139,6 +139,8 @@ public class BaseAppDao {
 
 		db.setTransactionSuccessful();
 		db.endTransaction();
+		
+		db.close();
 	}
 
 	public void insert(SQLiteDatabase db, BaseApp ba) {
@@ -156,6 +158,8 @@ public class BaseAppDao {
 
 		db.setTransactionSuccessful();
 		db.endTransaction();
+		
+		db.close();
 	}
 
 	/**

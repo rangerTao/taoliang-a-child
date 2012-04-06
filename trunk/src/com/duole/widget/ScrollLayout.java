@@ -99,7 +99,7 @@ public class ScrollLayout extends ViewGroup {
         for (int i = 0; i < count; i++) {   
             getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);   
         }   
-        scrollTo(mCurScreen * width, 0);         
+        scrollTo(mCurScreen * width, 0);
     }  
     
     /**

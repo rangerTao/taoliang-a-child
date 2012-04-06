@@ -136,7 +136,7 @@ public class Duole extends BaseActivity {
 		Log.e("TAG", dm.widthPixels + "     " + dm.heightPixels);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-//		systemSettings();
+		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -216,7 +216,7 @@ public class Duole extends BaseActivity {
 		//disable usb debug
 		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 1);
 		//Disable the auto rotation.
-		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 1);
+		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0);
 		//Disable the wifi available_notification.
 		Settings.System.putInt(getContentResolver(), Settings.System.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON, 0);
 		//Enable the auto time.
