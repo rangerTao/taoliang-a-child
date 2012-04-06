@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DuoleDBHelper extends SQLiteOpenHelper{
 	
 	private static final String DBNAME = "duole.db";
-	private static final int VERSION = 4;
+	private static final int VERSION = 5;
 	
 	private static DuoleDBHelper fmdd;
 	
