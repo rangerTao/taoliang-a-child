@@ -129,7 +129,6 @@ public class AssetItemAdapter extends BaseAdapter {
 				return WidgetUtils.getWidgetViewByWidgetPackageName(mContext,
 						packagename);
 			}
-			
 		}
 		
 		if(Constants.alAssetCache.containsKey(asset.getId())){

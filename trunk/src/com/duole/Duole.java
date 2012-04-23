@@ -136,7 +136,7 @@ public class Duole extends BaseActivity {
 		Log.e("TAG", dm.widthPixels + "     " + dm.heightPixels);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		systemSettings();
+//		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -299,7 +299,6 @@ public class Duole extends BaseActivity {
 			}catch(Exception e ){
 				Log.v("TAG", e.getMessage());
 			}
-	
 		}
 		
 	}
@@ -412,8 +411,8 @@ public class Duole extends BaseActivity {
 		String enstart = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_LASTENSTART);
 		long current = Long.parseLong(enstart.equals("") ? currentTimeMillis+"" : enstart);
 
-		long entime = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
-		long restime = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
+		long entime = Integer.parseInt(Constants.entime == "" ? "120" : Constants.entime) * 60 * 1000;
+		long restime = Integer.parseInt(Constants.restime == "" ? "10" : Constants.restime) * 60 * 1000;
 		long enSeek = 0;
 		long restSeek = 0;
 		
@@ -460,14 +459,14 @@ public class Duole extends BaseActivity {
 			@Override
 			public void onFinish() {
 				Constants.ENTIME_OUT = true;
-				int time = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+				int time = Integer.parseInt(Constants.entime == "" ? "120" : Constants.entime) * 60 * 1000;
 				this.setTotalTime(time);
 				this.seek(0);
 				this.stop();
 				getPb().setMax(time);
 				getPb().setProgress(0);
 				if(restCountDown != null){
-					time = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
+					time = Integer.parseInt(Constants.restime == "" ? "10" : Constants.restime) * 60 * 1000;
 					restCountDown.setTotalTime(time);
 					restCountDown.seek(0);
 				}
@@ -706,7 +705,9 @@ public class Duole extends BaseActivity {
 			
 			String frontid = assItem.getFrontID();
 			if(frontid != null && !frontid.equals("0")){
-				if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
+				if(DuoleUtils.getContentFilterCount("duole/pres", getApplicationContext()) > 0 ){
+					startContentFilterOfPResByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/",assItem);
+				}else if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
 					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/",assItem);
 				}else{
 					startItem(assItem);
@@ -861,6 +862,38 @@ public class Duole extends BaseActivity {
 		
 	}
 	
+	private void startContentFilterOfPResByPackageName(String pkgname,
+			String frontid, String basepath, Asset asset) {
+
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
+		try {
+			if (asset.getType().equals(Constants.RES_APK)) {
+				pkgName = assItem.getPackag();
+				if (pkgName == null) {
+					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
+				}
+				Uri uri = Uri.parse(basepath + "," + frontid + "," + pkgname);
+
+				intent.setDataAndType(uri, "duole/pres");
+				
+				startActivity(intent);
+				pkgName = pkgname;
+			} else {
+				Uri uri = Uri.parse(basepath + "," + frontid + ", ");
+
+				intent.setDataAndType(uri, "duole/pres");
+				
+				startActivityForResult(intent, 1);
+			}
+			overridePendingTransition(R.anim.scalein, R.anim.scaleout);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	
 	/**
 	 * Start a activity result of package.
 	 * @param packagename
@@ -868,7 +901,6 @@ public class Duole extends BaseActivity {
 	 * @param basePath
 	 */
 	private void startActivityForResultByPackageName(String packagename,String frontid,String basePath, Asset asset){
-		
 		
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_MAIN);
