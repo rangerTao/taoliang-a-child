@@ -52,9 +52,9 @@ public class AntiFatigueReceiver extends BroadcastReceiver{
 			configDao.save(Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_LASTENSTART, System.currentTimeMillis() + "");
 			
-			long time1 = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+			long time1 = Integer.parseInt(Constants.entime == "" ? "120" : Constants.entime) * 60 * 1000;
 			Duole.gameCountDown.setTotalTime(time1);
-			long time2 = Integer.parseInt(Constants.restime == "" ? "120" : Constants.restime) * 60 * 1000;
+			long time2 = Integer.parseInt(Constants.restime == "" ? "10" : Constants.restime) * 60 * 1000;
 			Duole.restCountDown.setTotalTime(time2);
 			
 			Constants.timePool = time1 + time2;
