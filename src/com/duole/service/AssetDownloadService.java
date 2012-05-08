@@ -1,6 +1,7 @@
 package com.duole.service;
 
 import com.duole.Duole;
+import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
 import com.duole.utils.DownloadFileUtils;
 
@@ -31,6 +32,11 @@ public class AssetDownloadService extends Service{
 
 				while(running){
 					
+					Asset temp = Constants.dtq.pop_front();
+					if(temp != null && !Constants.newItemExists){
+						Constants.newItemExists = true;
+					}
+					
 					DownloadFileUtils.downloadAll();
 					
 					Constants.dtq.trim();
@@ -41,7 +47,8 @@ public class AssetDownloadService extends Service{
 						e.printStackTrace();
 					}
 					
-					Constants.newItemExists = true;
+					Log.d("TAG", "The value of newItemExists" + Constants.newItemExists);
+					
 					Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 				}
 			

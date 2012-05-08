@@ -133,7 +133,9 @@ public class JsonUtils {
 			
 			String bgurl = jsonObject.getString("bg");
 			try{
-				file.delete();
+				if(file.exists()){
+					file.delete();
+				}
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -144,7 +146,6 @@ public class JsonUtils {
 			Constants.bgurl = bgurl;
 			
 			configDao.save(Constants.XML_BG,file.getAbsolutePath());
-			
 			Constants.newItemExists = true;
 		}
 		
@@ -177,7 +178,6 @@ public class JsonUtils {
 			Constants.bgRestUrl = bgurl;
 			
 			configDao.save(Constants.XML_BGURL,file.getAbsolutePath());
-			
 			Constants.newItemExists = true;
 		}
 		

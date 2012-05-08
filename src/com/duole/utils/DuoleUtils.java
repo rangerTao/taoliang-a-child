@@ -818,7 +818,10 @@ public class DuoleUtils {
 					+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 			if (asset.getUrl().startsWith("http")
 					&& !asset.getUrl().contains("duoleyuan")) {
-				Constants.newItemExists = true;
+				if(Constants.OnlineVideoUrlList != null && !Constants.OnlineVideoUrlList.contains(asset.getUrl())){
+					Log.d("TAG", asset.getUrl());
+					Constants.newItemExists = true;
+				}
 				return false;
 			}
 
@@ -1260,11 +1263,28 @@ public class DuoleUtils {
 			}
 		}
 
-		Log.d("TAG", "getMusicList :   Size of music list "
-				+ Constants.MusicList.size());
-
 		mld = new MusicListDao(Duole.appref);
 		mld.save(Constants.MusicList);
+	}
+	
+	/**
+	 * Get the list of online video
+	 * 
+	 * 
+	 */
+	public static void getOnlineVideoList(ArrayList<Asset> assets){
+		
+		Constants.OnlineVideoUrlList = new ArrayList<String>();
+		
+		for(Asset asset : assets) {
+			if(asset.getUrl() != null && !asset.getUrl().equals("")){
+				String url = asset.getUrl();
+				if(url.startsWith("http") && !url.contains("duole")){
+					Constants.OnlineVideoUrlList.add(url);
+				}
+				
+			}
+		}
 	}
 
 	/**

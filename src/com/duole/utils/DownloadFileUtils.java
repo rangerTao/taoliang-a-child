@@ -137,7 +137,6 @@ public class DownloadFileUtils extends Thread {
 			/**
 			 * To do : deal with priority resource.
 			 */
-			
 			Constants.newItemExists = true;
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			

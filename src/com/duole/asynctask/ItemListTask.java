@@ -79,8 +79,13 @@ public class ItemListTask extends AsyncTask {
 
 			// when error.
 			if (!gettedSourceList) {
-				Duole.appref.sendBroadcast(new Intent(
-						Constants.Refresh_Complete));
+				Duole.appref.mhandler.post(new Runnable() {
+					
+					public void run() {
+						Duole.appref.sendBroadcast(new Intent(
+								Constants.Refresh_Complete));
+					}
+				});
 				Constants.DOWNLOAD_RUNNING = false;
 			}
 		}

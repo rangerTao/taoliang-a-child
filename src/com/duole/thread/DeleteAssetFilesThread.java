@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;

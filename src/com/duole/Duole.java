@@ -13,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -26,6 +27,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ResolveInfo;
+import android.content.pm.PackageParser.NewPermissionInfo;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -34,8 +36,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -64,6 +69,7 @@ import com.duole.player.VideoPlayerActivity;
 import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
+import com.duole.receiver.RefreshCompeleteReceiver;
 import com.duole.service.AssetDownloadService;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
@@ -82,6 +88,9 @@ public class Duole extends BaseActivity {
 
 	public static DuoleCountDownTimer gameCountDown;
 	public static DuoleCountDownTimer restCountDown;
+	
+	public static final int INIT_COUNTDOWN = 999;
+	public static final int START_WIZARD = 998;
 	
 	public LinearLayout llPageDivider;
 	View view;
@@ -105,6 +114,40 @@ public class Duole extends BaseActivity {
 	Asset assItem;
 	
 	Thread startActivityForResult;
+	
+	public Handler mhandler = new Handler() {
+
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case INIT_COUNTDOWN:
+				initContents();
+				break;
+			case START_WIZARD:
+				ConfigDao cd = new ConfigDao(getApplicationContext());
+				Cursor cursor = cd.query("setup");
+				cursor.moveToFirst();
+
+				if (cursor.getCount() > 0) {
+					for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor
+							.moveToNext()) {
+						if (cursor.getString(0).equals("0")
+								|| cursor.getString(0) == null) {
+							startSetupWizard();
+						}
+					}
+				} else {
+					startSetupWizard();
+				}
+
+				cursor.close();
+			default:
+				break;
+			}
+			super.handleMessage(msg);
+		}
+
+	};
 	
 	/**
 	 * The connection of background refresh service.
@@ -132,8 +175,6 @@ public class Duole extends BaseActivity {
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		
-
-		Log.e("TAG", dm.widthPixels + "     " + dm.heightPixels);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 //		systemSettings();
@@ -177,22 +218,10 @@ public class Duole extends BaseActivity {
 	 * Start the setup wizard.
 	 */
 	private void startTheSetupWizard(){
-
-		ConfigDao cd = new ConfigDao(getApplicationContext());
-		Cursor cursor = cd.query("setup");
-		cursor.moveToFirst();
 		
-		if(cursor.getCount() > 0){
-			for(cursor.moveToFirst();!cursor.isAfterLast();cursor.moveToNext()){
-		        if(cursor.getString(0).equals("0") || cursor.getString(0) == null){
-		        	startSetupWizard();
-		        }
-		    }
-		}else{
-			startSetupWizard();
-		}
-		
-		cursor.close();
+		Message msg = new Message();
+		msg.what = START_WIZARD;
+		mhandler.sendMessageDelayed(msg, 1000);
 		
 	}
 	
@@ -243,7 +272,8 @@ public class Duole extends BaseActivity {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public void initContents()  throws Exception{
+	public void initContents(){
+		
 		// Check whether tf card exists.
 		if (DuoleUtils.checkTFCard()) {
 			// init the cache folders.
@@ -251,10 +281,16 @@ public class Duole extends BaseActivity {
 
 				inited = true;
 				
-				//Verify the installation of flash player.
+				// Verify the installation of flash player.
 				verifyFlashPlayerInstallation();
+
 				//Init the view.
-				initViews();
+				try {
+					initViews();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				//Set the background picture.
 				setBackground();
@@ -266,11 +302,17 @@ public class Duole extends BaseActivity {
 				DuoleNetUtils.uploadLocalVersionForce();
 				
 				//Start the asset download service.s
-				Intent downService = new Intent(this,AssetDownloadService.class);
-				startService(downService);
+				mhandler.post(new Runnable() {
+					
+					public void run() {
+						Intent downService = new Intent(appref,AssetDownloadService.class);
+						appref.startService(downService);
+					}
+				});
 				
 				//Start refreshing the network traffic status.
 				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
+				
 				Message msgRefresh = new Message();
 				msgRefresh.what = Constants.NET_TRAFFIC;
 				mHandler.sendMessageDelayed(msgRefresh, 5000);
@@ -286,13 +328,9 @@ public class Duole extends BaseActivity {
 			
 			new ItemListTask().execute();
 
-			
 		} else {
-//			Toast.makeText(this, R.string.tf_unmounted, 2000).show();
-			
 			IntentFilter intentFilter = new IntentFilter("android.intent.action.MEDIA_MOUNTED");
 			try{
-//				registerReceiver(mountedReceiver, intentFilter);
 				Message msg = new Message();
 				msg.what = Constants.REFRESH_CONTENT;
 				mHandler.sendMessageDelayed(msg,2000);
@@ -303,15 +341,12 @@ public class Duole extends BaseActivity {
 		
 	}
 	
-	
-	
 	@Override
 	protected void refresh_content() {
 		super.refresh_content();
 		try {
 			initContents();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -335,52 +370,65 @@ public class Duole extends BaseActivity {
 		
 	}
 	
-	public void verifyFlashPlayerInstallation(){
-		if(!DuoleUtils.verifyInstallationOfAPK(this, Constants.PKG_FLASH)){
-			
-			boolean installed = false;
-			Log.e("TAG", "flash player not installed");
-			
-			File file = new File("/sdcard/");
-			for(File tempapk : file.listFiles()){
-				if(tempapk.getName().toLowerCase().endsWith(".apk")){
-					installed = DuoleUtils.installApkFromFile(tempapk);
-				}
-			}
-			
-			if(!installed){
-				AssetManager am = null;
-				am = getAssets();
-				
-				try {
-					InputStream is = am.open("flashplayer.apk");
-					
-					int byteread = 0;
-					if (is != null) {
-						file = new File("/sdcard/flashplayer.apk");
-						file.createNewFile();
-						FileOutputStream fs = new FileOutputStream(file);
-						byte[] buffer = new byte[512];
-						while ((byteread = is.read(buffer)) != -1) {
-							fs.write(buffer, 0, byteread);
+	public void verifyFlashPlayerInstallation() {
+
+		new Runnable() {
+
+			public void run() {
+				long start = System.currentTimeMillis();
+				if (!DuoleUtils.verifyInstallationOfAPK(appref,
+						Constants.PKG_FLASH)) {
+
+					boolean installed = false;
+					Log.e("TAG", "flash player not installed");
+
+					File file = new File("/sdcard/");
+					for (File tempapk : file.listFiles()) {
+						if (tempapk.getName().toLowerCase().endsWith(".apk")) {
+							installed = DuoleUtils.installApkFromFile(tempapk);
 						}
-						is.close();
-						fs.close();
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				if(file.exists()){
-					if(DuoleUtils.installApkFromFile(file)){
-						android.os.Process.killProcess(android.os.Process.myPid());
+
+					if (!installed) {
+						AssetManager am = null;
+						am = getAssets();
+
+						try {
+							InputStream is = am.open("flashplayer.apk");
+
+							int byteread = 0;
+							if (is != null) {
+								file = new File("/sdcard/flashplayer.apk");
+								file.createNewFile();
+								FileOutputStream fs = new FileOutputStream(file);
+								byte[] buffer = new byte[512];
+								while ((byteread = is.read(buffer)) != -1) {
+									fs.write(buffer, 0, byteread);
+								}
+								is.close();
+								fs.close();
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						if (file.exists()) {
+							if (DuoleUtils.installApkFromFile(file)) {
+								Log.d("TAG",
+										"install flash apk "
+												+ (System.currentTimeMillis() - start)
+												/ 1000);
+								android.os.Process
+										.killProcess(android.os.Process.myPid());
+							}
+						} else {
+							Log.e("TAG", "error redirect to assets");
+						}
 					}
-				}else{
-					Log.e("TAG", "error redirect to assets");
+
 				}
 			}
-			
-		}
+		}.run();
 	}
 	
 	/**
@@ -492,7 +540,7 @@ public class Duole extends BaseActivity {
 			@Override
 			public void onFinish() {
 				Constants.ENTIME_OUT = false;
-				int time = Integer.parseInt(Constants.restime == "" ? "30" : Constants.restime) * 60 * 1000;
+				int time = Integer.parseInt(Constants.restime == "" ? "10" : Constants.restime) * 60 * 1000;
 				this.setTotalTime(time);
 				this.seek(0);
 				this.stop();
@@ -502,7 +550,7 @@ public class Duole extends BaseActivity {
 				}
 				
 				if(gameCountDown != null){
-					time = Integer.parseInt(Constants.entime == "" ? "30" : Constants.entime) * 60 * 1000;
+					time = Integer.parseInt(Constants.entime == "" ? "120" : Constants.entime) * 60 * 1000;
 					gameCountDown.setTotalTime(time);
 					gameCountDown.seek(0);
 					
@@ -553,6 +601,7 @@ public class Duole extends BaseActivity {
 	 */
 	public void initViews() throws IOException, TransformerException,
 			SAXException, XmlPullParserException, ParserConfigurationException {
+		
 		//Get the current version of the system.
 		Constants.System_ver = DuoleUtils.getVersion(appref);
 		// get all apps
@@ -570,6 +619,9 @@ public class Duole extends BaseActivity {
 		DuoleUtils.addNetworkManager(temp);
 		//Get the music list.
 		getMusicList(temp);
+		
+		/** 2012.05.07 **/
+		DuoleUtils.getOnlineVideoList(temp);
 
 		// the total pages
 		int PageCount = (int) Math.ceil(temp.size()
@@ -580,6 +632,8 @@ public class Duole extends BaseActivity {
 		}
 
 		alAIA = new ArrayList<AssetItemAdapter>();
+		
+		mScrollLayout.removeAllViews();
 		
 		for (int i = 0; i < PageCount; i++) {
 			GridView appPage = new GridView(Duole.appref);
@@ -620,7 +674,6 @@ public class Duole extends BaseActivity {
 		DuoleUtils.setChildrenDrawingCacheEnabled(mScrollLayout, true);
 		
 		mScrollLayout.refresh();
-
 	}
 	
 	/**
@@ -706,7 +759,7 @@ public class Duole extends BaseActivity {
 			String frontid = assItem.getFrontID();
 			if(frontid != null && !frontid.equals("0")){
 				if(DuoleUtils.getContentFilterCount("duole/pres", getApplicationContext()) > 0 ){
-					startContentFilterOfPResByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/",assItem);
+					startContentFilterOfPResByPackageName("",frontid,Constants.CacheDir + "/front/",assItem);
 				}else if(DuoleUtils.verifyInstallationOfAPK(appref, Constants.PKG_PRIORITY)){
 					startActivityForResultByPackageName(Constants.PKG_PRIORITY,frontid,Constants.CacheDir + "/front/",assItem);
 				}else{
@@ -874,7 +927,7 @@ public class Duole extends BaseActivity {
 				if (pkgName == null) {
 					pkgName = FileUtils.getPackagenameFromAPK(appref, assItem);
 				}
-				Uri uri = Uri.parse(basepath + "," + frontid + "," + pkgname);
+				Uri uri = Uri.parse(basepath + "," + frontid + "," + pkgName);
 
 				intent.setDataAndType(uri, "duole/pres");
 				
@@ -975,8 +1028,13 @@ public class Duole extends BaseActivity {
 	 * Bind a auto refresh service.
 	 */
 	public void bindAutoRefreshService(){
-		Duole.appref.bindService(getIntent(), mConnection,
-				Context.BIND_AUTO_CREATE);
+		mhandler.post(new Runnable() {
+			
+			public void run() {
+				Duole.appref.bindService(getIntent(), mConnection,
+						Context.BIND_AUTO_CREATE);
+			}
+		});
 	}
 
 	/**
