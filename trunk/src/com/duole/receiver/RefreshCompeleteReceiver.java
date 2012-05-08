@@ -19,6 +19,8 @@ import com.duole.widget.ScrollLayout;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +28,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 public class RefreshCompeleteReceiver extends BroadcastReceiver {
 
@@ -39,7 +40,11 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 							+ new SimpleDateFormat("yyyy MM dd HH mm ss")
 									.format(new Date(System.currentTimeMillis())));
 
+			Log.d("TAG","is new item exists : " + Constants.newItemExists);
+			
 			if(Constants.newItemExists){
+				
+				Log.d("TAG", "refresh view");
 				Duole.appref.mHandler.post(new Runnable() {
 
 					public void run() {
@@ -60,7 +65,7 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 	/**
 	 * if there is anything changed,refresh the view.
 	 */
-	private synchronized boolean refreshView(){
+	public synchronized static boolean refreshView(){
 		
 		//Set the thread as single task.
 		Constants.viewrefreshenable = false;
@@ -83,6 +88,8 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			
 			DuoleUtils.getMusicList(temp);
 			
+			DuoleUtils.getOnlineVideoList(temp);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -104,6 +111,10 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 		ScrollLayout sl = Duole.appref.mScrollLayout;
 
 		sl.removeAllViews();
+		
+//		Message msg = new Message();
+//		msg.what = Duole.appref.REMOVE_ITEMS;
+//		Duole.appref.mhandler.sendMessage(msg);
 		
 		for (int i = 0; i < PageCount; i++) {
 			

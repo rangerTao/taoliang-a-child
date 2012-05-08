@@ -59,6 +59,7 @@ public class Constants {
 	
 	public static ArrayList<Asset> AssetList;
 	public static ArrayList<Asset> MusicList;
+	public static ArrayList<String> OnlineVideoUrlList;
 	public static ArrayList<Asset> DownLoadTaskList;
 	public static ArrayList<Asset> temp;
 	public static ArrayList<Asset> alAsset;
