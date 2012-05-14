@@ -44,7 +44,8 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			
 			if(Constants.newItemExists){
 				
-				Log.d("TAG", "refresh view");
+				Log.d("TAG", "is refresh enable " + Constants.viewrefreshenable);
+				
 				Duole.appref.mHandler.post(new Runnable() {
 
 					public void run() {

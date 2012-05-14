@@ -177,7 +177,7 @@ public class Duole extends BaseActivity {
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-//		systemSettings();
+		systemSettings();
 		
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -251,7 +251,7 @@ public class Duole extends BaseActivity {
 		//Enable the auto time.
 		Settings.System.putInt(getContentResolver(), Settings.System.AUTO_TIME, 1);
 		//Set the time out of screen.
-		Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 5 * 60 * 1000);
+		Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 8 * 60 * 1000);
 		
 	}
 	

@@ -109,6 +109,8 @@ public class DeleteAssetFilesThread extends Thread {
 				}
 			}
 		}
+		Constants.newItemExists = true;
+		Constants.viewrefreshenable = true;
 		Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 	}
 
