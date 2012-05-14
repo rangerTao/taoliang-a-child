@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duole"
     android:versionCode="2"
-    android:versionName="1.05.0064" >
+    android:versionName="1.05.0067" >
 
     <application
         android:icon="@drawable/icon"

@@ -279,6 +279,9 @@ public class DuoleUtils {
 								"pm install -r" + target.getAbsolutePath());
 						p.waitFor();
 
+						Constants.newItemExists = true;
+						Constants.viewrefreshenable = true;
+						Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -806,6 +809,11 @@ public class DuoleUtils {
 					List<PackageInfo> infos = pm.getInstalledPackages(0);
 					if (!infos.contains(infos)) {
 						if (DuoleUtils.installApkFromFile(file)) {
+							
+							Constants.newItemExists = true;
+							Constants.viewrefreshenable = true;
+							Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
+							
 							return false;
 						} else {
 							return true;

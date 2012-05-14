@@ -59,9 +59,13 @@ public class DownloadFileUtils extends Thread {
 		try{
 			
 			Asset downAsset = Constants.dtq.pop_front();
+			
+			if(downAsset != null && !Constants.newItemExists){
+				Constants.newItemExists = true;
+			}
+			
 			while(downAsset != null){
 				if(DuoleNetUtils.isNetworkAvailable(Duole.appref)){
-					
 					Log.d("TAG", downAsset.toString());
 					download(downAsset);
 					Constants.queueMap.remove(downAsset.getUrl());
@@ -138,6 +142,7 @@ public class DownloadFileUtils extends Thread {
 			 * To do : deal with priority resource.
 			 */
 			Constants.newItemExists = true;
+			Constants.viewrefreshenable = true;
 			Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 			
 		} catch (Exception e) {

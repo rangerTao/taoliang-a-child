@@ -141,8 +141,16 @@ public class AssetItemAdapter extends BaseAdapter {
 			if(file.exists()){
 				assItem.ivAssetThumb.setImageBitmap(BitmapFactory
 						.decodeFile(file.getAbsolutePath()));
-			}else{
-				assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
+			} else {
+				File nopic = new File(Constants.CacheDir + "/thumbnail/"
+						+ "nopic.gif");
+				if (nopic.exists()) {
+					assItem.ivAssetThumb.setImageBitmap(BitmapFactory
+							.decodeFile(nopic.getAbsolutePath()));
+				} else {
+					assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
+				}
+
 			}
 			
 		}

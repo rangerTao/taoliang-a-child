@@ -536,6 +536,7 @@ public class SystemConfigActivity extends PreferenceActivity {
 						FileUtils.emptyFolder(new File(Constants.CacheDir));
 
 						Constants.newItemExists = true;
+						Constants.viewrefreshenable = true;
 						Constants.AssetList = new ArrayList<Asset>();
 						Duole.appref.sendBroadcast(new Intent(
 								Constants.Refresh_Complete));

@@ -56,7 +56,6 @@ public class Asset {
 	}
 
 	public Asset() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getMd5() {

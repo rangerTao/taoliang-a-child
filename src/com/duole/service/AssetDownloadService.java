@@ -29,14 +29,16 @@ public class AssetDownloadService extends Service{
 
 			@Override
 			public void run() {
-
+				int index = 0;
 				while(running){
 					
-					Asset temp = Constants.dtq.pop_front();
-					if(temp != null && !Constants.newItemExists){
+					if(index == 10){
 						Constants.newItemExists = true;
+						Constants.viewrefreshenable = true;
+						index = 0;
 					}
 					
+					index ++;
 					DownloadFileUtils.downloadAll();
 					
 					Constants.dtq.trim();
@@ -46,8 +48,6 @@ public class AssetDownloadService extends Service{
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					
-					Log.d("TAG", "The value of newItemExists" + Constants.newItemExists);
 					
 					Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 				}
