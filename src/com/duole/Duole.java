@@ -618,7 +618,7 @@ public class Duole extends BaseActivity {
 		// Drop the resources which is not complete.
 		temp = DuoleUtils.checkFilesExists(temp);
 		// Add the jinzixuan
-		DuoleUtils.addJinzixuanManager(temp);
+//		DuoleUtils.addJinzixuanManager(temp);
 		// Add the system tweak function to the list.
 		DuoleUtils.addNetworkManager(temp);
 		// Get the music list.
