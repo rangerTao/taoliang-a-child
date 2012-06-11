@@ -122,9 +122,9 @@ public class DuoleUtils {
 		if (!file.exists()) {
 			file.mkdir();
 		}
-		
+
 		file = new File(Constants.CacheDir + "config.xml");
-		if (!file.exists()){
+		if (!file.exists()) {
 			DocumentBuilder dBuilder;
 			try {
 				dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -151,27 +151,26 @@ public class DuoleUtils {
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
-	public static boolean checkTFUsage(){
-		
+
+	public static boolean checkTFUsage() {
+
 		File sdcard = Environment.getExternalStorageDirectory();
 		StatFs statfs = new StatFs(sdcard.getAbsolutePath());
-		
-		long totalSize = FileUtils.countUp(statfs.getBlockCount(),statfs.getBlockSize());
-		long usedSize = totalSize
-				- FileUtils.countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
-		
-		if(usedSize >= totalSize){
+
+		long totalSize = FileUtils.countUp(statfs.getBlockCount(), statfs.getBlockSize());
+		long usedSize = totalSize - FileUtils.countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
+
+		if (usedSize >= totalSize) {
 			return false;
 		}
-		
-		if(usedSize > totalSize * 0.8f){
+
+		if (usedSize > totalSize * 0.8f) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -215,8 +214,7 @@ public class DuoleUtils {
 		URL url = checkUrl(video);
 
 		// the file used to save the video.
-		File file = new File(Constants.CacheDir + "/video" + "/"
-				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+		File file = new File(Constants.CacheDir + "/video" + "/" + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 		if (file.exists()) {
 			if (HashUtils.getMD5(file.getAbsolutePath()).equals(asset.getMd5())) {
@@ -248,8 +246,7 @@ public class DuoleUtils {
 		Log.v("TAG", url.toString());
 
 		// the file used to save the video.
-		File file = new File(Constants.CacheDir + "/apk" + "/"
-				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+		File file = new File(Constants.CacheDir + "/apk" + "/" + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 		if (file.exists()) {
 			return true;
@@ -257,26 +254,19 @@ public class DuoleUtils {
 
 		File cacheFile = new File(Constants.CacheDir + "/temp/");
 
-		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(
-				Duole.appref, asset, url.toString(), cacheFile, file, 7);
+		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(Duole.appref, asset, url.toString(), cacheFile, file, 7);
 
 		ftd.setOnDownloadCompleteListener(new OnDownloadCompleteListener() {
 
 			public void onDownloadComplete(Asset asset, File cache, File target) {
 
-				if (((asset.getUrl().startsWith("http") || asset.getUrl()
-						.startsWith("ftp")) && !asset.getUrl().contains(
-						Constants.siteName))
-						|| asset.getMd5().equals("false")
-						|| asset.getMd5().equals(
-								HashUtils.getMD5(cache.getAbsolutePath()))) {
+				if (((asset.getUrl().startsWith("http") || asset.getUrl().startsWith("ftp")) && !asset.getUrl().contains(Constants.siteName))
+						|| asset.getMd5().equals("false") || asset.getMd5().equals(HashUtils.getMD5(cache.getAbsolutePath()))) {
 
-					FileUtils.copyFile(cache.getAbsolutePath(),
-							target.getAbsolutePath());
+					FileUtils.copyFile(cache.getAbsolutePath(), target.getAbsolutePath());
 
 					try {
-						Process p = Runtime.getRuntime().exec(
-								"pm install -r" + target.getAbsolutePath());
+						Process p = Runtime.getRuntime().exec("pm install -r" + target.getAbsolutePath());
 						p.waitFor();
 
 						Constants.newItemExists = true;
@@ -316,7 +306,7 @@ public class DuoleUtils {
 		return false;
 
 	}
-	
+
 	/**
 	 * Down load app from server.
 	 * 
@@ -324,7 +314,7 @@ public class DuoleUtils {
 	 * @param video
 	 * @return
 	 */
-	public static boolean downloadBaseApp(BaseApp ba,String path) {
+	public static boolean downloadBaseApp(BaseApp ba, String path) {
 
 		// Reorganize the url.
 		URL url = checkUrl(Constants.Duole + ba.getbPath());
@@ -339,31 +329,24 @@ public class DuoleUtils {
 		}
 
 		File cacheFile = new File(Constants.CacheDir + "/temp/");
-		
+
 		Asset asset = new Asset();
 		asset.setMd5(ba.getFilemd5());
 		asset.setUrl(ba.getbPath());
 
-		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(
-				Duole.appref, asset, url.toString(), cacheFile, file, 7);
+		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(Duole.appref, asset, url.toString(), cacheFile, file, 7);
 
 		ftd.setOnDownloadCompleteListener(new OnDownloadCompleteListener() {
 
 			public void onDownloadComplete(Asset asset, File cache, File target) {
 
-				if (((asset.getUrl().startsWith("http") || asset.getUrl()
-						.startsWith("ftp")) && !asset.getUrl().contains(
-						Constants.siteName))
-						|| asset.getMd5().equals("false")
-						|| asset.getMd5().equals(
-								HashUtils.getMD5(cache.getAbsolutePath()))) {
+				if (((asset.getUrl().startsWith("http") || asset.getUrl().startsWith("ftp")) && !asset.getUrl().contains(Constants.siteName))
+						|| asset.getMd5().equals("false") || asset.getMd5().equals(HashUtils.getMD5(cache.getAbsolutePath()))) {
 
-					FileUtils.copyFile(cache.getAbsolutePath(),
-							target.getAbsolutePath());
+					FileUtils.copyFile(cache.getAbsolutePath(), target.getAbsolutePath());
 
 					try {
-						Process p = Runtime.getRuntime().exec(
-								"pm install -r " + target.getAbsolutePath());
+						Process p = Runtime.getRuntime().exec("pm install -r " + target.getAbsolutePath());
 						p.waitFor();
 
 					} catch (IOException e) {
@@ -409,8 +392,7 @@ public class DuoleUtils {
 		URL url = checkUrl(video);
 
 		// the file used to save the video.
-		File file = new File(Constants.CacheDir + "/front" + "/"
-				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+		File file = new File(Constants.CacheDir + "/front" + "/" + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 		if (file.exists()) {
 			return true;
@@ -418,19 +400,15 @@ public class DuoleUtils {
 
 		File cacheFile = new File(Constants.CacheDir + "/temp/");
 
-		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(
-				Duole.appref, asset, url.toString(), cacheFile, file, 5);
+		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(Duole.appref, asset, url.toString(), cacheFile, file, 5);
 
 		ftd.setOnDownloadCompleteListener(new OnDownloadCompleteListener() {
 
 			public void onDownloadComplete(Asset asset, File cache, File target) {
 
-				if (asset.getMd5().equals("false")
-						|| asset.getMd5().equals(
-								HashUtils.getMD5(cache.getAbsolutePath()))) {
+				if (asset.getMd5().equals("false") || asset.getMd5().equals(HashUtils.getMD5(cache.getAbsolutePath()))) {
 					Log.d("TAG", "upzip");
-					FileUtils.Unzip(cache.getAbsolutePath(), Constants.CacheDir
-							+ "/front" + "/" + asset.getId(), Constants.ZiPass);
+					FileUtils.Unzip(cache.getAbsolutePath(), Constants.CacheDir + "/front" + "/" + asset.getId(), Constants.ZiPass);
 				}
 
 				cache.delete();
@@ -471,8 +449,7 @@ public class DuoleUtils {
 		URL url = checkUrl(game);
 
 		// the file used to save the game.
-		File file = new File(Constants.CacheDir + "/game" + "/"
-				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+		File file = new File(Constants.CacheDir + "/game" + "/" + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 		if (file.exists()) {
 			return true;
@@ -496,8 +473,7 @@ public class DuoleUtils {
 
 		URL url = checkUrl(audio);
 
-		File file = new File(Constants.CacheDir + "/mp3" + "/"
-				+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+		File file = new File(Constants.CacheDir + "/mp3" + "/" + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 		if (file.exists()) {
 			return true;
@@ -522,8 +498,7 @@ public class DuoleUtils {
 		URL url = checkUrl(pic);
 
 		if (!asset.getThumbnail().equals("")) {
-			File file = new File(Constants.CacheDir + "/thumbnail" + "/"
-					+ pic.substring(pic.lastIndexOf("/")));
+			File file = new File(Constants.CacheDir + "/thumbnail" + "/" + pic.substring(pic.lastIndexOf("/")));
 
 			if (file.exists()) {
 				return true;
@@ -576,8 +551,7 @@ public class DuoleUtils {
 
 			return true;
 		} catch (Exception e) {
-			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:"
-					+ asset.getUrl());
+			Log.e("TAG", "download error " + "error:" + e.getMessage() + "url:" + asset.getUrl());
 			Constants.AssetList.remove(asset);
 			return false;
 		}
@@ -595,19 +569,16 @@ public class DuoleUtils {
 		Log.v("TAG", "download a file from " + url.toString());
 
 		String filename = file.getName();
-		File cacheFile = new File(Constants.CacheDir + "/temp/"
-				+ file.getName());
+		File cacheFile = new File(Constants.CacheDir + "/temp/" + file.getName());
 
 		if (FileUtils.isCacheFileExists(filename)) {
 			if (DownloadFileUtils.resumeDownloadCacheFile(url, cacheFile)) {
-				FileUtils.copyFile(cacheFile.getAbsolutePath(),
-						file.getAbsolutePath());
+				FileUtils.copyFile(cacheFile.getAbsolutePath(), file.getAbsolutePath());
 				cacheFile.delete();
 			}
 		} else {
 			if (DownloadFileUtils.downloadCacheFile(url, cacheFile)) {
-				FileUtils.copyFile(cacheFile.getAbsolutePath(),
-						file.getAbsolutePath());
+				FileUtils.copyFile(cacheFile.getAbsolutePath(), file.getAbsolutePath());
 				cacheFile.delete();
 			}
 		}
@@ -622,8 +593,7 @@ public class DuoleUtils {
 	 * @param file
 	 * @return
 	 */
-	public static boolean downloadSingleFile(URL url, File file,
-			final String md5) {
+	public static boolean downloadSingleFile(URL url, File file, final String md5) {
 
 		Log.v("TAG", "download a file from " + url.toString());
 
@@ -632,16 +602,13 @@ public class DuoleUtils {
 		// + file.getName());
 		File cacheFile = new File(Constants.CacheDir + "/temp/");
 
-		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(
-				Duole.appref, url.toString(), cacheFile, file, 5);
+		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(Duole.appref, url.toString(), cacheFile, file, 5);
 		ftd.setOnDownloadCompleteListener(new OnDownloadCompleteListener() {
 
 			public void onDownloadComplete(Asset asset, File cache, File target) {
 
-				if (md5.equals("false")
-						|| md5.equals(HashUtils.getMD5(cache.getAbsolutePath()))) {
-					FileUtils.copyFile(cache.getAbsolutePath(),
-							target.getAbsolutePath());
+				if (md5.equals("false") || md5.equals(HashUtils.getMD5(cache.getAbsolutePath()))) {
+					FileUtils.copyFile(cache.getAbsolutePath(), target.getAbsolutePath());
 				}
 
 				cache.delete();
@@ -674,8 +641,7 @@ public class DuoleUtils {
 	 * @param refer
 	 * @param source
 	 */
-	public static ArrayList<Asset> getAssetDeleteList(
-			HashMap<String, Asset> refer, ArrayList<Asset> source) {
+	public static ArrayList<Asset> getAssetDeleteList(HashMap<String, Asset> refer, ArrayList<Asset> source) {
 
 		ArrayList<Asset> alReturn = new ArrayList<Asset>();
 
@@ -687,7 +653,7 @@ public class DuoleUtils {
 					Asset referAsset = source.get(i);
 					if (!refer.containsKey(referAsset.getId())) {
 						alReturn.add(referAsset);
-						
+
 						/*----------------2012.03.05-----------------------------*/
 						source.remove(referAsset);
 						/*----------------2012.03.05-----------------------------*/
@@ -739,8 +705,7 @@ public class DuoleUtils {
 		}
 
 		if (type.equals(Constants.RES_FRONT)) {
-			File front = new File(Constants.CacheDir + "/front/"
-					+ asset.getId());
+			File front = new File(Constants.CacheDir + "/front/" + asset.getId());
 			if (!front.exists()) {
 				return true;
 			} else {
@@ -751,10 +716,7 @@ public class DuoleUtils {
 		File file;
 		// Thumbnail does not exists.
 		if (!asset.getThumbnail().equals("")) {
-			file = new File(Constants.CacheDir
-					+ Constants.RES_THUMB
-					+ asset.getThumbnail().substring(
-							asset.getThumbnail().lastIndexOf("/")));
+			file = new File(Constants.CacheDir + Constants.RES_THUMB + asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
 			if (!file.exists()) {
 				return true;
 			}
@@ -762,44 +724,35 @@ public class DuoleUtils {
 
 		// Source file does not exists.
 		if (type.equals(Constants.RES_APK) || type.equals(Constants.RES_WIDGET)) {
-			file = new File(Constants.CacheDir + Constants.RES_APK
-					+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+			file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 			if (!file.exists()) {
 				return true;
 			} else if (file.exists()) {
-				
-				if ((asset.getUrl().startsWith("ftp") || asset.getUrl()
-						.startsWith("http"))
-						&& !asset.getUrl().contains(Constants.siteName)) {
+
+				if ((asset.getUrl().startsWith("ftp") || asset.getUrl().startsWith("http")) && !asset.getUrl().contains(Constants.siteName)) {
 					return false;
 				}
-				
+
 				if (asset.getMd5() == null) {
-					if (!refer.getMd5().equals(
-							HashUtils.getMD5(file.getAbsolutePath()))) {
+					if (!refer.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))) {
 						file.delete();
 						return true;
 					}
 				} else if (asset.getMd5().equals("false")) {
 					return false;
-				} else if (!asset.getMd5().equals(
-						HashUtils.getMD5(file.getAbsolutePath()))) {
+				} else if (!asset.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))) {
 					file.delete();
 					return true;
 				}
 				return false;
 			} else {
 				PackageManager pm = Duole.appref.getPackageManager();
-				file = new File(Constants.CacheDir
-						+ Constants.RES_APK
-						+ asset.getUrl().substring(
-								asset.getUrl().lastIndexOf("/")));
+				file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 				PackageInfo info = null;
 				try {
-					info = pm.getPackageArchiveInfo(file.getAbsolutePath(),
-							PackageManager.GET_ACTIVITIES);
+					info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
 				} catch (Exception e) {
 					e.printStackTrace();
 					file.delete();
@@ -809,11 +762,11 @@ public class DuoleUtils {
 					List<PackageInfo> infos = pm.getInstalledPackages(0);
 					if (!infos.contains(infos)) {
 						if (DuoleUtils.installApkFromFile(file)) {
-							
+
 							Constants.newItemExists = true;
 							Constants.viewrefreshenable = true;
 							Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
-							
+
 							return false;
 						} else {
 							return true;
@@ -822,11 +775,9 @@ public class DuoleUtils {
 				}
 			}
 		} else if (!asset.getUrl().equals("")) {
-			file = new File(Constants.CacheDir + type
-					+ asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
-			if (asset.getUrl().startsWith("http")
-					&& !asset.getUrl().contains("duoleyuan")) {
-				if(Constants.OnlineVideoUrlList != null && !Constants.OnlineVideoUrlList.contains(asset.getUrl())){
+			file = new File(Constants.CacheDir + type + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
+			if (asset.getUrl().startsWith("http") && !asset.getUrl().contains("duoleyuan")) {
+				if (Constants.OnlineVideoUrlList != null && !Constants.OnlineVideoUrlList.contains(asset.getUrl())) {
 					Log.d("TAG", asset.getUrl());
 					Constants.newItemExists = true;
 				}
@@ -837,15 +788,13 @@ public class DuoleUtils {
 				return true;
 			} else {
 				if (asset.getMd5() == null) {
-					if (!refer.getMd5().equals(
-							HashUtils.getMD5(file.getAbsolutePath()))) {
+					if (!refer.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))) {
 						file.delete();
 						return true;
 					}
 				} else if (asset.getMd5().equals("false")) {
 					return false;
-				} else if (!asset.getMd5().equals(
-						HashUtils.getMD5(file.getAbsolutePath()))) {
+				} else if (!asset.getMd5().equals(HashUtils.getMD5(file.getAbsolutePath()))) {
 					file.delete();
 					return true;
 				}
@@ -865,8 +814,7 @@ public class DuoleUtils {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static boolean updateAssetListFile(ArrayList<Asset> assets)
-			throws SAXException, IOException, TransformerException {
+	public static boolean updateAssetListFile(ArrayList<Asset> assets) throws SAXException, IOException, TransformerException {
 
 		try {
 			XmlUtils.deleteAllItemNodes();
@@ -887,8 +835,7 @@ public class DuoleUtils {
 				iStream = new FileInputStream(backup);
 				Document document = dBuilder.parse(iStream);
 
-				FileUtils
-						.copyFile(backup.getAbsolutePath(), Constants.ItemList);
+				FileUtils.copyFile(backup.getAbsolutePath(), Constants.ItemList);
 			} catch (Exception ex) {
 
 				XmlUtils.initFile(iStream, dBuilder, file);
@@ -908,8 +855,7 @@ public class DuoleUtils {
 	 * @return
 	 */
 	public static String getAndroidId() {
-		String androidId = System.getString(Duole.appref.getContentResolver(),
-				System.ANDROID_ID);
+		String androidId = System.getString(Duole.appref.getContentResolver(), System.ANDROID_ID);
 		return (androidId + " ");
 	}
 
@@ -919,8 +865,7 @@ public class DuoleUtils {
 	 * @param vg
 	 * @param enabled
 	 */
-	public static void setChildrenDrawingCacheEnabled(ViewGroup vg,
-			boolean enabled) {
+	public static void setChildrenDrawingCacheEnabled(ViewGroup vg, boolean enabled) {
 		final int count = vg.getChildCount();
 		for (int i = 0; i < count; i++) {
 			final View view = vg.getChildAt(i);
@@ -957,6 +902,22 @@ public class DuoleUtils {
 		assets.add(asset);
 	}
 
+	// Add a jinzixuan manager icon in first place of the list.
+	public static void addJinzixuanManager(ArrayList<Asset> assets) {
+
+		Log.d("TAG", "add asset");
+
+		Asset asset = new Asset();
+
+		asset.setType(Constants.RES_JINZIXUAN);
+
+		asset.setFilename(Duole.appref.getString(R.string.jinzixuan));
+
+		asset.setUrl("");
+
+		assets.add(0,asset);
+	}
+
 	/**
 	 * Update the client.
 	 */
@@ -984,42 +945,31 @@ public class DuoleUtils {
 				File client = new File(Constants.CacheDir + "client.apk");
 
 				try {
-					File newClient = new File(Constants.CacheDir + "/temp/"
-							+ path.substring(path.lastIndexOf("/")));
+					File newClient = new File(Constants.CacheDir + "/temp/" + path.substring(path.lastIndexOf("/")));
 
 					if (!client.exists()) {
-						if (DownloadFileUtils.resumeDownloadCacheFile(new URL(
-								Constants.Duole + path), newClient)) {
+						if (DownloadFileUtils.resumeDownloadCacheFile(new URL(Constants.Duole + path), newClient)) {
 
 							if (!md5.equals("") && md5 != null) {
-								if (!HashUtils.getMD5(
-										newClient.getAbsolutePath())
-										.equals(md5)) {
+								if (!HashUtils.getMD5(newClient.getAbsolutePath()).equals(md5)) {
 									newClient.delete();
 								}
 							}
-							
-							if(newClient.exists()){
-								
-								FileUtils.copyFile(newClient.getAbsolutePath(),
-										client.getAbsolutePath());
+
+							if (newClient.exists()) {
+
+								FileUtils.copyFile(newClient.getAbsolutePath(), client.getAbsolutePath());
 								newClient.delete();
-								XmlUtils.updateSingleNode(
-										Constants.SystemConfigFile,
-										Constants.XML_VER, ver);
-								XmlUtils.updateSingleNode(
-										Constants.SystemConfigFile,
-										Constants.XML_UPDATE, Constants.TRUE);
-								XmlUtils.updateSingleNode(
-										Constants.SystemConfigFile,
-										Constants.XML_UPDATE_TIME, updateHour);
+								XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_VER, ver);
+								XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE, Constants.TRUE);
+								XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME, updateHour);
 
 								Constants.clientApkDownloaded = true;
 
 								DuoleUtils.instalUpdateApk(Duole.appref);
-							
+
 							}
-							
+
 						}
 					} else {
 						if (!ver.equals(DuoleUtils.getPackageVersion(client))) {
@@ -1042,8 +992,7 @@ public class DuoleUtils {
 
 	public static long getUpdateMills() {
 
-		String uptime = XmlUtils.readNodeValue(Constants.SystemConfigFile,
-				Constants.XML_UPDATE_TIME);
+		String uptime = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_UPDATE_TIME);
 
 		Date date = new Date(java.lang.System.currentTimeMillis());
 
@@ -1074,8 +1023,7 @@ public class DuoleUtils {
 
 		PackageInfo info = null;
 		try {
-			info = pm.getPackageArchiveInfo(file.getAbsolutePath(),
-					PackageManager.GET_ACTIVITIES);
+			info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
 		} catch (Exception e) {
 			if (file.exists()) {
 				Log.d("TAG", "update package error. Delete");
@@ -1096,8 +1044,7 @@ public class DuoleUtils {
 	 */
 	public static String getVersion(Context context) {
 		try {
-			return context.getPackageManager().getPackageInfo(
-					context.getPackageName(), 0).versionName;
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -1119,69 +1066,30 @@ public class DuoleUtils {
 			if (type.trim().toLowerCase().equals("")) {
 				type = DuoleUtils.checkAssetType(asset);
 			}
-			
-			if(asset.getType().equals(Constants.RES_WIDGET)){
+
+			if (asset.getType().equals(Constants.RES_WIDGET)) {
 				type = Constants.RES_APK;
 			}
-			
+
 			String path = asset.getUrl();
 			String isfront = asset.getIsFront();
 
-//			if (!path.startsWith("http") || path.contains("duoleyuan")) {
-//				try {
-//					file = new File(Constants.CacheDir + type
-//							+ path.substring(path.lastIndexOf("/")));
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//				if (file != null && file.exists() && isfront != null
-//						&& isfront.equals("0")) {
-//
-//					if (type.equals(Constants.RES_APK)) {
-//						String pkgname = asset.getPackag();
-//						if (pkgname == null) {
-//							pkgname = FileUtils.getPackagenameFromAPK(
-//									Duole.appref, asset);
-//						}
-//						if (!DuoleUtils.verifyInstallationOfAPK(Duole.appref,
-//								pkgname)) {
-//							installThread it = new installThread(file);
-//							it.start();
-//						} else {
-//							temp.add(asset);
-//						}
-//					} else {
-//						temp.add(asset);
-//					}
-//
-//				}
-//			} else {
-//				if (DuoleNetUtils.isNetworkAvailable(Duole.appref)
-//						&& path.contains("youku"))
-//					temp.add(asset);
-//			}
-			
-			if (DuoleNetUtils.isNetworkAvailable(Duole.appref)
-					&& path.contains("youku"))
+			if (DuoleNetUtils.isNetworkAvailable(Duole.appref) && path.contains("youku"))
 				temp.add(asset);
 			else {
 				try {
-					file = new File(Constants.CacheDir + type
-							+ path.substring(path.lastIndexOf("/")));
+					file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				if (file != null && file.exists() && isfront != null
-						&& isfront.equals("0")) {
+				if (file != null && file.exists() && isfront != null && isfront.equals("0")) {
 
 					if (type.equals(Constants.RES_APK)) {
 						String pkgname = asset.getPackag();
 						if (pkgname == null) {
-							pkgname = FileUtils.getPackagenameFromAPK(
-									Duole.appref, asset);
+							pkgname = FileUtils.getPackagenameFromAPK(Duole.appref, asset);
 						}
-						if (!DuoleUtils.verifyInstallationOfAPK(Duole.appref,
-								pkgname)) {
+						if (!DuoleUtils.verifyInstallationOfAPK(Duole.appref, pkgname)) {
 							installThread it = new installThread(file);
 							it.start();
 						} else {
@@ -1194,6 +1102,11 @@ public class DuoleUtils {
 				}
 
 			}
+
+//			if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
+//				temp.add(asset);
+////				continue;
+//			}
 
 		}
 
@@ -1224,8 +1137,7 @@ public class DuoleUtils {
 	 */
 	public static boolean getSourceList(ArrayList<Asset> alAsset) {
 		try {
-			String url = Constants.Duole + "/e/member/child/ancJn.php?cc="
-					+ DuoleUtils.getAndroidId();
+			String url = Constants.Duole + "/e/member/child/ancJn.php?cc=" + DuoleUtils.getAndroidId();
 
 			alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);
@@ -1274,23 +1186,23 @@ public class DuoleUtils {
 		mld = new MusicListDao(Duole.appref);
 		mld.save(Constants.MusicList);
 	}
-	
+
 	/**
 	 * Get the list of online video
 	 * 
 	 * 
 	 */
-	public static void getOnlineVideoList(ArrayList<Asset> assets){
-		
+	public static void getOnlineVideoList(ArrayList<Asset> assets) {
+
 		Constants.OnlineVideoUrlList = new ArrayList<String>();
-		
-		for(Asset asset : assets) {
-			if(asset.getUrl() != null && !asset.getUrl().equals("")){
+
+		for (Asset asset : assets) {
+			if (asset.getUrl() != null && !asset.getUrl().equals("")) {
 				String url = asset.getUrl();
-				if(url.startsWith("http") && !url.contains("duole")){
+				if (url.startsWith("http") && !url.contains("duole")) {
 					Constants.OnlineVideoUrlList.add(url);
 				}
-				
+
 			}
 		}
 	}
@@ -1304,8 +1216,7 @@ public class DuoleUtils {
 	public static boolean installApkFromFile(File file) {
 		try {
 			Log.v("TAG", "install apk from " + file.getAbsolutePath());
-			Process p = Runtime.getRuntime().exec(
-					"pm install -r " + file.getAbsolutePath());
+			Process p = Runtime.getRuntime().exec("pm install -r " + file.getAbsolutePath());
 			p.waitFor();
 			int result = p.exitValue();
 			if (result == 0) {
@@ -1335,19 +1246,12 @@ public class DuoleUtils {
 					PackageManager pm = context.getPackageManager();
 
 					try {
-						PackageInfo info = pm.getPackageArchiveInfo(
-								client.getAbsolutePath(),
-								PackageManager.GET_ACTIVITIES);
-						if (!DuoleUtils.getVersion(context).equals(
-								info.versionName)) {
+						PackageInfo info = pm.getPackageArchiveInfo(client.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
+						if (!DuoleUtils.getVersion(context).equals(info.versionName)) {
 							Log.v("TAG", "upate client");
 
-							XmlUtils.updateSingleNode(
-									Constants.SystemConfigFile,
-									Constants.XML_CLIENTVERSIONUPLOAD,
-									Constants.FALSE);
-							Log.v("TAG",
-									"pm install -r" + client.getAbsolutePath());
+							XmlUtils.updateSingleNode(Constants.SystemConfigFile, Constants.XML_CLIENTVERSIONUPLOAD, Constants.FALSE);
+							Log.v("TAG", "pm install -r" + client.getAbsolutePath());
 							DuoleUtils.installApkFromFile(client);
 							client.delete();
 
@@ -1387,28 +1291,24 @@ public class DuoleUtils {
 	 * Query the package manager for MAIN/LAUNCHER activities in the supplied
 	 * package.
 	 */
-	public static List<ResolveInfo> findActivitiesForPackage(Context context,
-			String packageName) {
+	public static List<ResolveInfo> findActivitiesForPackage(Context context, String packageName) {
 		final PackageManager packageManager = context.getPackageManager();
 
 		final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
 		mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		mainIntent.setPackage(packageName);
 
-		final List<ResolveInfo> apps = packageManager.queryIntentActivities(
-				mainIntent, 0);
+		final List<ResolveInfo> apps = packageManager.queryIntentActivities(mainIntent, 0);
 		return apps != null ? apps : new ArrayList<ResolveInfo>();
 	}
 
 	/**
 	 * verify the installation of a apk. installed true. not installed false.
 	 */
-	public static boolean verifyInstallationOfAPK(Context context,
-			String pkgname) {
+	public static boolean verifyInstallationOfAPK(Context context, String pkgname) {
 		PackageManager pm = context.getPackageManager();
 
-		List<ApplicationInfo> lai = pm
-				.getInstalledApplications(PackageManager.GET_META_DATA);
+		List<ApplicationInfo> lai = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 		for (ApplicationInfo ai : lai) {
 			if (ai.packageName.equals(pkgname)) {
 				return true;
@@ -1424,8 +1324,7 @@ public class DuoleUtils {
 	 * @param input
 	 * @return
 	 */
-	public synchronized static HashMap<String, Asset> deDuplicate(
-			HashMap<String, Asset> input) {
+	public synchronized static HashMap<String, Asset> deDuplicate(HashMap<String, Asset> input) {
 
 		HashMap<String, Asset> output = new HashMap<String, Asset>();
 		Set<String> si = input.keySet();
@@ -1486,30 +1385,27 @@ public class DuoleUtils {
 			return Constants.RES_FRONT;
 		} else if (url.endsWith(".zip")) {
 			return Constants.RES_FRONT;
-		} else if (url.endsWith(".mp4") || url.endsWith(".avi")
-				|| url.endsWith(".mkv") || url.endsWith(".rmvb")
-				|| url.endsWith(".rm")) {
+		} else if (url.endsWith(".mp4") || url.endsWith(".avi") || url.endsWith(".mkv") || url.endsWith(".rmvb") || url.endsWith(".rm")) {
 			return Constants.RES_VIDEO;
 		} else {
 			return "";
 		}
 
 	}
-	
-	public static int getContentFilterCount(String filter ,Context context){
-		
+
+	public static int getContentFilterCount(String filter, Context context) {
+
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setType(filter);
-	     
-        List<ResolveInfo> rList;
-        
-        PackageManager mPm = context.getPackageManager();
-        
-        rList = mPm.queryIntentActivities(
-                intent, PackageManager.MATCH_DEFAULT_ONLY);
-        
-        return rList.size();
+
+		List<ResolveInfo> rList;
+
+		PackageManager mPm = context.getPackageManager();
+
+		rList = mPm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+		return rList.size();
 	}
 }
 

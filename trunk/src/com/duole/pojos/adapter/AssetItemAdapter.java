@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.duole.Duole;
@@ -28,7 +29,7 @@ public class AssetItemAdapter extends BaseAdapter {
 
 	private ArrayList<Asset> mList;
 	private Context mContext;
-	
+
 	private Bitmap musicBmp;
 	private Bitmap keBmp;
 
@@ -42,16 +43,16 @@ public class AssetItemAdapter extends BaseAdapter {
 			mList.add(list.get(i));
 			i++;
 		}
-		
+
 		keBmp = FileUtils.toRoundCorner(Constants.bmpKe, 7);
 		musicBmp = FileUtils.toRoundCorner(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke_music), 7);
 	}
-	
-	public AssetItemAdapter(ArrayList<Asset> list){
+
+	public AssetItemAdapter(ArrayList<Asset> list) {
 		mContext = Duole.appref;
 		mList = list;
 	}
- 
+
 	public int getCount() {
 		return mList.size();
 	}
@@ -68,11 +69,10 @@ public class AssetItemAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		Asset asset = mList.get(position);
-		
+
 		AssetItem assItem;
 		if (convertView == null) {
-			View v = LayoutInflater.from(mContext).inflate(R.layout.app_item,
-					null);
+			View v = LayoutInflater.from(mContext).inflate(R.layout.app_item, null);
 
 			assItem = new AssetItem();
 			assItem.ivKe = (ImageView) v.findViewById(R.id.ivKe);
@@ -82,11 +82,10 @@ public class AssetItemAdapter extends BaseAdapter {
 			v.setTag(assItem);
 			convertView = v;
 		} else {
-			try{
+			try {
 				assItem = (AssetItem) convertView.getTag();
-			}catch (Exception e) {
-				View v = LayoutInflater.from(mContext).inflate(R.layout.app_item,
-						null);
+			} catch (Exception e) {
+				View v = LayoutInflater.from(mContext).inflate(R.layout.app_item, null);
 
 				assItem = new AssetItem();
 				assItem.ivKe = (ImageView) v.findViewById(R.id.ivKe);
@@ -96,81 +95,98 @@ public class AssetItemAdapter extends BaseAdapter {
 				v.setTag(assItem);
 				convertView = v;
 			}
-			
+
 		}
-		
-		if(asset.getType().equals(Constants.RES_CONFIG)){
-			
+
+		if (asset.getType().equals(Constants.RES_CONFIG)) {
+
 			assItem.ivAssetThumb.setImageResource(R.drawable.network);
 			assItem.tvAssetName.setText(asset.getFilename());
-			
+
 			assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
-			
+
 			return convertView;
 		}
-		 
-		if(asset.getType().equals(Constants.RES_WIDGET)){
-			
+
+		if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
+
+			Log.d("TAG", "add view");
+			assItem.ivAssetThumb.setImageResource(R.drawable.jinzixuan);
+			assItem.tvAssetName.setText(asset.getFilename());
+
+			assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
+
+			return convertView;
+
+		}
+
+		if (asset.getType().equals(Constants.RES_WIDGET)) {
+
 			WidgetDao wd = new WidgetDao(mContext);
-			
+
 			String wid = "";
 			String packagename = "";
-			if(asset.getPackag() != null && !asset.getPackag().equals("")){
+			if (asset.getPackag() != null && !asset.getPackag().equals("")) {
 				packagename = asset.getPackag();
 				wid = wd.findWidgetId(packagename);
-				
-			}else{
+
+			} else {
 				packagename = FileUtils.getPackagenameFromAPK(mContext, asset);
 				wid = wd.findWidgetId(packagename);
 			}
 			if (!wid.equals("")) {
-				return WidgetUtils.getWidgetViewByWidgetID(mContext, wid,packagename);
+				RelativeLayout rLayout = (RelativeLayout) convertView.findViewById(R.id.rlApp_Item);
+				// return WidgetUtils.getWidgetViewByWidgetID(mContext,
+				// wid,packagename);
+				View view = WidgetUtils.getWidgetViewByWidgetID(mContext, wid, packagename);
+				view.setPadding(0, 5, 0, 0);
+				rLayout.addView(view);
+				return convertView;
 			} else {
-				return WidgetUtils.getWidgetViewByWidgetPackageName(mContext,
-						packagename);
+				RelativeLayout rLayout = (RelativeLayout) convertView.findViewById(R.id.rlApp_Item);
+				View view = WidgetUtils.getWidgetViewByWidgetPackageName(mContext, packagename);
+				view.setPadding(0, 5, 0, 0);
+				rLayout.addView(view);
+				return convertView;
+				// return WidgetUtils.getWidgetViewByWidgetPackageName(mContext,
+				// packagename);
 			}
 		}
-		
-		if(Constants.alAssetCache.containsKey(asset.getId())){
+
+		if (Constants.alAssetCache.containsKey(asset.getId())) {
 			return Constants.alAssetCache.get(asset.getId());
 		}
-		
-		if(!asset.getThumbnail().equals("")){
-			File file = new File(Constants.CacheDir
-							+ "/thumbnail/"	+ asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
-			if(file.exists()){
-				assItem.ivAssetThumb.setImageBitmap(BitmapFactory
-						.decodeFile(file.getAbsolutePath()));
+
+		if (!asset.getThumbnail().equals("")) {
+			File file = new File(Constants.CacheDir + "/thumbnail/" + asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
+			if (file.exists()) {
+				assItem.ivAssetThumb.setImageBitmap(BitmapFactory.decodeFile(file.getAbsolutePath()));
 			} else {
-				File nopic = new File(Constants.CacheDir + "/thumbnail/"
-						+ "nopic.gif");
+				File nopic = new File(Constants.CacheDir + "/thumbnail/" + "nopic.gif");
 				if (nopic.exists()) {
-					assItem.ivAssetThumb.setImageBitmap(BitmapFactory
-							.decodeFile(nopic.getAbsolutePath()));
+					assItem.ivAssetThumb.setImageBitmap(BitmapFactory.decodeFile(nopic.getAbsolutePath()));
 				} else {
 					assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
 				}
 
 			}
-			
+
 		}
-		
-		if(asset.getType().toLowerCase().equals(Constants.RES_AUDIO)){
+
+		if (asset.getType().toLowerCase().equals(Constants.RES_AUDIO)) {
 			assItem.ivKe.setImageBitmap(musicBmp);
-		}else{
+		} else {
 			assItem.ivKe.setImageBitmap(keBmp);
 		}
-		
-		
+
 		// set the icon
-		
+
 		// set the app name
 		assItem.tvAssetName.setText(asset.getName());
-		
-		if(Constants.alAssetCache.size() < 50){
+
+		if (Constants.alAssetCache.size() < 50) {
 			Constants.alAssetCache.put(asset.getId(), convertView);
 		}
-		
 
 		return convertView;
 	}
