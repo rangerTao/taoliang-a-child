@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/current_time" >
+        <Preference
+            android:enabled="true"
+            android:key="curTime"
+            android:selectable="false" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/storage" >
+        <Preference
+            android:enabled="true"
+            android:key="preStorage"
+            android:selectable="false" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/anti_fatigure" >
+        <Preference
+            android:enabled="true"
+            android:key="preTimeEclipsed"
+            android:title="@string/enterteiment" />
+        <Preference
+            android:enabled="true"
+            android:key="preSleep"
+            android:selectable="false"
+            android:title="@string/sleep" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/network" >
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="preWIFI"
+            android:selectable="true"
+            android:title="Wi-Fi" />
+
+        <Preference
+            android:enabled="false"
+            android:key="preListWifi"
+            android:selectable="true"
+            android:title="@string/wifi_connection" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="pcUserInfo"
+        android:title="@string/user_info" >
+        <Preference
+            android:enabled="false"
+            android:key="preDeviceId"
+            android:selectable="false"
+            android:title="@string/device_id" >
+        </Preference>
+        <Preference
+            android:key="preGettingUserInfo"
+            android:title="@string/getting_user_info" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/security_title" >
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="prePowerSave"
+            android:selectable="true"
+            android:title="@string/power_save" />
+
+        <Preference
+            android:key="preSecurityChangePasswd"
+            android:title="@string/security_changePasswd" >
+        </Preference>
+        <Preference
+            android:enabled="true"
+            android:key="preCheckUpdate"
+            android:title="@string/check_update" >
+        </Preference>
+        <Preference
+            android:enabled="true"
+            android:key="preSetupWizard"
+            android:title="@string/startSetup" />
+        <Preference
+            android:enabled="true"
+            android:key="preClearLocal"
+            android:title="@string/local_clear" >
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>
