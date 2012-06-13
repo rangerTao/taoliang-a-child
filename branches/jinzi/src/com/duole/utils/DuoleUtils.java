@@ -915,7 +915,7 @@ public class DuoleUtils {
 
 		asset.setUrl("");
 
-		assets.add(0,asset);
+		assets.add(0, asset);
 	}
 
 	/**
@@ -1080,6 +1080,7 @@ public class DuoleUtils {
 				try {
 					file = new File(Constants.CacheDir + type + path.substring(path.lastIndexOf("/")));
 				} catch (Exception e) {
+					Log.e("TAG", file.getAbsolutePath());
 					e.printStackTrace();
 				}
 				if (file != null && file.exists() && isfront != null && isfront.equals("0")) {
@@ -1102,12 +1103,6 @@ public class DuoleUtils {
 				}
 
 			}
-
-//			if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
-//				temp.add(asset);
-////				continue;
-//			}
-
 		}
 
 		// Remove duplicate content
