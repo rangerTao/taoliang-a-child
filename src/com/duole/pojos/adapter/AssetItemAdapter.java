@@ -110,7 +110,6 @@ public class AssetItemAdapter extends BaseAdapter {
 
 		if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
 
-			Log.d("TAG", "add view");
 			assItem.ivAssetThumb.setImageResource(R.drawable.jinzixuan);
 			assItem.tvAssetName.setText(asset.getFilename());
 

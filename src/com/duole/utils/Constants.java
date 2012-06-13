@@ -7,11 +7,14 @@ import java.util.HashMap;
 import android.graphics.Bitmap;
 import android.view.View;
 
+import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
 import com.duole.thread.DownloadTaskQueue;
 
 public class Constants {
 
+	public static ArrayList<AssetItemAdapter> alAssetAdapter = new ArrayList<AssetItemAdapter>();
+	public static ArrayList<Asset> temp = new ArrayList<Asset>();
 	// Download items thread
 	public static DownloadFileUtils dfu = new DownloadFileUtils();
 
@@ -61,7 +64,6 @@ public class Constants {
 	public static ArrayList<Asset> MusicList;
 	public static ArrayList<String> OnlineVideoUrlList;
 	public static ArrayList<Asset> DownLoadTaskList;
-	public static ArrayList<Asset> temp;
 	public static ArrayList<Asset> alAsset;
 
 	// Bitmap constant
