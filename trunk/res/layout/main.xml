@@ -41,6 +41,14 @@
             android:layout_height="5dip"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
+
+        <ProgressBar
+            android:id="@+id/pbRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:visibility="invisible" />
     </RelativeLayout>
 
 </LinearLayout>

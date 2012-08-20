@@ -67,6 +67,7 @@ import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
 import com.duole.player.SingleMusicPlayerActivity;
 import com.duole.player.VideoPlayerActivity;
+import com.duole.pojos.CellTag;
 import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
@@ -83,6 +84,8 @@ import com.duole.utils.WidgetUtils;
 import com.duole.utils.XmlUtils;
 import com.duole.widget.ScrollLayout;
 
+import dalvik.system.VMRuntime;
+
 public class Duole extends BaseActivity {
 
 	public static Duole appref;
@@ -92,6 +95,8 @@ public class Duole extends BaseActivity {
 
 	public static final int INIT_COUNTDOWN = 999;
 	public static final int START_WIZARD = 998;
+	public static final int SHOW_REFRESH = 997;
+	public static final int HIDE_REFRESH = 996;
 
 	public LinearLayout llPageDivider;
 	View view;
@@ -107,8 +112,13 @@ public class Duole extends BaseActivity {
 	private static Context mContext;
 	public static BackgroundRefreshService mBoundService;
 	public static ArrayList<AssetItemAdapter> alAIA;
+	private boolean viewRefreshing = false;
+	private boolean viewRefreshed = false;
+
+	initView iView = new initView();
 
 	ProgressBar pbEnTime;
+	ProgressBar pbRefresh;
 
 	public int curPageDiv = 0;
 
@@ -122,6 +132,13 @@ public class Duole extends BaseActivity {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
+			case SHOW_REFRESH:
+				pbRefresh.setVisibility(View.VISIBLE);
+				break;
+			case HIDE_REFRESH:
+				pbRefresh.setVisibility(View.INVISIBLE);
+				break;
+
 			case INIT_COUNTDOWN:
 				initContents();
 				break;
@@ -175,6 +192,10 @@ public class Duole extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
+		final int CWJ_HEAP_SIZE = 32 * 1024 * 1024;
+		VMRuntime.getRuntime().setMinimumHeapSize(CWJ_HEAP_SIZE);
+		VMRuntime.getRuntime().setTargetHeapUtilization(0.75f);
+
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -186,6 +207,7 @@ public class Duole extends BaseActivity {
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
 		bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.pagedividerselected);
 		Constants.bmpKe = BitmapFactory.decodeResource(getResources(), R.drawable.ke);
+		pbRefresh = (ProgressBar) findViewById(R.id.pbRefresh);
 
 		tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
 
@@ -246,7 +268,7 @@ public class Duole extends BaseActivity {
 		// Disable the screen lock.
 		Settings.Secure.putInt(getContentResolver(), Settings.Secure.LOCK_PATTERN_ENABLED, 0);
 		// disable usb debug
-		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 1);
+		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 0);
 		// Disable the auto rotation.
 		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0);
 		// Disable the wifi available_notification.
@@ -290,42 +312,15 @@ public class Duole extends BaseActivity {
 
 				// Init the view.
 				try {
-					initViews();
+					// initViews();
+					if (!viewRefreshing) {
+						new initView().execute();
+					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-				// Set the background picture.
-				setBackground();
-
-				// Init the count down timer of game and rest time.
-				initCountDownTimer();
-
-				// Upload local version.
-				DuoleNetUtils.uploadLocalVersionForce();
-
-				// Start the asset download service.s
-				mhandler.postDelayed(new Runnable() {
-
-					public void run() {
-						Intent downService = new Intent(appref, AssetDownloadService.class);
-						appref.startService(downService);
-					}
-				}, 10000);
-
-				// Start refreshing the network traffic status.
-				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
-
-				Message msgRefresh = new Message();
-				msgRefresh.what = Constants.NET_TRAFFIC;
-				mHandler.sendMessageDelayed(msgRefresh, 5000);
-
-				// If a update is exists.install it.
-				DuoleUtils.instalUpdateApk(appref);
-
 			} else {
-				Toast.makeText(this, R.string.itemlist_lost, 2000).show();
 			}
 
 			startTheSetupWizard();
@@ -334,11 +329,11 @@ public class Duole extends BaseActivity {
 
 				public void run() {
 					new ItemListTask().execute();
-
 				}
 			}, 60 * 1000);
 
 		} else {
+			@SuppressWarnings("unused")
 			IntentFilter intentFilter = new IntentFilter("android.intent.action.MEDIA_MOUNTED");
 			try {
 				Message msg = new Message();
@@ -391,12 +386,8 @@ public class Duole extends BaseActivity {
 					boolean installed = false;
 					Log.e("TAG", "flash player not installed");
 
-					File file = new File("/sdcard/");
-					for (File tempapk : file.listFiles()) {
-						if (tempapk.getName().toLowerCase().endsWith(".apk")) {
-							installed = DuoleUtils.installApkFromFile(tempapk);
-						}
-					}
+					File file = new File("/sdcard/flashplayer.apk");
+					installed = DuoleUtils.installApkFromFile(file);
 
 					if (!installed) {
 						AssetManager am = null;
@@ -593,6 +584,169 @@ public class Duole extends BaseActivity {
 		}
 	}
 
+	class initView extends AsyncTask {
+
+		ArrayList<AssetItemAdapter> alAssetAdapter;
+
+		@Override
+		protected Object doInBackground(Object... arg0) {
+			Log.d("TAG", "do in background");
+			ArrayList<Asset> temp = new ArrayList<Asset>();
+			viewRefreshing = true;
+			alAssetAdapter = new ArrayList<AssetItemAdapter>();
+			try {
+				// Get the current version of the system.
+				Constants.System_ver = DuoleUtils.getVersion(appref);
+				// get all apps
+				Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir + "itemlist.xml");
+
+				// Get the system configuration.
+				XmlUtils.readConfiguration();
+
+				// About to deal with the source list.
+				temp.addAll(Constants.AssetList);
+				// Drop the resources which is not complete.
+				temp = DuoleUtils.checkFilesExists(temp);
+				// Add the jinzixuan
+				if (DuoleUtils.getContentFilterCount(Constants.CONTENT_FILTER_JINZIXUAN, getApplicationContext()) > 0) {
+					DuoleUtils.addJinzixuanManager(temp);
+				}
+
+				// Add the system tweak function to the list.
+				DuoleUtils.addNetworkManager(temp);
+				// Get the music list.
+				getMusicList(temp);
+
+				/** 2012.05.07 **/
+				DuoleUtils.getOnlineVideoList(temp);
+
+				// the total pages
+				int PageCount = (int) Math.ceil(temp.size() / Constants.APP_PAGE_SIZE);
+
+				if (PageCount == 0 || (temp.size() % Constants.APP_PAGE_SIZE) > 0) {
+					PageCount += 1;
+				}
+
+				alAIA = new ArrayList<AssetItemAdapter>();
+
+				// mHandler.post(new Runnable() {
+				//
+				// public void run() {
+				// mScrollLayout.removeAllViews();
+				// }
+				// });
+
+				llPageDivider = (LinearLayout) findViewById(R.id.llPageDividerTip);
+
+				for (int i = 0; i < PageCount; i++) {
+					alAssetAdapter.add(new AssetItemAdapter(Duole.appref, temp, i));
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Object result) {
+
+			if (!viewRefreshed) {
+				viewRefreshed = true;
+				mScrollLayout.removeAllViews();
+
+				for (int i = 0; i < alAssetAdapter.size(); i++) {
+					GridView appPage = new GridView(Duole.appref);
+					// get the "i" page data
+					AssetItemAdapter tempAdapter = alAssetAdapter.get(i);
+					appPage.setAdapter(tempAdapter);
+
+					appPage.setSelector(R.drawable.grid_selector);
+
+					appPage.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+					appPage.setNumColumns(Constants.COLUMNS);
+
+					appPage.setPadding(40, 10, 40, 0);
+
+					appPage.setVerticalSpacing(30);
+					appPage.setGravity(Gravity.CENTER);
+					appPage.setColumnWidth(110);
+
+					appPage.setOnItemClickListener(listener);
+
+					CellTag pageTag = new CellTag();
+					pageTag.setAssetList(tempAdapter.getAssetList());
+					pageTag.setAdapter(tempAdapter);
+					appPage.setTag(pageTag);
+
+					mScrollLayout.addView(appPage);
+
+					view = LayoutInflater.from(appref).inflate(R.layout.pagedividerselected, null);
+
+					PageDiv pd = new PageDiv();
+					pd.ivPageDiv = (ImageView) view.findViewById(R.id.ivBackground);
+					view.setTag(pd);
+
+					llPageDivider.addView(view);
+
+					mScrollLayout.refresh();
+
+					mScrollLayout.postInvalidate();
+				}
+
+				setPageDividerSelected(0);
+
+				DuoleUtils.setChildrenDrawingCacheEnabled(mScrollLayout, true);
+
+				// Set the background picture.
+				setBackground();
+
+				// Init the count down timer of game and rest time.
+				initCountDownTimer();
+
+				// Upload local version.
+				DuoleNetUtils.uploadLocalVersionForce();
+
+				// Start the asset download service.s
+				mhandler.postDelayed(new Runnable() {
+
+					public void run() {
+						Intent downService = new Intent(appref, AssetDownloadService.class);
+						appref.startService(downService);
+					}
+				}, 10000);
+
+				// Start refreshing the network traffic status.
+				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
+
+				Message msgRefresh = new Message();
+				msgRefresh.what = Constants.NET_TRAFFIC;
+				mHandler.sendMessageDelayed(msgRefresh, 5000);
+
+				// If a update is exists.install it.
+				DuoleUtils.instalUpdateApk(appref);
+
+				mScrollLayout.refresh();
+				viewRefreshing = false;
+
+				Log.d("TAG", "refresh main view from main finished");
+
+				mHandler.postDelayed(new Runnable() {
+
+					public void run() {
+						viewRefreshed = false;
+					}
+				}, 30 * 1000);
+				super.onPostExecute(result);
+			} else {
+				Log.d("TAG", "other bug escapsed ");
+			}
+		}
+
+	}
+
 	/**
 	 * Init the grid scroll view.
 	 * 
@@ -618,7 +772,7 @@ public class Duole extends BaseActivity {
 		// Drop the resources which is not complete.
 		temp = DuoleUtils.checkFilesExists(temp);
 		// Add the jinzixuan
-//		DuoleUtils.addJinzixuanManager(temp);
+		// DuoleUtils.addJinzixuanManager(temp);
 		// Add the system tweak function to the list.
 		DuoleUtils.addNetworkManager(temp);
 		// Get the music list.
@@ -728,14 +882,12 @@ public class Duole extends BaseActivity {
 		Constants.MusicList = new ArrayList<Asset>();
 
 		for (Asset asset : assets) {
-			Log.d("TAG", asset.getType());
 			if (asset.getType().equals(Constants.RES_AUDIO)) {
 
 				Constants.MusicList.add(asset);
 
 			}
 		}
-
 	}
 
 	/**
@@ -827,7 +979,7 @@ public class Duole extends BaseActivity {
 
 			// Launch the jinzixuan.
 			if (assItem.getType().equals(Constants.RES_JINZIXUAN)) {
-				String jinzi = "duole/jinzixuan";
+				String jinzi = Constants.CONTENT_FILTER_JINZIXUAN;
 				intent = new Intent(Intent.ACTION_VIEW);
 				intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK);
 				intent.setType(jinzi);
@@ -918,7 +1070,8 @@ public class Duole extends BaseActivity {
 	private void startContentFilterOfPResByPackageName(String pkgname, String frontid, String basepath, Asset asset) {
 
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		// intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
 		try {
 			if (asset.getType().equals(Constants.RES_APK)) {
@@ -1004,7 +1157,7 @@ public class Duole extends BaseActivity {
 		Log.d("TAG", resultCode + "   reaultde");
 		if (startActivityForResult != null) {
 			startActivityForResult.notify();
-		} else {
+		} else if (resultCode == 2) {
 			startItem(assItem);
 		}
 		super.onActivityResult(requestCode, resultCode, data);

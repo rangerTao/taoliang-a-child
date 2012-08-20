@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duole"
     android:versionCode="2"
-    android:versionName="1.05.0070" >
+    android:versionName="1.05.0073" >
 
     <application
         android:icon="@drawable/icon"
@@ -10,13 +10,13 @@
         android:sharedUserId="android.uid.system"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         <activity
+            android:name="Duole"
             android:clearTaskOnLaunch="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:name="Duole"
             android:screenOrientation="landscape"
             android:stateNotNeeded="true" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.HOME" />
@@ -26,33 +26,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".player.FlashPlayerActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
+            android:name=".player.MusicPlayerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:name=".player.MusicPlayerActivity"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".player.VideoPlayerActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".activity.SystemConfigActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" />
         <activity
-            android:label="@string/app_name"
             android:name=".activity.PasswordActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Dialog" />
         <activity
-            android:label="@string/systemstatus"
             android:name=".activity.SystemTweakActivity"
+            android:label="@string/systemstatus"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Dialog" />
         <activity
@@ -60,8 +60,8 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Dialog" />
         <activity
-            android:label="@string/app_name"
             android:name=".player.SingleMusicPlayerActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" />
 
         <service android:name=".service.BackgroundRefreshService" />
@@ -69,35 +69,35 @@
         <service android:name=".service.AssetDownloadService" />
 
         <receiver android:name=".receiver.BackgroundRefreshReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.refresh.Start" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.RestTimeoutReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.restime.out" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.DownloadStartReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.download.Start" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.UpdatInstallReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.update.install" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.RefreshCompeleteReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.refresh.Complete" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receiver.AntiFatigueReceiver" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.player.start" />
             </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <action android:name="com.duole.player.end" />
             </intent-filter>
         </receiver>
@@ -105,8 +105,11 @@
         <service android:name=".service.AntiFatigueService" />
 
         <provider
-            android:authorities="com.duole.provider"
-            android:name=".provider.DuoleProvider" />
+            android:name=".provider.DuoleProvider"
+            android:authorities="com.duole.provider" />
+
+        <service android:name=".service.RefreshMainViewService" >
+        </service>
     </application>
 
     <supports-screens
