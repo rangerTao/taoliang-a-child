@@ -1,9 +1,11 @@
 package com.duole.utils;
 
+import java.lang.ref.SoftReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.pm.PackageParser.NewPermissionInfo;
 import android.graphics.Bitmap;
 import android.view.View;
 
@@ -14,6 +16,9 @@ public class Constants {
 
 	// Download items thread
 	public static DownloadFileUtils dfu = new DownloadFileUtils();
+	
+	//Image pool
+	public static HashMap<String, SoftReference<Bitmap>> imagePool = new HashMap<String, SoftReference<Bitmap>>();
 
 	// The asset list used to delete.
 	public static ArrayList<Asset> alAssetDeleteList;
@@ -23,6 +28,8 @@ public class Constants {
 	public static DownloadTaskQueue dtq = new DownloadTaskQueue();
 
 	public static Asset assetSynchronized;
+	
+	public static String CONTENT_FILTER_JINZIXUAN = "duole/jinzixuan";
 
 	// system flags
 	public static boolean musicPlayerIsRunning = false;

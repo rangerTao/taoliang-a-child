@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,6 +34,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import android.R.xml;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -135,6 +137,22 @@ public class DuoleUtils {
 			}
 		}
 
+		return true;
+	}
+
+	public static boolean forceStopActivity(Context context,String name) {
+
+		if (name != null && !name.equals("")) {
+			ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+			Method method;
+			try {
+				method = Class.forName("android.app.ActivityManager").getMethod("forceStopPackage", String.class);
+				method.invoke(am, name);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		return true;
 	}
 
@@ -915,7 +933,7 @@ public class DuoleUtils {
 
 		asset.setUrl("");
 
-		assets.add(0,asset);
+		assets.add(0, asset);
 	}
 
 	/**
@@ -1103,10 +1121,10 @@ public class DuoleUtils {
 
 			}
 
-//			if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
-//				temp.add(asset);
-////				continue;
-//			}
+			// if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
+			// temp.add(asset);
+			// // continue;
+			// }
 
 		}
 

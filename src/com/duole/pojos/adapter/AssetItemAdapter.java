@@ -1,10 +1,12 @@
 package com.duole.pojos.adapter;
 
 import java.io.File;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.pm.PackageParser.NewPermissionInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -29,9 +31,16 @@ public class AssetItemAdapter extends BaseAdapter {
 
 	private ArrayList<Asset> mList;
 	private Context mContext;
+	BitmapFactory.Options opts = new BitmapFactory.Options();
 
-	private Bitmap musicBmp;
-	private Bitmap keBmp;
+	// private Bitmap musicBmp;
+	// private Bitmap keBmp;
+
+	public AssetItemAdapter(Context convert, ArrayList<Asset> list) {
+		mContext = convert;
+
+		mList = list;
+	}
 
 	public AssetItemAdapter(Context context, List<Asset> list, int page) {
 		mContext = context;
@@ -44,8 +53,14 @@ public class AssetItemAdapter extends BaseAdapter {
 			i++;
 		}
 
-		keBmp = FileUtils.toRoundCorner(Constants.bmpKe, 7);
-		musicBmp = FileUtils.toRoundCorner(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke_music), 7);
+		// keBmp = FileUtils.toRoundCorner(Constants.bmpKe, 7);
+		// musicBmp =
+		// FileUtils.toRoundCorner(BitmapFactory.decodeResource(Duole.appref.getResources(),
+		// R.drawable.ke_music), 7);
+	}
+
+	public ArrayList<Asset> getAssetList() {
+		return mList;
 	}
 
 	public AssetItemAdapter(ArrayList<Asset> list) {
@@ -103,18 +118,17 @@ public class AssetItemAdapter extends BaseAdapter {
 			assItem.ivAssetThumb.setImageResource(R.drawable.network);
 			assItem.tvAssetName.setText(asset.getFilename());
 
-			assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
+			assItem.ivKe.setImageResource(R.drawable.ke);
 
 			return convertView;
 		}
 
 		if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
 
-			Log.d("TAG", "add view");
 			assItem.ivAssetThumb.setImageResource(R.drawable.jinzixuan);
 			assItem.tvAssetName.setText(asset.getFilename());
 
-			assItem.ivKe.setImageBitmap(BitmapFactory.decodeResource(Duole.appref.getResources(), R.drawable.ke));
+			assItem.ivKe.setImageResource(R.drawable.ke);
 
 			return convertView;
 
@@ -160,23 +174,18 @@ public class AssetItemAdapter extends BaseAdapter {
 		if (!asset.getThumbnail().equals("")) {
 			File file = new File(Constants.CacheDir + "/thumbnail/" + asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
 			if (file.exists()) {
-				assItem.ivAssetThumb.setImageBitmap(BitmapFactory.decodeFile(file.getAbsolutePath()));
+				setImageViewByFilePath(assItem.ivAssetThumb, file.getAbsolutePath(), true);
 			} else {
-				File nopic = new File(Constants.CacheDir + "/thumbnail/" + "nopic.gif");
-				if (nopic.exists()) {
-					assItem.ivAssetThumb.setImageBitmap(BitmapFactory.decodeFile(nopic.getAbsolutePath()));
-				} else {
-					assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
-				}
+				assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
 
 			}
-
+			file = null;
 		}
 
 		if (asset.getType().toLowerCase().equals(Constants.RES_AUDIO)) {
-			assItem.ivKe.setImageBitmap(musicBmp);
+			assItem.ivKe.setImageResource(R.drawable.ke_music);
 		} else {
-			assItem.ivKe.setImageBitmap(keBmp);
+			assItem.ivKe.setImageResource(R.drawable.ke);
 		}
 
 		// set the icon
@@ -189,6 +198,32 @@ public class AssetItemAdapter extends BaseAdapter {
 		}
 
 		return convertView;
+	}
+
+	private void setImageViewByFilePath(ImageView iv, String path, boolean save) {
+
+		if (Constants.imagePool.containsKey(path)) {
+			if (Constants.imagePool.get(path) == null) {
+				if (save) {
+					addBitmapIntoImagePool(iv, path);
+				}
+			} else {
+				iv.setImageBitmap(Constants.imagePool.get(path).get());
+			}
+		} else {
+			if (save) {
+				addBitmapIntoImagePool(iv, path);
+			}
+		}
+
+	}
+
+	private void addBitmapIntoImagePool(ImageView iv, String path) {
+		Bitmap bmp = BitmapFactory.decodeFile(path);
+		SoftReference<Bitmap> sr = new SoftReference<Bitmap>(bmp);
+		iv.setImageBitmap(sr.get());
+		Constants.imagePool.put(path, sr);
+		bmp = null;
 	}
 
 	class AssetItem {

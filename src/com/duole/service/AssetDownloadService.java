@@ -1,7 +1,6 @@
 package com.duole.service;
 
 import com.duole.Duole;
-import com.duole.pojos.asset.Asset;
 import com.duole.utils.Constants;
 import com.duole.utils.DownloadFileUtils;
 
@@ -10,9 +9,10 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-public class AssetDownloadService extends Service{
-	
+public class AssetDownloadService extends Service {
+
 	private static boolean running = true;
+	private static boolean isRunning = false;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -20,63 +20,63 @@ public class AssetDownloadService extends Service{
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onStart(Intent intent, int startId) {
-		
-		Log.d("TAG", "Asset download service start");
-		
-		Thread start = new Thread(){
+
+		Thread start = new Thread() {
 
 			@Override
 			public void run() {
+
+				isRunning = true;
 				int index = 0;
-				while(running){
-					
-					if(index == 10){
+				while (running) {
+
+					if (index == 10) {
 						Constants.newItemExists = true;
 						Constants.viewrefreshenable = true;
 						index = 0;
 					}
-					
-					index ++;
+
+					index++;
 					DownloadFileUtils.downloadAll();
-					
+
 					Constants.dtq.trim();
-					
+
 					try {
-						Thread.sleep( 20 * 1000);
+						Thread.sleep(15 * 1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					
+
 					Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 				}
-			
+				isRunning = false;
 				super.run();
 			}
-			
+
 		};
-		
-		start.start();
-		
+
+		if (!isRunning) {
+			Log.d("TAG", "Asset download service start");
+			start.start();
+		}
+
 		super.onStart(intent, startId);
 	}
-	
-	public void destroyService(){
+
+	public void destroyService() {
 		running = false;
 	}
 
 	@Override
 	public void onDestroy() {
-		
+
 		running = false;
 		Constants.dtq.empty();
-		
+
 		super.onDestroy();
 	}
-	
-	
-	
-	
 
 }
