@@ -1,5 +1,6 @@
 package com.duole.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -7,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -70,6 +72,74 @@ public class DuoleUtils {
 
 	static {
 		mld = new MusicListDao(Duole.appref);
+	}
+
+	public static String getCurrentTime() {
+
+		// Set the time format as Year-month-day hour:minute:second.
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = sdf.format(new Date(java.lang.System.currentTimeMillis()));
+
+		return time;
+	}
+
+	/**
+	 * read info from file
+	 */
+	public static String readFromFile(File file) {
+		StringBuffer sb = new StringBuffer();
+		try {
+			FileInputStream fis = new FileInputStream(file);
+
+			InputStreamReader isr = new InputStreamReader(fis);
+
+			BufferedReader br = new BufferedReader(isr);
+
+			String temp = br.readLine();
+			while (temp != null) {
+				sb.append(temp);
+				temp = br.readLine();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return sb.toString();
+	}
+
+	public static String getUserinfoFormatted(String result) {
+
+		StringBuffer userinfo = new StringBuffer();
+
+		try {
+			JSONObject json = new JSONObject(result);
+
+			String username = json.getString("username");
+			String babyname = json.getString("truename");
+			String birthday = json.getString("birthd");
+			String sex = json.getString("sex");
+			String userid = json.getString("userid");
+
+			if (!userid.equals("null")) {
+
+				userinfo.append(Duole.appref.getString(R.string.username) + ":" + username + "\n");
+				userinfo.append(Duole.appref.getString(R.string.babyname) + ":" + babyname + "\n");
+				userinfo.append(Duole.appref.getString(R.string.birthday) + ":" + birthday + "\n");
+				if (sex.equals("0")) {
+					sex = Duole.appref.getString(R.string.sex_male);
+				} else if (sex.equals("1")) {
+					sex = Duole.appref.getString(R.string.sex_female);
+				} else {
+					sex = Duole.appref.getString(R.string.sex_unborn);
+				}
+				userinfo.append(Duole.appref.getString(R.string.sex) + ":" + sex + "\n");
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return userinfo.toString();
 	}
 
 	/**
@@ -140,7 +210,7 @@ public class DuoleUtils {
 		return true;
 	}
 
-	public static boolean forceStopActivity(Context context,String name) {
+	public static boolean forceStopActivity(Context context, String name) {
 
 		if (name != null && !name.equals("")) {
 			ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -615,9 +685,6 @@ public class DuoleUtils {
 
 		Log.v("TAG", "download a file from " + url.toString());
 
-		String filename = file.getName();
-		// File cacheFile = new File(Constants.CacheDir + "/temp/"
-		// + file.getName());
 		File cacheFile = new File(Constants.CacheDir + "/temp/");
 
 		FileMultiThreadDownloader ftd = new FileMultiThreadDownloader(Duole.appref, url.toString(), cacheFile, file, 5);

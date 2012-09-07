@@ -5,8 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.R.integer;
 import android.content.pm.PackageParser.NewPermissionInfo;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.view.View;
 
 import com.duole.pojos.asset.Asset;
@@ -14,10 +16,13 @@ import com.duole.thread.DownloadTaskQueue;
 
 public class Constants {
 
+	public final static int WIFI_STATUS = 999;
+	public final static int WIFI_CONNECTIONINFO = 998;
+	public static Handler handler;
 	// Download items thread
 	public static DownloadFileUtils dfu = new DownloadFileUtils();
-	
-	//Image pool
+
+	// Image pool
 	public static HashMap<String, SoftReference<Bitmap>> imagePool = new HashMap<String, SoftReference<Bitmap>>();
 
 	// The asset list used to delete.
@@ -28,7 +33,7 @@ public class Constants {
 	public static DownloadTaskQueue dtq = new DownloadTaskQueue();
 
 	public static Asset assetSynchronized;
-	
+
 	public static String CONTENT_FILTER_JINZIXUAN = "duole/jinzixuan";
 
 	// system flags
@@ -168,6 +173,7 @@ public class Constants {
 	// Broadcast
 	public static final String Refresh_Start = "com.duole.refresh.Start";
 	public static final String Refresh_Complete = "com.duole.refresh.Complete";
+	public static final String REFRESH_COMPLETE_DOWNLOAD_PROVIDER = "com.duole.refresh.complete.fromprovider";
 	public static final String Event_AppStart = "com.duole.player.start";
 	public static final String Event_AppEnd = "com.duole.player.end";
 	public static final String EVENT_INSTALL_UPDATE = "com.duole.update.install";

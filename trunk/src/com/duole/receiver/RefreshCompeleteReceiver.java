@@ -55,7 +55,6 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 							if ((System.currentTimeMillis() - refreshStartTime) > 15 * 1000) {
 								refreshView();
 							}
-
 						}
 					}
 
@@ -63,6 +62,23 @@ public class RefreshCompeleteReceiver extends BroadcastReceiver {
 			}
 
 			Constants.newItemExists = false;
+
+		}
+
+		if (intent.getAction().equals(Constants.REFRESH_COMPLETE_DOWNLOAD_PROVIDER)) {
+			if (Duole.appref != null) {
+				Duole.appref.mHandler.post(new Runnable() {
+
+					public void run() {
+
+						if ((System.currentTimeMillis() - refreshStartTime) > 25 * 1000) {
+							refreshView();
+						}
+
+					}
+
+				});
+			}
 
 		}
 	}

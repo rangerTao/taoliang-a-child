@@ -13,12 +13,10 @@ import javax.xml.transform.TransformerException;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.R.integer;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +25,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ResolveInfo;
-import android.content.pm.PackageParser.NewPermissionInfo;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -40,7 +37,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -58,10 +54,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.duole.activity.BaseActivity;
-import com.duole.activity.PasswordActivity;
+import com.duole.activity.SystemConfigActivity;
 import com.duole.asynctask.ItemListTask;
 import com.duole.listener.OnScrolledListener;
 import com.duole.player.FlashPlayerActivity;
@@ -71,7 +66,6 @@ import com.duole.pojos.CellTag;
 import com.duole.pojos.DuoleCountDownTimer;
 import com.duole.pojos.adapter.AssetItemAdapter;
 import com.duole.pojos.asset.Asset;
-import com.duole.receiver.RefreshCompeleteReceiver;
 import com.duole.service.AssetDownloadService;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.service.UnLockScreenService;
@@ -201,7 +195,7 @@ public class Duole extends BaseActivity {
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		systemSettings();
+		// systemSettings();
 
 		setContentView(R.layout.main);
 		bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pagedivider);
@@ -229,14 +223,6 @@ public class Duole extends BaseActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		mScrollLayout.setOnScrolledListener(new OnScrolledListener() {
-
-			@Override
-			public void scrolled(final int last, final int index) {
-				setPageDividerSelected(index);
-			}
-		});
 	}
 
 	/**
@@ -710,20 +696,29 @@ public class Duole extends BaseActivity {
 				DuoleNetUtils.uploadLocalVersionForce();
 
 				// Start the asset download service.s
-				mhandler.postDelayed(new Runnable() {
+				try {
+					Uri downloadUri = Uri.parse("content://com.duole.download");
+					getContentResolver().insert(downloadUri, new ContentValues());
 
-					public void run() {
-						Intent downService = new Intent(appref, AssetDownloadService.class);
-						appref.startService(downService);
-					}
-				}, 10000);
+					sendBroadcast(new Intent("com.duole.init.complete"));
 
-				// Start refreshing the network traffic status.
-				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
+					tvTrafficStats.setVisibility(View.INVISIBLE);
+				} catch (Exception e) {
+					mhandler.postDelayed(new Runnable() {
 
-				Message msgRefresh = new Message();
-				msgRefresh.what = Constants.NET_TRAFFIC;
-				mHandler.sendMessageDelayed(msgRefresh, 5000);
+						public void run() {
+							Intent downService = new Intent(appref, AssetDownloadService.class);
+							appref.startService(downService);
+						}
+					}, 10000);
+
+					// Start refreshing the network traffic status.
+					tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
+
+					Message msgRefresh = new Message();
+					msgRefresh.what = Constants.NET_TRAFFIC;
+					mHandler.sendMessageDelayed(msgRefresh, 5000);
+				}
 
 				// If a update is exists.install it.
 				DuoleUtils.instalUpdateApk(appref);
@@ -732,6 +727,14 @@ public class Duole extends BaseActivity {
 				viewRefreshing = false;
 
 				Log.d("TAG", "refresh main view from main finished");
+
+				mScrollLayout.setOnScrolledListener(new OnScrolledListener() {
+
+					@Override
+					public void scrolled(final int last, final int index) {
+						setPageDividerSelected(index);
+					}
+				});
 
 				mHandler.postDelayed(new Runnable() {
 
@@ -744,7 +747,6 @@ public class Duole extends BaseActivity {
 				Log.d("TAG", "other bug escapsed ");
 			}
 		}
-
 	}
 
 	/**
@@ -973,8 +975,9 @@ public class Duole extends BaseActivity {
 
 			// Launch the configure function.
 			if (assItem.getType().equals(Constants.RES_CONFIG)) {
-				intent = new Intent(appref, PasswordActivity.class);
-				intent.putExtra("type", "0");
+				// intent = new Intent(appref, PasswordActivity.class);
+				// intent.putExtra("type", "0");
+				intent = new Intent(appref, SystemConfigActivity.class);
 			}
 
 			// Launch the jinzixuan.

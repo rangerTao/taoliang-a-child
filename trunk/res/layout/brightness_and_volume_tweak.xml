@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:id="@+id/ivLess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/brightness_last" />
+
+    <SeekBar
+        android:id="@+id/sbTweak"
+        android:layout_width="249dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical" />
+
+    <ImageView
+        android:id="@+id/ivFull"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/sun_small" />
+
+</LinearLayout>

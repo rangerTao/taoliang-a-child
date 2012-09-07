@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/password_bg_expand" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="@string/power_save"
+                android:textColor="#000000"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <CheckBox
+                android:id="@+id/cbPowerSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
+
+        <Button
+            android:id="@+id/btnSettingWizard"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg_white"
+            android:onClick="advanceMenuOnClick"
+            android:text="@string/startSetup" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
+
+        <Button
+            android:id="@+id/btnCheckingUpdate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg_white"
+            android:onClick="advanceMenuOnClick"
+            android:src="@drawable/button_bg_white"
+            android:text="@string/check_update" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
+
+        <Button
+            android:id="@+id/btnChangepassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg_white"
+            android:onClick="advanceMenuOnClick"
+            android:src="@drawable/button_bg_white"
+            android:text="@string/security_changePasswd" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
+
+        <Button
+            android:id="@+id/btnLocalReset"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg_white"
+            android:onClick="advanceMenuOnClick"
+            android:src="@drawable/button_bg_white"
+            android:text="@string/local_clear" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
+
+        <ImageView
+            android:id="@+id/ivAdvanceMenuClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/btn_close" />
+    </LinearLayout>
+
+</RelativeLayout>

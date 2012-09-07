@@ -1,12 +1,7 @@
 package com.duole.service.download.dao;
 
-import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.Map;
 
-import com.duole.utils.Constants;
-
-import android.R.integer;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
