@@ -43,6 +43,11 @@ public class RefreshMainViewService extends Service {
 
 		// get all apps
 		try {
+			
+			if(Constants.alAsset == null){
+				Log.e("TAG", "COnstants.alasset is null");
+				return 0;
+			}
 			if (Constants.alAsset.size() < 1) {
 				Constants.alAsset = XmlUtils.readXML(null, Constants.CacheDir + "itemlist.xml");
 			}
