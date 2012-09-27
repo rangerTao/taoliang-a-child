@@ -2,12 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/popup_bg_white"
+    android:background="@drawable/password_bg"
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/llSeekBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal" >
 
         <ImageView
@@ -19,8 +22,8 @@
 
         <SeekBar
             android:id="@+id/sbTweakBrightnessAndVolume"
-            android:layout_width="249dp"
-            android:layout_height="wrap_content"
+            android:layout_width="330dp"
+            android:layout_height="90dp"
             android:layout_gravity="center_vertical"
             android:max="10"
             android:progress="5"
@@ -31,6 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:paddingRight="20dp"
             android:src="@drawable/sun_small" />
     </LinearLayout>
 
@@ -39,6 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
         android:src="@drawable/btn_close" />
 
 </LinearLayout>

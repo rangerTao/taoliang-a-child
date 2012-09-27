@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,7 +12,6 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,15 +29,10 @@ import javax.xml.transform.TransformerException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
-import android.R.xml;
 import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -47,15 +40,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
-import android.provider.ContactsContract.Contacts.Data;
 import android.provider.Settings.System;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.duole.Duole;
 import com.duole.R;
@@ -64,6 +54,7 @@ import com.duole.pojos.asset.BaseApp;
 import com.duole.service.download.FileMultiThreadDownloader;
 import com.duole.service.download.OnDownloadCompleteListener;
 import com.duole.service.download.OnDownloadErrorListener;
+import com.duole.service.download.dao.AssetDao;
 import com.duole.service.download.dao.MusicListDao;
 
 public class DuoleUtils {
@@ -134,6 +125,8 @@ public class DuoleUtils {
 				}
 				userinfo.append(Duole.appref.getString(R.string.sex) + ":" + sex + "\n");
 
+			} else {
+				userinfo.append(Duole.appref.getString(R.string.user_unregiste));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -202,7 +195,6 @@ public class DuoleUtils {
 				dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 				XmlUtils.initConfiguration(Constants.CacheDir, dBuilder, file);
 			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -361,10 +353,8 @@ public class DuoleUtils {
 						Constants.viewrefreshenable = true;
 						Duole.appref.sendBroadcast(new Intent(Constants.Refresh_Complete));
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -386,7 +376,6 @@ public class DuoleUtils {
 			try {
 				ftd.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -438,10 +427,8 @@ public class DuoleUtils {
 						p.waitFor();
 
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -463,7 +450,6 @@ public class DuoleUtils {
 			try {
 				ftd.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -515,7 +501,6 @@ public class DuoleUtils {
 			try {
 				ftd.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -619,7 +604,6 @@ public class DuoleUtils {
 				return new URL(url);
 			}
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -712,7 +696,6 @@ public class DuoleUtils {
 			try {
 				ftd.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -906,6 +889,9 @@ public class DuoleUtils {
 
 			XmlUtils.addNode(assets);
 
+			AssetDao ad = new AssetDao(Duole.appref);
+			ad.addToDB(assets);
+
 		} catch (Exception e) {
 			File file = new File(Constants.ItemList);
 			file.delete();
@@ -918,7 +904,6 @@ public class DuoleUtils {
 				File backup = new File(Constants.ItemList + ".bak");
 				dBuilder = dbf.newDocumentBuilder();
 				iStream = new FileInputStream(backup);
-				Document document = dBuilder.parse(iStream);
 
 				FileUtils.copyFile(backup.getAbsolutePath(), Constants.ItemList);
 			} catch (Exception ex) {
@@ -988,19 +973,14 @@ public class DuoleUtils {
 	}
 
 	// Add a jinzixuan manager icon in first place of the list.
-	public static void addJinzixuanManager(ArrayList<Asset> assets) {
+	public static ArrayList<ArrayList<Asset>> addJinzixuanManager(ArrayList<Asset> assets) {
 
-		Log.d("TAG", "add asset");
+		File file = new File("/sdcard/jinzixuan/index/jinzixuan.xml");
+		if (!file.exists()) {
+			return null;
+		}
 
-		Asset asset = new Asset();
-
-		asset.setType(Constants.RES_JINZIXUAN);
-
-		asset.setFilename(Duole.appref.getString(R.string.jinzixuan));
-
-		asset.setUrl("");
-
-		assets.add(0, asset);
+		return XmlUtils.parseJinzixuanXML(file);
 	}
 
 	/**
@@ -1070,7 +1050,6 @@ public class DuoleUtils {
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1091,7 +1070,6 @@ public class DuoleUtils {
 		try {
 			dateU = sdf.parse(update);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1415,7 +1393,6 @@ public class DuoleUtils {
 		Set<String> si = input.keySet();
 
 		Iterator it = si.iterator();
-		int i = 0;
 		while (it.hasNext()) {
 			output.put(it.next().toString(), input.get(it.next()));
 		}
@@ -1491,6 +1468,17 @@ public class DuoleUtils {
 		rList = mPm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 
 		return rList.size();
+	}
+
+	public static boolean isServiceWorked(Context context) {
+		ActivityManager myManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		ArrayList<RunningServiceInfo> runningService = (ArrayList<RunningServiceInfo>) myManager.getRunningServices(30);
+		for (int i = 0; i < runningService.size(); i++) {
+			if (runningService.get(i).service.getClassName().toString().equals("com.duole.service.AssetDownloadService")) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 

@@ -26,17 +26,16 @@ import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import android.content.ComponentName;
-import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.util.Log;
 import android.util.Xml;
 
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
+import com.duole.service.download.dao.AssetDao;
+import com.duole.service.download.dao.ConfigDao;
 
 public class XmlUtils {
 	public static String filePath = Constants.CacheDir + "/itemlist.xml";
@@ -45,8 +44,7 @@ public class XmlUtils {
 
 	// public static FileInputStream iStream = null;
 
-	public static void initFile(InputStream is, DocumentBuilder dBuilder,
-			File file) throws SAXException, IOException, TransformerException {
+	public static void initFile(InputStream is, DocumentBuilder dBuilder, File file) throws SAXException, IOException, TransformerException {
 		try {
 			Document document;
 			File itemfile = new File(Constants.ItemList);
@@ -68,8 +66,7 @@ public class XmlUtils {
 
 			document.appendChild(newElement);
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer;
 			transformer = transformerFactory.newTransformer();
 			StreamResult streamResult = new StreamResult(file);
@@ -82,8 +79,7 @@ public class XmlUtils {
 
 	}
 
-	public static void initConfiguration(String path, DocumentBuilder dBuilder,
-			File file) {
+	public static void initConfiguration(String path, DocumentBuilder dBuilder, File file) {
 
 		try {
 			File itemlist = new File(Constants.SystemConfigFile);
@@ -102,8 +98,7 @@ public class XmlUtils {
 			document.appendChild(newElement);
 			// document.getDocumentElement().appendChild(newElement);
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -142,35 +137,31 @@ public class XmlUtils {
 			}
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (XmlPullParserException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return "";
 	}
 
-	public static ArrayList<Asset> readFile(String filePath,
-			DocumentBuilder dBuilder, boolean update) throws SAXException,
-			IOException, XmlPullParserException, TransformerException,
-			ParserConfigurationException {
+	public static ArrayList<Asset> readFile(String filePath, DocumentBuilder dBuilder, boolean update) throws SAXException, IOException,
+			XmlPullParserException, TransformerException, ParserConfigurationException {
 
 		ArrayList<Asset> result = new ArrayList<Asset>();
 
-		FileInputStream iStream = new FileInputStream(new File(filePath));
-
-		XmlPullParser parser = Xml.newPullParser();
-
-		parser.setInput(iStream, "UTF-8");
-
-		int event = parser.getEventType();
-		Asset asset = null;
 		try {
+			FileInputStream iStream = new FileInputStream(new File(filePath));
+
+			XmlPullParser parser = Xml.newPullParser();
+
+			parser.setInput(iStream, "UTF-8");
+
+			int event = parser.getEventType();
+			Asset asset = null;
+
 			while (event != XmlPullParser.END_DOCUMENT) {
 				switch (event) {
 				case XmlPullParser.START_DOCUMENT:
@@ -283,6 +274,7 @@ public class XmlUtils {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+
 			Constants.entime = "120";
 			Constants.restime = "10";
 			Constants.sleepstart = "22:00";
@@ -307,6 +299,14 @@ public class XmlUtils {
 					new File(filePath + ".bak").delete();
 					initFile(null, dBuilder, new File(filePath + ".bak"));
 
+					getConfigurationsFromDB();
+					getAssetListFromDB(result);
+
+					if (result.size() > 0) {
+
+						Log.e("TAG", "load asset list from db");
+						return result;
+					}
 				}
 
 			} else {
@@ -317,7 +317,100 @@ public class XmlUtils {
 			new File(filePath + ".bak").delete();
 			FileUtils.copyFile(filePath, filePath + ".bak");
 		}
+
+		if (result.size() < 1) {
+			Log.e("TAG", "empty asset list ,check asset content from db");
+			getConfigurationsFromDB();
+			getAssetListFromDB(result);
+		}
+
 		return result;
+	}
+
+	private static void getConfigurationsFromDB() {
+
+		Log.e("TAG", "load configuration from db");
+
+		ConfigDao config = new ConfigDao(Duole.appref);
+		Cursor configs = config.queryAll();
+
+		for (configs.moveToFirst(); !configs.isAfterLast(); configs.moveToNext()) {
+
+			String name = configs.getString(1);
+
+			if (name.equals("bg"))
+				Constants.bgurl = configs.getString(2);
+			if (name.equals("bgurl"))
+				Constants.bgRestUrl = configs.getString(2);
+			if (name.equals("tipstart"))
+				Constants.restart = configs.getString(2);
+			if (name.equals("entime")) {
+				String entime = configs.getString(2);
+				if (entime.equals("")) {
+					Constants.entime = "120";
+				} else {
+					Constants.entime = entime;
+				}
+			}
+			if (name.equals("restime")) {
+				String restime = configs.getString(2);
+				if (restime.equals("")) {
+					Constants.restime = "10";
+				} else {
+					Constants.restime = restime;
+				}
+			}
+			if (name.equals("sleepstart")) {
+				String sleepstart = configs.getString(2);
+				if (sleepstart.equals("")) {
+					Constants.sleepstart = "22:00";
+				} else {
+					Constants.sleepstart = sleepstart;
+				}
+			}
+
+			if (name.equals("sleepend")) {
+				String sleepend = configs.getString(2);
+				if (sleepend.equals("")) {
+					Constants.sleepend = "07:00";
+				} else {
+					Constants.sleepend = sleepend;
+				}
+			}
+
+		}
+
+		configs.close();
+
+	}
+
+	private static void getAssetListFromDB(ArrayList<Asset> result) {
+
+		Asset asset = null;
+		AssetDao ad = new AssetDao(Duole.appref);
+		Cursor allItems = ad.queryAll();
+
+		for (allItems.moveToFirst(); !allItems.isAfterLast(); allItems.moveToNext()) {
+
+			asset = new Asset();
+			asset.setName(allItems.getString(1));
+			asset.setId(allItems.getString(2));
+			asset.setThumbnail(allItems.getString(3));
+			asset.setType(allItems.getString(5));
+			asset.setUrl(allItems.getString(6));
+			asset.setBg(allItems.getString(7));
+			asset.setIsFront(allItems.getString(8));
+			asset.setFrontID(allItems.getString(9));
+			asset.setLastmodified(allItems.getString(10));
+			asset.setPackag(allItems.getString(12));
+			asset.setActivity(allItems.getString(13));
+
+			asset.setMd5(allItems.getString(14));
+
+			result.add(asset);
+
+		}
+		allItems.close();
 	}
 
 	/**
@@ -332,8 +425,7 @@ public class XmlUtils {
 	 * @throws TransformerException
 	 * @throws ParserConfigurationException
 	 */
-	public static void readConfiguration() throws SAXException, IOException,
-			XmlPullParserException, TransformerException,
+	public static void readConfiguration() throws SAXException, IOException, XmlPullParserException, TransformerException,
 			ParserConfigurationException {
 
 		File file = new File(Constants.SystemConfigFile);
@@ -347,8 +439,7 @@ public class XmlUtils {
 			parser.setInput(iStream, "UTF-8");
 
 			int event = parser.getEventType();
-			Asset asset = null;
-
+			
 			while (event != XmlPullParser.END_DOCUMENT) {
 				switch (event) {
 				case XmlPullParser.START_DOCUMENT:
@@ -372,12 +463,10 @@ public class XmlUtils {
 		}
 	}
 
-	public static ArrayList<Asset> readXML(InputStream is, String filePath)
-			throws IOException, TransformerException, SAXException,
+	public static ArrayList<Asset> readXML(InputStream is, String filePath) throws IOException, TransformerException, SAXException,
 			XmlPullParserException, ParserConfigurationException {
 
 		ArrayList<Asset> result = null;
-		StringBuffer sbresult = new StringBuffer();
 		File file = new File(filePath);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = null;
@@ -404,7 +493,6 @@ public class XmlUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (XmlPullParserException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (is != null) {
@@ -437,12 +525,10 @@ public class XmlUtils {
 			}
 
 			// bgurl bgRestUrl entime restime sleepstart sleepend ke tipstart
-			String[] names = { "bgurl", "bgRestUrl", "entime", "restime",
-					"sleepstart", "sleepend", "ke", "tipstart" };
+			String[] names = { "bgurl", "bgRestUrl", "entime", "restime", "sleepstart", "sleepend", "ke", "tipstart" };
 			removeNode(document, names);
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -478,8 +564,7 @@ public class XmlUtils {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
-			FileInputStream iStream = new FileInputStream(new File(
-					Constants.ItemList));
+			FileInputStream iStream = new FileInputStream(new File(Constants.ItemList));
 			Document document = dBuilder.parse(iStream);
 
 			for (int i = 0; i < assetList.size(); i++) {
@@ -489,16 +574,12 @@ public class XmlUtils {
 				// the values
 				Text id = document.createTextNode(asset.getId().trim());
 				Text title = document.createTextNode(asset.getName().trim());
-				Text thumbnail = document.createTextNode(asset.getThumbnail()
-						.trim());
+				Text thumbnail = document.createTextNode(asset.getThumbnail().trim());
 				Text url = document.createTextNode(asset.getUrl().trim());
-				Text lastmodified = document.createTextNode(asset
-						.getLastmodified().trim());
+				Text lastmodified = document.createTextNode(asset.getLastmodified().trim());
 				Text type = document.createTextNode(asset.getType().trim());
-				Text frontId = document.createTextNode(asset.getFrontID()
-						.trim());
-				Text isFront = document.createTextNode(asset.getIsFront()
-						.trim());
+				Text frontId = document.createTextNode(asset.getFrontID().trim());
+				Text isFront = document.createTextNode(asset.getIsFront().trim());
 				Text md5 = document.createTextNode(asset.getMd5().trim());
 
 				// new elements
@@ -507,8 +588,7 @@ public class XmlUtils {
 				Element newTitleElement = document.createElement("title");
 				Element newThumbElement = document.createElement("thumbnail");
 				Element newUrlElement = document.createElement("url");
-				Element newLastModifiedElement = document
-						.createElement("lastmodified");
+				Element newLastModifiedElement = document.createElement("lastmodified");
 				Element newTypeElement = document.createElement("type");
 				Element newFrontID = document.createElement("frontid");
 				Element newIsFront = document.createElement("isfront");
@@ -544,14 +624,10 @@ public class XmlUtils {
 				if (asset.getType().equals(Constants.RES_APK)) {
 
 					PackageManager pm = Duole.appref.getPackageManager();
-					File file = new File(Constants.CacheDir
-							+ Constants.RES_APK
-							+ asset.getUrl().substring(
-									asset.getUrl().lastIndexOf("/")));
+					File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 					PackageInfo info;
-					info = pm.getPackageArchiveInfo(file.getAbsolutePath(),
-							PackageManager.GET_ACTIVITIES);
+					info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
 
 					if (info != null) {
 						Text packag = document.createTextNode(info.packageName);
@@ -559,10 +635,8 @@ public class XmlUtils {
 						newPackage.appendChild(packag);
 						newElement.appendChild(newPackage);
 
-						Text mainActivity = document
-								.createTextNode(info.activities[0].name);
-						Element newActivity = document
-								.createElement("activity");
+						Text mainActivity = document.createTextNode(info.activities[0].name);
+						Element newActivity = document.createElement("activity");
 						newActivity.appendChild(mainActivity);
 						newElement.appendChild(newActivity);
 
@@ -571,14 +645,10 @@ public class XmlUtils {
 
 				if (asset.getType().equals(Constants.RES_WIDGET)) {
 					PackageManager pm = Duole.appref.getPackageManager();
-					File file = new File(Constants.CacheDir
-							+ Constants.RES_APK
-							+ asset.getUrl().substring(
-									asset.getUrl().lastIndexOf("/")));
+					File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 					PackageInfo info;
-					info = pm.getPackageArchiveInfo(file.getAbsolutePath(),
-							PackageManager.GET_ACTIVITIES);
+					info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
 
 					if (info != null) {
 						Text packag = document.createTextNode(info.packageName);
@@ -595,8 +665,7 @@ public class XmlUtils {
 
 			updateNode(document);
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -611,16 +680,13 @@ public class XmlUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public static void addNodeAndConfig(String filepath, DocumentBuilder db,
-			ArrayList<Asset> assetList) throws Exception {
+	public static void addNodeAndConfig(String filepath, DocumentBuilder db, ArrayList<Asset> assetList) throws Exception {
 
 		FileInputStream iStream = new FileInputStream(new File(filepath));
 		Document document = db.parse(iStream);
@@ -632,11 +698,9 @@ public class XmlUtils {
 			// the values
 			Text id = document.createTextNode(asset.getId().trim());
 			Text title = document.createTextNode(asset.getName().trim());
-			Text thumbnail = document.createTextNode(asset.getThumbnail()
-					.trim());
+			Text thumbnail = document.createTextNode(asset.getThumbnail().trim());
 			Text url = document.createTextNode(asset.getUrl().trim());
-			Text lastmodified = document.createTextNode(asset.getLastmodified()
-					.trim());
+			Text lastmodified = document.createTextNode(asset.getLastmodified().trim());
 			Text type = document.createTextNode(asset.getType().trim());
 			Text frontId = document.createTextNode(asset.getFrontID().trim());
 			Text isFront = document.createTextNode(asset.getIsFront().trim());
@@ -648,8 +712,7 @@ public class XmlUtils {
 			Element newTitleElement = document.createElement("title");
 			Element newThumbElement = document.createElement("thumbnail");
 			Element newUrlElement = document.createElement("url");
-			Element newLastModifiedElement = document
-					.createElement("lastmodified");
+			Element newLastModifiedElement = document.createElement("lastmodified");
 			Element newTypeElement = document.createElement("type");
 			Element newFrontID = document.createElement("frontid");
 			Element newIsFront = document.createElement("isfront");
@@ -685,14 +748,10 @@ public class XmlUtils {
 			if (asset.getType().equals(Constants.RES_APK)) {
 
 				PackageManager pm = Duole.appref.getPackageManager();
-				File file = new File(Constants.CacheDir
-						+ Constants.RES_APK
-						+ asset.getUrl().substring(
-								asset.getUrl().lastIndexOf("/")));
+				File file = new File(Constants.CacheDir + Constants.RES_APK + asset.getUrl().substring(asset.getUrl().lastIndexOf("/")));
 
 				PackageInfo info;
-				info = pm.getPackageArchiveInfo(file.getAbsolutePath(),
-						PackageManager.GET_ACTIVITIES);
+				info = pm.getPackageArchiveInfo(file.getAbsolutePath(), PackageManager.GET_ACTIVITIES);
 
 				if (info != null) {
 					Text packag = document.createTextNode(info.packageName);
@@ -700,8 +759,7 @@ public class XmlUtils {
 					newPackage.appendChild(packag);
 					newElement.appendChild(newPackage);
 
-					Text mainActivity = document
-							.createTextNode(info.activities[0].name);
+					Text mainActivity = document.createTextNode(info.activities[0].name);
 					Element newActivity = document.createElement("activity");
 					newActivity.appendChild(mainActivity);
 					newElement.appendChild(newActivity);
@@ -715,8 +773,7 @@ public class XmlUtils {
 
 		updateNode(document);
 
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		DOMSource domSource = new DOMSource(document);
 
@@ -727,14 +784,12 @@ public class XmlUtils {
 
 	}
 
-	public static void addSingleNode(String name, String value)
-			throws IOException {
+	public static void addSingleNode(String name, String value) throws IOException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
-			FileInputStream iStream = new FileInputStream(new File(
-					Constants.ItemList));
+			FileInputStream iStream = new FileInputStream(new File(Constants.ItemList));
 			Document document = dBuilder.parse(iStream);
 
 			// the values
@@ -749,8 +804,7 @@ public class XmlUtils {
 
 			updateNode(document);
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -764,10 +818,8 @@ public class XmlUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -864,11 +916,9 @@ public class XmlUtils {
 		if (!Constants.System_Password.equals("")) {
 			nl = document.getElementsByTagName(Constants.XML_PASSWORD);
 			if (nl.getLength() > 0) {
-				nl.item(0).getFirstChild()
-						.setNodeValue(Constants.System_Password);
+				nl.item(0).getFirstChild().setNodeValue(Constants.System_Password);
 			} else {
-				createNode(document, Constants.XML_PASSWORD,
-						Constants.System_Password);
+				createNode(document, Constants.XML_PASSWORD, Constants.System_Password);
 			}
 		}
 
@@ -886,8 +936,7 @@ public class XmlUtils {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder dBuilder = dbf.newDocumentBuilder();
-			FileInputStream iStream = new FileInputStream(new File(
-					Constants.ItemList));
+			FileInputStream iStream = new FileInputStream(new File(Constants.ItemList));
 			Document document = dBuilder.parse(iStream);
 
 			NodeList nl;
@@ -900,8 +949,7 @@ public class XmlUtils {
 				}
 			}
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -923,8 +971,7 @@ public class XmlUtils {
 	 * @param value
 	 * @return
 	 */
-	public static boolean updateSingleNode(String file, String name,
-			String value) {
+	public static boolean updateSingleNode(String file, String name, String value) {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
@@ -948,8 +995,7 @@ public class XmlUtils {
 				}
 			}
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -1004,8 +1050,7 @@ public class XmlUtils {
 
 			document.appendChild(newElement);
 
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource domSource = new DOMSource(document);
 
@@ -1022,12 +1067,91 @@ public class XmlUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * Get the jinzixuan list from index file.
+	 * 
+	 * @param FIle
+	 *            file
+	 */
+	public static ArrayList<ArrayList<Asset>> parseJinzixuanXML(File file) {
+
+		ArrayList<ArrayList<Asset>> result = new ArrayList<ArrayList<Asset>>();
+
+		try {
+
+			FileInputStream fis = new FileInputStream(file);
+
+			XmlPullParser parser = Xml.newPullParser();
+
+			parser.setInput(fis, "UTF-8");
+
+			int event = parser.getEventType();
+
+			Asset jItem = null;
+
+			ArrayList<Asset> screenItems = null;
+
+			while (event != XmlPullParser.END_DOCUMENT) {
+				switch (event) {
+				case XmlPullParser.START_DOCUMENT:
+					break;
+				case XmlPullParser.START_TAG:
+
+					if (parser.getName().equals("screen")) {
+						screenItems = new ArrayList<Asset>();
+					}
+					if (parser.getName().equals("item")) {
+						jItem = new Asset();
+						jItem.setType(Constants.RES_JINZIXUAN);
+						jItem.setUrl("");
+					}
+					if (parser.getName().equals("name")) {
+						jItem.setName(parser.nextText());
+					}
+					if (parser.getName().equals("thumb")) {
+						jItem.setThumbnail(parser.nextText());
+					}
+					if (parser.getName().equals("intent")) {
+						String filter = parser.nextText();
+
+						jItem.setPackag(filter);
+
+					}
+					if (parser.getName().equals("index")) {
+						jItem.setActivity(parser.nextText());
+					}
+
+					break;
+				case XmlPullParser.END_TAG:
+
+					if (parser.getName().equals("item") && jItem != null && screenItems != null) {
+
+						if (DuoleUtils.getContentFilterCount(jItem.getPackag(), Duole.appref) > 0) {
+							screenItems.add(jItem);
+						}
+
+					}
+
+					if (parser.getName().equals("screen") && screenItems != null) {
+						result.add(screenItems);
+					}
+
+					break;
+				}
+				event = parser.next();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 }

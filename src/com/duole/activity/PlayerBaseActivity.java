@@ -3,20 +3,19 @@ package com.duole.activity;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 
-public class PlayerBaseActivity extends BaseActivity{
+public class PlayerBaseActivity extends BaseActivity {
 
-	public void initSystemParams(){
-		
+	public void initSystemParams() {
+
 	}
-	
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		
-		switch(keyCode){
+
+		switch (keyCode) {
 		case KeyEvent.KEYCODE_HOME:
 			finish();
-//			sendBroadcast(new Intent(Constants.Event_AppEnd));
+			// sendBroadcast(new Intent(Constants.Event_AppEnd));
 			break;
 		}
 		return super.onKeyDown(keyCode, event);
@@ -24,8 +23,10 @@ public class PlayerBaseActivity extends BaseActivity{
 
 	@Override
 	public void onAttachedToWindow() {
-		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		if (android.os.Build.VERSION.SDK_INT < 12) {
+			this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		}
 		super.onAttachedToWindow();
 	}
-	
+
 }

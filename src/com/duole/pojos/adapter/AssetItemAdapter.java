@@ -77,7 +77,6 @@ public class AssetItemAdapter extends BaseAdapter {
 	}
 
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -125,8 +124,14 @@ public class AssetItemAdapter extends BaseAdapter {
 
 		if (asset.getType().equals(Constants.RES_JINZIXUAN)) {
 
-			assItem.ivAssetThumb.setImageResource(R.drawable.jinzixuan);
-			assItem.tvAssetName.setText(asset.getFilename());
+			File file = new File("/sdcard/jinzixuan/index/thumb/" + asset.getThumbnail());
+			if (file.exists()) {
+				setImageViewByFilePath(assItem.ivAssetThumb, file.getAbsolutePath(), true);
+			} else {
+				assItem.ivAssetThumb.setImageResource(R.drawable.nopic);
+
+			}
+			assItem.tvAssetName.setText(asset.getName());
 
 			assItem.ivKe.setImageResource(R.drawable.ke);
 
@@ -167,9 +172,9 @@ public class AssetItemAdapter extends BaseAdapter {
 			}
 		}
 
-		if (Constants.alAssetCache.containsKey(asset.getId())) {
-			return Constants.alAssetCache.get(asset.getId());
-		}
+		// if (Constants.alAssetCache.containsKey(asset.getId())) {
+		// return Constants.alAssetCache.get(asset.getId());
+		// }
 
 		if (!asset.getThumbnail().equals("")) {
 			File file = new File(Constants.CacheDir + "/thumbnail/" + asset.getThumbnail().substring(asset.getThumbnail().lastIndexOf("/")));
@@ -193,9 +198,9 @@ public class AssetItemAdapter extends BaseAdapter {
 		// set the app name
 		assItem.tvAssetName.setText(asset.getName());
 
-		if (Constants.alAssetCache.size() < 50) {
-			Constants.alAssetCache.put(asset.getId(), convertView);
-		}
+		// if (Constants.alAssetCache.size() < 120) {
+		// Constants.alAssetCache.put(asset.getId(), convertView);
+		// }
 
 		return convertView;
 	}
@@ -208,7 +213,7 @@ public class AssetItemAdapter extends BaseAdapter {
 					addBitmapIntoImagePool(iv, path);
 				}
 			} else {
-				iv.setImageBitmap(Constants.imagePool.get(path).get());
+				getBitmapFromImagePool(iv, path);
 			}
 		} else {
 			if (save) {
@@ -218,12 +223,37 @@ public class AssetItemAdapter extends BaseAdapter {
 
 	}
 
+	private void getBitmapFromImagePool(ImageView iv, String path) {
+		Bitmap bmpBitmap = Constants.imagePool.get(path).get();
+		if (bmpBitmap == null) {
+			File file = new File(path);
+			if (file.exists()) {
+				addBitmapIntoImagePool(iv, path);
+			} else {
+				iv.setImageResource(R.drawable.nopic);
+			}
+		} else {
+			iv.setImageBitmap(bmpBitmap);
+		}
+
+	}
+
 	private void addBitmapIntoImagePool(ImageView iv, String path) {
 		Bitmap bmp = BitmapFactory.decodeFile(path);
-		SoftReference<Bitmap> sr = new SoftReference<Bitmap>(bmp);
-		iv.setImageBitmap(sr.get());
-		Constants.imagePool.put(path, sr);
-		bmp = null;
+		if (bmp == null) {
+			iv.setImageResource(R.drawable.nopic);
+		} else {
+			SoftReference<Bitmap> sr = new SoftReference<Bitmap>(bmp);
+			Constants.imagePool.put(path, sr);
+			bmp = null;
+			Bitmap bmpBitmap = Constants.imagePool.get(path).get();
+			if (bmpBitmap != null) {
+				iv.setImageBitmap(bmpBitmap);
+			} else {
+				iv.setImageResource(R.drawable.nopic);
+			}
+		}
+
 	}
 
 	class AssetItem {

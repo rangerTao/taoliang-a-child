@@ -11,10 +11,10 @@ import android.util.Log;
 
 public class FileOperator {
 	
-	private DuoleDBHelper fileHelper;
+	private DownLoadDBHelper fileHelper;
 	
 	public FileOperator(Context context){
-		fileHelper = DuoleDBHelper.getInstance(context);
+		fileHelper = DownLoadDBHelper.getInstance(context);
 	}
 	
 	/**

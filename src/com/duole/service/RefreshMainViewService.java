@@ -38,13 +38,16 @@ public class RefreshMainViewService extends Service {
 		Log.d("TAG", "back refresh service start");
 		// Set the thread as single task.
 		Constants.viewrefreshenable = false;
+		ArrayList<ArrayList<Asset>> alJinzixuan = new ArrayList<ArrayList<Asset>>();
+
+		ArrayList<AssetItemAdapter> alAssetAdapter = new ArrayList<AssetItemAdapter>();
 
 		ArrayList<Asset> temp = null;
 
 		// get all apps
 		try {
-			
-			if(Constants.alAsset == null){
+
+			if (Constants.alAsset == null) {
 				Log.e("TAG", "COnstants.alasset is null");
 				return 0;
 			}
@@ -59,7 +62,7 @@ public class RefreshMainViewService extends Service {
 
 			// Add the jinzixuan
 			if (DuoleUtils.getContentFilterCount(Constants.CONTENT_FILTER_JINZIXUAN, Duole.appref) > 0) {
-				DuoleUtils.addJinzixuanManager(temp);
+				alJinzixuan = DuoleUtils.addJinzixuanManager(temp);
 			}
 
 			DuoleUtils.addNetworkManager(temp);
@@ -83,6 +86,16 @@ public class RefreshMainViewService extends Service {
 			PageCount += 1;
 		}
 
+		if (alJinzixuan != null) {
+			for (ArrayList<Asset> jinzi : alJinzixuan) {
+				alAssetAdapter.add(new AssetItemAdapter(Duole.appref, jinzi));
+			}
+		}
+
+		for (int i = 0; i < PageCount; i++) {
+			alAssetAdapter.add(new AssetItemAdapter(Duole.appref, temp, i));
+		}
+
 		ScrollLayout sl = Duole.appref.mScrollLayout;
 
 		Message msg = new Message();
@@ -92,25 +105,22 @@ public class RefreshMainViewService extends Service {
 		long start = System.currentTimeMillis();
 		sl.removeAllViews();
 
-		// Message msg = new Message();
-		// msg.what = Duole.appref.REMOVE_ITEMS;
-		// Duole.appref.mhandler.sendMessage(msg);
+		for (int i = 0; i < alAssetAdapter.size(); i++) {
 
-		for (int i = 0; i < PageCount; i++) {
-
-			ArrayList<Asset> mList = new ArrayList<Asset>();
-			int iStart = i * Constants.APP_PAGE_SIZE;
-			int iEnd = iStart + Constants.APP_PAGE_SIZE;
-			while ((iStart < temp.size()) && (iStart < iEnd)) {
-				mList.add(temp.get(iStart));
-				iStart++;
-			}
+			// ArrayList<Asset> mList = new ArrayList<Asset>();
+			// int iStart = i * Constants.APP_PAGE_SIZE;
+			// int iEnd = iStart + Constants.APP_PAGE_SIZE;
+			// while ((iStart < temp.size()) && (iStart < iEnd)) {
+			// mList.add(temp.get(iStart));
+			// iStart++;
+			// }
 
 			if (i > sl.getChildCount() - 1) {
 				GridView appPage = new GridView(Duole.appref);
 				// get the "i" page data
-				AssetItemAdapter aia = new AssetItemAdapter(Duole.appref, temp, i);
-				appPage.setAdapter(aia);
+				// get the "i" page data
+				AssetItemAdapter tempAdapter = alAssetAdapter.get(i);
+				appPage.setAdapter(tempAdapter);
 
 				appPage.setSelector(R.drawable.grid_selector);
 
@@ -148,13 +158,15 @@ public class RefreshMainViewService extends Service {
 			llChildCount = Duole.appref.llPageDivider.getChildCount();
 		}
 
-		if (PageCount <= llChildCount) {
-			for (int i = llChildCount; i > PageCount; i--) {
+		int totalPageCount = alJinzixuan == null ? PageCount : PageCount + alJinzixuan.size();
+
+		if (totalPageCount <= llChildCount) {
+			for (int i = llChildCount; i > totalPageCount; i--) {
 				Duole.appref.llPageDivider.removeViewAt(i - 1);
 			}
 		} else {
 			View view;
-			for (int i = llChildCount; i < PageCount; i++) {
+			for (int i = llChildCount; i < totalPageCount; i++) {
 				view = LayoutInflater.from(Duole.appref).inflate(R.layout.pagedividerselected, null);
 
 				PageDiv pd = Duole.appref.new PageDiv();

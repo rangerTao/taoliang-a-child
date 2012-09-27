@@ -15,9 +15,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageParser.NewPermissionInfo;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -40,7 +40,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -50,6 +49,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -71,9 +71,6 @@ import com.duole.utils.DuoleUtils;
 import com.duole.utils.FileUtils;
 import com.duole.utils.WifiUtils;
 import com.duole.utils.XmlUtils;
-import com.duole.widget.BatteryProgressBar;
-import com.duole.widget.MemoryCardProgressBar;
-
 /**
  * To config the system preperties.
  * 
@@ -92,23 +89,24 @@ public class SystemConfigActivity extends Activity {
 	private String passwd;
 
 	RelativeLayout rlSettingMain;
+	RelativeLayout rlControlButtons;
 
 	AudioManager am;
 	WifiManager wifiManager;
 	WifiInfo wifiInfo;
 
-	BatteryProgressBar pbBattery;
-	MemoryCardProgressBar mcPb;
+	ImageView ivBatteryLevel;
+	ImageView ivMemoryCard;
 
 	TextView tvMemoryLevel;
 	TextView tvBatteryLevel;
 	RelativeLayout rlBattery;
 
-	static ImageView wifiStatus;
-	ImageView ivBrightness;
-	ImageView ivSound;
+	static ImageButton wifiStatus;
+	ImageButton ivBrightness;
+	ImageButton ivSound;
 
-	ImageView ivDownload;
+	ImageButton ivDownload;
 
 	static TextView tvCurrentTime;
 	Thread refreshTime;
@@ -155,6 +153,7 @@ public class SystemConfigActivity extends Activity {
 	EditText etConnectWifiPassword;
 
 	Dialog advancedAdminMenuPopup;
+	TextView tvLocalVersion;
 	Button btnSetupWizard;
 	Button btnCheckUpdate;
 	Button btnResetLocal;
@@ -179,22 +178,22 @@ public class SystemConfigActivity extends Activity {
 				int level = (Integer) msg.obj;
 				switch (level) {
 				case 0:
-					wifiStatus.setImageResource(R.drawable.wifi1);
+					wifiStatus.setBackgroundResource(R.drawable.wifi_status_selector);
 					break;
 				case 1:
-					wifiStatus.setImageResource(R.drawable.wifi1);
+					wifiStatus.setBackgroundResource(R.drawable.wifi_status_selector_1);
 					break;
 				case 2:
-					wifiStatus.setImageResource(R.drawable.wifi2);
+					wifiStatus.setBackgroundResource(R.drawable.wifi_status_selector_2);
 					break;
 				case 3:
-					wifiStatus.setImageResource(R.drawable.wifi3);
+					wifiStatus.setBackgroundResource(R.drawable.wifi_status_selector_3);
 					break;
 				case 4:
-					wifiStatus.setImageResource(R.drawable.wifi4);
+					wifiStatus.setBackgroundResource(R.drawable.wifi_status_selector_4);
 					break;
 				case 5:
-					wifiStatus.setImageResource(R.drawable.wifi_disabled);
+					wifiStatus.setBackgroundResource(R.drawable.wifi_status_selector_disabled);
 				default:
 					break;
 				}
@@ -229,36 +228,32 @@ public class SystemConfigActivity extends Activity {
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		setContentView(R.layout.system_setting_main);
 		rlSettingMain = (RelativeLayout) findViewById(R.id.rlSettingMain);
-
+		rlControlButtons = (RelativeLayout) findViewById(R.id.rlControlButtons);
 		// Get the password of user.
 		passwd = XmlUtils.readNodeValue(Constants.SystemConfigFile, Constants.XML_PASSWORD);
 		if (passwd.equals("")) {
 			passwd = Constants.defaultPasswd;
 		}
 
-		ivDownload = (ImageView) findViewById(R.id.ivDownload);
+		ivDownload = (ImageButton) findViewById(R.id.ivDownload);
 
-		// Wifi related.
+		// wifi_status_selector related.
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		wifiStatus = (ImageView) findViewById(R.id.ivWifiStatus);
+		wifiStatus = (ImageButton) findViewById(R.id.ivWifiStatus);
 		wifiStatus.setOnClickListener(wifiStatusOnClickListener);
 
 		// Brightness Tweak.
-		ivBrightness = (ImageView) findViewById(R.id.ivBrightness);
-		ivSound = (ImageView) findViewById(R.id.ivVolume);
+		ivBrightness = (ImageButton) findViewById(R.id.ivBrightness);
+		ivSound = (ImageButton) findViewById(R.id.ivVolume);
 		ivBrightness.setOnClickListener(brightnessAndVolumeOnClickListener);
 		ivSound.setOnClickListener(brightnessAndVolumeOnClickListener);
 
 		// MemoryCard.
-		tvMemoryLevel = (TextView) findViewById(R.id.tvMemoryLevel);
-		mcPb = (MemoryCardProgressBar) findViewById(R.id.pbMemoryCard);
-		mcPb.setMax(100);
+		ivMemoryCard = (ImageView) findViewById(R.id.ivMemoryCard);
 		tvMemoryLevel = (TextView) findViewById(R.id.tvMemoryLevel);
 
 		// Battery.
-		pbBattery = (BatteryProgressBar) findViewById(R.id.pbBattery);
-		rlBattery = (RelativeLayout) findViewById(R.id.rlBattery);
-		pbBattery.setMax(100);
+		ivBatteryLevel = (ImageView) findViewById(R.id.ivBatteryLevel);
 		tvBatteryLevel = (TextView) findViewById(R.id.tvBatteryLevel);
 
 		// Init the time view.
@@ -338,7 +333,7 @@ public class SystemConfigActivity extends Activity {
 	private void initDownload() {
 
 		if (DuoleUtils.getContentFilterCount("duole/store", appref) < 1) {
-			ivDownload.setVisibility(View.INVISIBLE);
+			ivDownload.setVisibility(View.GONE);
 		} else {
 			// If store is installed.
 			ivDownload.setOnClickListener(new OnClickListener() {
@@ -409,9 +404,9 @@ public class SystemConfigActivity extends Activity {
 	OnClickListener brightnessAndVolumeOnClickListener = new OnClickListener() {
 
 		public void onClick(View view) {
-
+			View contentView = getLayoutInflater().inflate(R.layout.brightness_volume_tweak, null);
 			if (brightnessAndVolumePopup == null) {
-				View contentView = getLayoutInflater().inflate(R.layout.brightness_volume_tweak, null);
+
 				brightnessAndVolumePopup = new PopupWindow(contentView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 
 				ivLessTweak = (ImageView) contentView.findViewById(R.id.ivLessTweak);
@@ -467,7 +462,9 @@ public class SystemConfigActivity extends Activity {
 					});
 				} catch (Exception e) {
 				}
-				brightnessAndVolumePopup.showAsDropDown(ivBrightness);
+				
+				brightnessAndVolumePopup.showAtLocation(rlSettingMain, Gravity.CENTER , 0, 0);
+
 			}
 
 			// Volume icon,
@@ -495,7 +492,7 @@ public class SystemConfigActivity extends Activity {
 					}
 				});
 
-				brightnessAndVolumePopup.showAsDropDown(ivSound);
+				brightnessAndVolumePopup.showAtLocation(rlSettingMain, Gravity.CENTER, 0, 0);
 			}
 		}
 	};
@@ -638,7 +635,7 @@ public class SystemConfigActivity extends Activity {
 			advancedAdminMenuPopup = new Dialog(this, R.style.CustomDialog);
 
 			advancedAdminMenuPopup.setContentView(view);
-			
+
 			WindowManager.LayoutParams lp = advancedAdminMenuPopup.getWindow().getAttributes();
 			lp.alpha = 0.8f;
 			advancedAdminMenuPopup.getWindow().setAttributes(lp);
@@ -650,6 +647,7 @@ public class SystemConfigActivity extends Activity {
 			cbPowerSave = (CheckBox) view.findViewById(R.id.cbPowerSave);
 			btnChangePassword = (Button) view.findViewById(R.id.btnChangepassword);
 			iBtnAdminMenuClose = (ImageView) view.findViewById(R.id.ivAdvanceMenuClose);
+			tvLocalVersion = (TextView) view.findViewById(R.id.tvLocalVersion);
 
 			if (DuoleUtils.getContentFilterCount("duole/setup", appref) < 1) {
 				btnSetupWizard.setEnabled(false);
@@ -663,6 +661,8 @@ public class SystemConfigActivity extends Activity {
 			});
 
 			initPowersaveSetting();
+
+			tvLocalVersion.setText(DuoleUtils.getVersion(Duole.appref));
 		}
 
 		advancedAdminMenuPopup.show();
@@ -872,7 +872,7 @@ public class SystemConfigActivity extends Activity {
 				} else {
 
 					if (wifiConnectPasswordInputPopup == null) {
-						View viewPassword = getLayoutInflater().inflate(R.layout.advanced_password_input, null);
+						View viewPassword = getLayoutInflater().inflate(R.layout.wifi_password_input, null);
 						wifiConnectPasswordInputPopup = new PopupWindow(viewPassword, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 						iBtnConnectWifiPasswordConfirm = (ImageView) viewPassword.findViewById(R.id.ivBtnConfirm);
 						iBtnConnectWifiPasswordCancel = (ImageView) viewPassword.findViewById(R.id.ivBtnCancel);
@@ -1007,23 +1007,61 @@ public class SystemConfigActivity extends Activity {
 			int status = intent.getIntExtra("status", BatteryManager.BATTERY_STATUS_NOT_CHARGING);
 
 			if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
-				if (status == BatteryManager.BATTERY_STATUS_CHARGING) {
-					rlBattery.setBackgroundResource(R.drawable.battery_charging);
-					pbBattery.setVisibility(View.INVISIBLE);
-				} else {
-					pbBattery.setVisibility(View.VISIBLE);
-					rlBattery.setBackgroundResource(R.drawable.battery_empty);
-				}
-				tvBatteryLevel.setVisibility(View.VISIBLE);
-				rlBattery.setVisibility(View.VISIBLE);
+
 				int level = intent.getIntExtra("level", 0);
 				tvBatteryLevel.setText(level + "%");
+
+				if (status == BatteryManager.BATTERY_STATUS_CHARGING) {
+					// rlBattery.setBackgroundResource(R.drawable.battery_charging);
+					ivBatteryLevel.setImageResource(R.drawable.battery_charging);
+				} else {
+
+					int battery_level = level / 10;
+
+					switch (battery_level) {
+					case 0:
+						ivBatteryLevel.setImageResource(R.drawable.battery_empty);
+						break;
+					case 1:
+					case 2:
+						ivBatteryLevel.setImageResource(R.drawable.battery_1);
+						break;
+					case 3:
+						ivBatteryLevel.setImageResource(R.drawable.battery_2);
+						break;
+					case 4:
+						ivBatteryLevel.setImageResource(R.drawable.battery_3);
+						break;
+					case 5:
+						ivBatteryLevel.setImageResource(R.drawable.battery_4);
+						break;
+					case 6:
+						ivBatteryLevel.setImageResource(R.drawable.battery_5);
+						break;
+					case 7:
+						ivBatteryLevel.setImageResource(R.drawable.battery_6);
+						break;
+					case 8:
+						ivBatteryLevel.setImageResource(R.drawable.battery_7);
+						break;
+					case 9:
+					case 10:
+						ivBatteryLevel.setImageResource(R.drawable.battery_full);
+						break;
+					default:
+						break;
+					}
+				}
+				tvBatteryLevel.setVisibility(View.VISIBLE);
+				// rlBattery.setVisibility(View.VISIBLE);
+
 				if (level < 15) {
 					tvBatteryLevel.setTextColor(Color.RED);
+					tvBatteryLevel.setTypeface(tvBatteryLevel.getTypeface(), Typeface.BOLD);
 				} else {
 					tvBatteryLevel.setTextColor(Color.BLACK);
 				}
-				pbBattery.setProgress(level);
+				// pbBattery.setProgress(level);
 
 			}
 
@@ -1043,7 +1081,6 @@ public class SystemConfigActivity extends Activity {
 
 			long totalSize = countUp(statfs.getBlockCount(), statfs.getBlockSize());
 			long usedSize = totalSize - countUp(statfs.getFreeBlocks(), statfs.getBlockSize());
-			mcPb.setProgress((int) (((float) usedSize / totalSize) * 100));
 			tvMemoryLevel.setTextColor(Color.BLACK);
 			tvMemoryLevel.setText(getString(R.string.data_last) + "\n" + "  " + parseDataSize(totalSize - usedSize));
 		}
@@ -1093,19 +1130,19 @@ public class SystemConfigActivity extends Activity {
 			final int orgProgress = progress;
 
 			if (orgProgress == 0) {
-				ivSound.setImageResource(R.drawable.sound_disable);
+				ivSound.setBackgroundResource(R.drawable.volume_status_selector_disabled);
 			} else {
 				int level = orgProgress / 5;
 				switch (level) {
 				case 0:
-					ivSound.setImageResource(R.drawable.sound1);
+					ivSound.setBackgroundResource(R.drawable.volume_status_selector_1);
 					break;
 				case 1:
-					ivSound.setImageResource(R.drawable.sound2);
+					ivSound.setBackgroundResource(R.drawable.volume_status_selector_2);
 					break;
 				case 2:
 				case 3:
-					ivSound.setImageResource(R.drawable.sound3);
+					ivSound.setBackgroundResource(R.drawable.volume_status_selector_3);
 					break;
 				}
 			}
@@ -1132,16 +1169,16 @@ public class SystemConfigActivity extends Activity {
 
 			switch (level) {
 			case 0:
-				ivBrightness.setImageResource(R.drawable.sun01);
+				ivBrightness.setBackgroundResource(R.drawable.brightness_status_selector_01);
 				break;
 
 			case 1:
-				ivBrightness.setImageResource(R.drawable.sun02);
+				ivBrightness.setBackgroundResource(R.drawable.brightness_status_selector_02);
 				break;
 
 			case 2:
 			case 3:
-				ivBrightness.setImageResource(R.drawable.sun03);
+				ivBrightness.setBackgroundResource(R.drawable.brightness_status_selector_03);
 				break;
 
 			default:
@@ -1233,7 +1270,9 @@ public class SystemConfigActivity extends Activity {
 
 	@Override
 	public void onAttachedToWindow() {
-		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		if (android.os.Build.VERSION.SDK_INT < 12) {
+			this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		}
 		super.onAttachedToWindow();
 	}
 

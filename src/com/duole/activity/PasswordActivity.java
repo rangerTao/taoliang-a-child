@@ -227,7 +227,9 @@ public class PasswordActivity extends BaseActivity implements OnEditorActionList
 
 	@Override
 	public void onAttachedToWindow() {
-		this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		if (android.os.Build.VERSION.SDK_INT < 12) {
+			this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD);
+		}
 		super.onAttachedToWindow();
 	}
 	

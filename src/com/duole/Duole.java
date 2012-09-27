@@ -2,16 +2,9 @@ package com.duole;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -78,8 +71,6 @@ import com.duole.utils.WidgetUtils;
 import com.duole.utils.XmlUtils;
 import com.duole.widget.ScrollLayout;
 
-import dalvik.system.VMRuntime;
-
 public class Duole extends BaseActivity {
 
 	public static Duole appref;
@@ -127,10 +118,12 @@ public class Duole extends BaseActivity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case SHOW_REFRESH:
-				pbRefresh.setVisibility(View.VISIBLE);
+				if (pbRefresh != null)
+					pbRefresh.setVisibility(View.VISIBLE);
 				break;
 			case HIDE_REFRESH:
-				pbRefresh.setVisibility(View.INVISIBLE);
+				if (pbRefresh != null)
+					pbRefresh.setVisibility(View.INVISIBLE);
 				break;
 
 			case INIT_COUNTDOWN:
@@ -182,13 +175,12 @@ public class Duole extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mContext = this;
 
-		final int CWJ_HEAP_SIZE = 32 * 1024 * 1024;
-		VMRuntime.getRuntime().setMinimumHeapSize(CWJ_HEAP_SIZE);
-		VMRuntime.getRuntime().setTargetHeapUtilization(0.75f);
+		// final int CWJ_HEAP_SIZE = 32 * 1024 * 1024;
+		// VMRuntime.getRuntime().setMinimumHeapSize(CWJ_HEAP_SIZE);
+		// VMRuntime.getRuntime().setTargetHeapUtilization(0.75f);
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -220,7 +212,6 @@ public class Duole extends BaseActivity {
 			initContents();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -239,7 +230,7 @@ public class Duole extends BaseActivity {
 	private void startSetupWizard() {
 
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setType("duole/setup");
 		try {
 			startActivity(intent);
@@ -249,12 +240,13 @@ public class Duole extends BaseActivity {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	private void systemSettings() {
 
 		// Disable the screen lock.
 		Settings.Secure.putInt(getContentResolver(), Settings.Secure.LOCK_PATTERN_ENABLED, 0);
 		// disable usb debug
-		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 0);
+		Settings.Secure.putInt(getContentResolver(), Settings.Secure.ADB_ENABLED, 1);
 		// Disable the auto rotation.
 		Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0);
 		// Disable the wifi available_notification.
@@ -574,6 +566,8 @@ public class Duole extends BaseActivity {
 
 		ArrayList<AssetItemAdapter> alAssetAdapter;
 
+		ArrayList<ArrayList<Asset>> alJinzixuan;
+
 		@Override
 		protected Object doInBackground(Object... arg0) {
 			Log.d("TAG", "do in background");
@@ -595,7 +589,7 @@ public class Duole extends BaseActivity {
 				temp = DuoleUtils.checkFilesExists(temp);
 				// Add the jinzixuan
 				if (DuoleUtils.getContentFilterCount(Constants.CONTENT_FILTER_JINZIXUAN, getApplicationContext()) > 0) {
-					DuoleUtils.addJinzixuanManager(temp);
+					alJinzixuan = DuoleUtils.addJinzixuanManager(temp);
 				}
 
 				// Add the system tweak function to the list.
@@ -615,14 +609,13 @@ public class Duole extends BaseActivity {
 
 				alAIA = new ArrayList<AssetItemAdapter>();
 
-				// mHandler.post(new Runnable() {
-				//
-				// public void run() {
-				// mScrollLayout.removeAllViews();
-				// }
-				// });
-
 				llPageDivider = (LinearLayout) findViewById(R.id.llPageDividerTip);
+
+				if (alJinzixuan != null) {
+					for (ArrayList<Asset> jinzi : alJinzixuan) {
+						alAssetAdapter.add(new AssetItemAdapter(Duole.appref, jinzi));
+					}
+				}
 
 				for (int i = 0; i < PageCount; i++) {
 					alAssetAdapter.add(new AssetItemAdapter(Duole.appref, temp, i));
@@ -695,7 +688,10 @@ public class Duole extends BaseActivity {
 				// Upload local version.
 				DuoleNetUtils.uploadLocalVersionForce();
 
-				// Start the asset download service.s
+				// Start refreshing the network traffic status.
+				tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
+
+				// Start the asset download service.
 				try {
 					Uri downloadUri = Uri.parse("content://com.duole.download");
 					getContentResolver().insert(downloadUri, new ContentValues());
@@ -711,9 +707,6 @@ public class Duole extends BaseActivity {
 							appref.startService(downService);
 						}
 					}, 10000);
-
-					// Start refreshing the network traffic status.
-					tvTrafficStats = (TextView) findViewById(R.id.tvTrafficStats);
 
 					Message msgRefresh = new Message();
 					msgRefresh.what = Constants.NET_TRAFFIC;
@@ -750,91 +743,6 @@ public class Duole extends BaseActivity {
 	}
 
 	/**
-	 * Init the grid scroll view.
-	 * 
-	 * @throws IOException
-	 * @throws TransformerException
-	 * @throws SAXException
-	 * @throws XmlPullParserException
-	 * @throws ParserConfigurationException
-	 */
-	public void initViews() throws IOException, TransformerException, SAXException, XmlPullParserException, ParserConfigurationException {
-
-		// Get the current version of the system.
-		Constants.System_ver = DuoleUtils.getVersion(appref);
-		// get all apps
-		Constants.AssetList = XmlUtils.readXML(null, Constants.CacheDir + "itemlist.xml");
-
-		// Get the system configuration.
-		XmlUtils.readConfiguration();
-		ArrayList<Asset> temp = new ArrayList<Asset>();
-
-		// About to deal with the source list.
-		temp.addAll(Constants.AssetList);
-		// Drop the resources which is not complete.
-		temp = DuoleUtils.checkFilesExists(temp);
-		// Add the jinzixuan
-		// DuoleUtils.addJinzixuanManager(temp);
-		// Add the system tweak function to the list.
-		DuoleUtils.addNetworkManager(temp);
-		// Get the music list.
-		getMusicList(temp);
-
-		/** 2012.05.07 **/
-		DuoleUtils.getOnlineVideoList(temp);
-
-		// the total pages
-		int PageCount = (int) Math.ceil(temp.size() / Constants.APP_PAGE_SIZE);
-
-		if (PageCount == 0 || (temp.size() % Constants.APP_PAGE_SIZE) > 0) {
-			PageCount += 1;
-		}
-
-		alAIA = new ArrayList<AssetItemAdapter>();
-
-		mScrollLayout.removeAllViews();
-
-		for (int i = 0; i < PageCount; i++) {
-			GridView appPage = new GridView(Duole.appref);
-			// get the "i" page data
-			appPage.setAdapter(new AssetItemAdapter(Duole.appref, temp, i));
-
-			appPage.setSelector(R.drawable.grid_selector);
-
-			appPage.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-
-			appPage.setNumColumns(Constants.COLUMNS);
-
-			appPage.setPadding(40, 10, 40, 0);
-
-			appPage.setVerticalSpacing(30);
-			appPage.setGravity(Gravity.CENTER);
-			appPage.setColumnWidth(110);
-
-			appPage.setOnItemClickListener(listener);
-			mScrollLayout.addView(appPage);
-		}
-
-		llPageDivider = (LinearLayout) findViewById(R.id.llPageDividerTip);
-
-		for (int i = 0; i < PageCount; i++) {
-			view = LayoutInflater.from(this).inflate(R.layout.pagedividerselected, null);
-
-			PageDiv pd = new PageDiv();
-			pd.ivPageDiv = (ImageView) view.findViewById(R.id.ivBackground);
-			view.setTag(pd);
-
-			llPageDivider.addView(view);
-		}
-
-		setPageDividerSelected(0);
-
-		DuoleUtils.setChildrenDrawingCacheEnabled(mScrollLayout, true);
-
-		mScrollLayout.refresh();
-	}
-
-	/**
 	 * Set the page divider.
 	 * 
 	 * @param last
@@ -854,8 +762,10 @@ public class Duole extends BaseActivity {
 						}
 
 						view = llPageDivider.getChildAt(index);
-						pageDiv = (PageDiv) view.getTag();
-						pageDiv.ivPageDiv.setImageBitmap(bmp2);
+						if (view != null) {
+							pageDiv = (PageDiv) view.getTag();
+							pageDiv.ivPageDiv.setImageBitmap(bmp2);
+						}
 					} else {
 						view = llPageDivider.getChildAt(index);
 						if (view != null) {
@@ -898,7 +808,7 @@ public class Duole extends BaseActivity {
 	public OnItemClickListener listener = new OnItemClickListener() {
 
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			// TODO Auto-generated method stub
+
 			assItem = (Asset) parent.getItemAtPosition(position);
 			Constants.gameStartMillis = System.currentTimeMillis();
 			Constants.resourceId = assItem.getId();
@@ -982,10 +892,11 @@ public class Duole extends BaseActivity {
 
 			// Launch the jinzixuan.
 			if (assItem.getType().equals(Constants.RES_JINZIXUAN)) {
-				String jinzi = Constants.CONTENT_FILTER_JINZIXUAN;
 				intent = new Intent(Intent.ACTION_VIEW);
 				intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK);
-				intent.setType(jinzi);
+				Uri uri = Uri.parse("1");
+				intent.setDataAndType(uri, assItem.getPackag());
+				intent.putExtra("index", assItem.getActivity());
 			}
 
 			// Play a video.
@@ -1073,8 +984,6 @@ public class Duole extends BaseActivity {
 	private void startContentFilterOfPResByPackageName(String pkgname, String frontid, String basepath, Asset asset) {
 
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		// intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		// intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
 		try {
 			if (asset.getType().equals(Constants.RES_APK)) {
@@ -1194,7 +1103,7 @@ public class Duole extends BaseActivity {
 	 */
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
+
 		try {
 			unbindService(mConnection);
 
