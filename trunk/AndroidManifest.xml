@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duole"
     android:versionCode="2"
-    android:versionName="1.05.0073" >
+    android:versionName="1.05.0075" >
 
     <application
         android:icon="@drawable/icon"
@@ -27,6 +27,7 @@
         </activity>
         <activity
             android:name=".player.FlashPlayerActivity"
+            android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>

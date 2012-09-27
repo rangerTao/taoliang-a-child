@@ -12,13 +12,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.internal.R.color;
 import com.duole.Duole;
 import com.duole.pojos.asset.Asset;
+import com.duole.service.AssetDownloadService;
 import com.duole.service.BackgroundRefreshService;
 import com.duole.thread.DeleteAssetFilesThread;
 import com.duole.utils.Constants;
@@ -29,6 +29,7 @@ import com.duole.utils.FileUtils;
 import com.duole.utils.JsonUtils;
 import com.duole.utils.XmlUtils;
 
+@SuppressWarnings("rawtypes")
 public class ItemListTask extends AsyncTask {
 
 	static TextView tvDeviceId;
@@ -45,9 +46,25 @@ public class ItemListTask extends AsyncTask {
 			Duole.appref.getContentResolver().insert(downloadUri, new ContentValues());
 
 			Duole.appref.sendBroadcast(new Intent("com.duole.init.complete"));
+
+			Duole.appref.tvTrafficStats.setVisibility(View.INVISIBLE);
+
+		} catch (Exception e) {
+
+			if (!DuoleUtils.isServiceWorked(Duole.appref)) {
+				Intent downService = new Intent(Duole.appref, AssetDownloadService.class);
+				Duole.appref.startService(downService);
+
+				Duole.appref.tvTrafficStats.setVisibility(View.VISIBLE);
+				Message msgRefresh = new Message();
+				msgRefresh.what = Constants.NET_TRAFFIC;
+				Duole.appref.mHandler.sendMessageDelayed(msgRefresh, 5000);
+			}
+		}
+
+		try {
 			treatData();
 		} catch (Exception e) {
-			e.printStackTrace();
 			Constants.DOWNLOAD_RUNNING = false;
 			return false;
 		}
@@ -64,7 +81,6 @@ public class ItemListTask extends AsyncTask {
 
 		// Whether sdcard exists.
 		if (!DuoleUtils.checkTFCard()) {
-			Toast.makeText(Duole.appref, "no tf", 2000);
 			return false;
 		}
 
@@ -205,7 +221,6 @@ public class ItemListTask extends AsyncTask {
 					try {
 						DownloadFileUtils.insertToContentProviderQueue(asset);
 					} catch (Exception e) {
-						e.printStackTrace();
 						Constants.queueMap.put(asset.getUrl(), asset);
 						Constants.dtq.push_back(asset);
 					}
@@ -236,7 +251,6 @@ public class ItemListTask extends AsyncTask {
 		try {
 			Duole.appref.bindService(new Intent(Duole.appref, BackgroundRefreshService.class), Duole.appref.mConnection, Context.BIND_AUTO_CREATE);
 		} catch (Exception e) {
-			Log.e("TAG", e.getMessage() + "    bind service");
 			e.printStackTrace();
 			Message msg = new Message();
 			msg.what = Constants.RESTART_REFRESH;
@@ -250,8 +264,6 @@ public class ItemListTask extends AsyncTask {
 	public boolean getSourceList() {
 		try {
 			String url = Constants.resourceUrl + DuoleUtils.getAndroidId();
-			// "http://www.duoleyuan.com/e/member/child/ancJn.php?cc=" +
-			// "7c71f33fce7335e4");
 
 			Constants.alAsset = new ArrayList<Asset>();
 			String result = DuoleNetUtils.connect(url);

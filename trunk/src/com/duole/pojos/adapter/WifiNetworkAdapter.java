@@ -7,7 +7,6 @@ import com.duole.R;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,9 +55,16 @@ public class WifiNetworkAdapter extends BaseAdapter {
 
 			view.setTag(wc);
 			convertview = view;
+
 		} else {
 			wc = (WifiConnection) convertview.getTag();
 		}
+
+		if (wc == null)
+			Log.d("TAG", "wc null");
+
+		if (wc.ivStrength == null)
+			Log.d("TAG", "ivStength null");
 
 		int level = Math.abs(sr.level) / 10;
 		switch (level) {
@@ -72,22 +78,19 @@ public class WifiNetworkAdapter extends BaseAdapter {
 
 		case 4:
 		case 5:
-			wc.ivStrength.setImageResource(R.drawable.wifi4);
+			wc.ivStrength.setImageResource(R.drawable.wifi_status4);
 			break;
 		case 6:
-
-			wc.ivStrength.setImageResource(R.drawable.wifi3);
+			wc.ivStrength.setImageResource(R.drawable.wifi_status3);
 			break;
 		case 7:
-
-			wc.ivStrength.setImageResource(R.drawable.wifi2);
+			wc.ivStrength.setImageResource(R.drawable.wifi_status2);
 			break;
 		case 8:
-
-			wc.ivStrength.setImageResource(R.drawable.wifi1);
+			wc.ivStrength.setImageResource(R.drawable.wifi_status1);
 			break;
 		case 9:
-			wc.ivStrength.setImageResource(R.drawable.wifi);
+			wc.ivStrength.setImageResource(R.drawable.wifi_status);
 			break;
 		default:
 			break;
